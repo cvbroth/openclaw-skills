@@ -1,7 +1,7 @@
 # 环境安装（一次就行）
 
 ```bash
-# 系统依赖：pandoc（文档互转）、ffmpeg（transcribe 技能的音频解码用）
+# 系统依赖：pandoc（文档互转）、ffmpeg（音频解码）
 sudo apt update && sudo apt install -y pandoc ffmpeg
 
 # Python 依赖（清华镜像快一些）
@@ -18,6 +18,8 @@ pip3 install pymupdf pdf2docx pdfplumber python-docx \
 
 | 工具 | 需要 |
 |---|---|
+| ocr_pdf.py | pymupdf + rapidocr_onnxruntime |
+| transcribe_audio.py | faster-whisper + ffmpeg |
 | pdf2md.py | pymupdf（+ rapidocr_onnxruntime，如需 OCR） |
 | pdf2docx.py | pdf2docx |
 | docx2md.py | pandoc（推荐）或 python-docx |
