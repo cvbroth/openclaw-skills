@@ -2,7 +2,7 @@
 
 目标 OpenClaw **2026.9.4**、Node **24.16+**，实际注册 7 个 `filetools_*` 工具；Skill 在 `skills/filetools-session/SKILL.md`。Python 核心/服务在仓库 `src/nas_filetools`，独立环境通过固定 Unix socket 服务。
 
-本插件不安装 OCR/ASR 进 Gateway，不接受模型路径或身份，不修改永久知识库。只支持经过可信身份映射的 direct session，群聊 V1 拒绝。附件按 canonical message_received 登记，再用 before_prompt_build 运行/会话事实关联；缺少可信字段明确不可用。
+本插件不安装 OCR/ASR 进 Gateway，不接受模型路径或身份，不修改永久知识库。只支持经过可信身份映射的 direct session，群聊 V1 拒绝。附件按 canonical message_received 登记，再用 session-store-runtime / session_start 运行/会话事实关联；缺少可信字段明确不可用。
 
 ```bash
 npm ci --ignore-scripts
