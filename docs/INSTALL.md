@@ -1,3 +1,5 @@
+> 这是87f93ac交付的V1历史记录，限额/接口不代表当前V1.1。当前说明见 [V11_INSTALL](V11_INSTALL.md)。本轮远程CI未执行，不能将历史或已编写工作流视为V1.1 CI通过。
+
 # 安装、资源控制与回滚（部署草案，未执行）
 
 本轮仅开发。生产为 Ubuntu 26.04 x86_64 / OpenClaw 2026.9.4（3a9d69d），Gateway 容器 openclaw-openclaw-gateway-1，镜像 stockanalyse-openclaw-managed:latest；**不在运行容器或既有检索环境执行 pip install**。推荐新增独立 filetools 宿主服务，或另一个 CPU worker 容器；先通过测试机验证后再由用户批准生产部署。

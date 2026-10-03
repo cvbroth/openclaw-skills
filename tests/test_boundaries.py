@@ -61,7 +61,7 @@ def test_image_only_docx_is_not_text_success(samples, tmp_path):
 
 def test_limits_config_is_validated():
     for setting in [{"concurrency": 3}, {"engine_threads": 0}, {"worker_memory_mb": 1},
-                    {"max_bytes": True}, {"offline": "yes"}, {"inspection_timeout_seconds": 61}]:
+                    {"max_receive_bytes": True}, {"offline": "yes"}, {"inspection_timeout_seconds": 61}]:
         with pytest.raises(Fault, match="INVALID_CONFIG"):
             Limits(**setting)
 
@@ -95,7 +95,7 @@ def test_state_symlink_rejected(tmp_path):
     state = tmp_path / "state"
     state.mkdir()
     try:
-        (state / "tasks").symlink_to(original, target_is_directory=True)
+        (state / "agents").symlink_to(original, target_is_directory=True)
     except OSError:
         pytest.skip("Symlink creation unavailable on this Windows runner")
     with pytest.raises(Fault, match="UNSAFE_STATE_DIRECTORY"):
@@ -108,10 +108,11 @@ def test_expired_job_denied_but_original_snapshot_retained(store, identity, samp
     job = store.submit(identity, "1" * 32, {"mode": "full"})
     with store.db() as db:
         db.execute("UPDATE jobs SET status='CANCELLED',expires=0 WHERE id=?", (job["job_id"],))
-    with pytest.raises(Fault, match="NOT_FOUND"):
-        store.status(identity, job["job_id"])
+    assert store.status(identity, job["job_id"])["status"] == "CANCELLED"
+    with pytest.raises(Fault, match="CACHE_EXPIRED"):
+        store.read(identity, job["job_id"], {})
     store.cleanup()
-    assert list((store.root / "originals").rglob("*.md"))
+    assert list((store.root / "agents" / "chen" / "snapshots").rglob("*.md"))
     assert (samples / "notes.md").is_file()
 
 
@@ -134,20 +135,12 @@ def test_queued_task_has_empty_content_and_trusted_provenance(store, identity, s
     assert not manifest["coverage"]["full_document"]
 
 
-def test_exclusive_snapshot_race_never_deletes_an_existing_original(store, identity, samples, monkeypatch):
-    from pathlib import Path
-    from nas_filetools.contracts import owner
-    file = samples / "notes.md"
-    target = store.original(owner(identity), "1" * 32, file.name)
-    actual_open = Path.open
-    def raced_open(path, mode="r", *args, **kwargs):
-        if path == target and mode == "xb":
-            with actual_open(path, "wb") as writer:
-                writer.write(b"pre-existing original")
-            raise FileExistsError("exclusive create lost race")
-        return actual_open(path, mode, *args, **kwargs)
-    monkeypatch.setattr(Path, "open", raced_open)
-    with pytest.raises(FileExistsError):
-        register(store, identity, file)
-    assert target.read_bytes() == b"pre-existing original"
-    assert file.is_file()
+def test_failed_copy_never_registers_missing_snapshot(store, identity, samples, monkeypatch):
+    import nas_filetools.workspace as workspace
+    def failure(*_):
+        raise OSError("disk full")
+    monkeypatch.setattr(workspace, "copy_stream", failure)
+    with pytest.raises(OSError):
+        store.register(identity, "1"*32, "notes.md", samples/"notes.md")
+    assert store.inspect(identity)["attachments"] == []
+    assert (samples/"notes.md").is_file()

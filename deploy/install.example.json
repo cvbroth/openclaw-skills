@@ -1,0 +1,14 @@
+{
+  "data_root": "/var/lib/nas-filetools-v11",
+  "agents": [
+    "chen"
+  ],
+  "bindings": [
+    {
+      "agent_id": "chen",
+      "channel_id": "qqbot",
+      "account_id": "default",
+      "sender_id": "REPLACE_WITH_EXISTING_TRUSTED_QQ_SENDER"
+    }
+  ]
+}

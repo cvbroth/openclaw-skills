@@ -45,9 +45,14 @@ test("registered attachment bytes flow through real core, background worker and 
   const sessionKey = "agent:chen:qqbot:direct:sender", runId = randomUUID(), sessionId = randomUUID();
   const context = { agentId: "chen", sessionKey, sessionId, requesterSenderId: "sender",
     messageChannel: "qqbot", agentAccountId: "default" };
-  const registry = new Registry();
+  client.capabilities = identity => client.call(identity, "capabilities", {});
+  const registry = new Registry(Date.now, client);
   await registry.received(config, { content: "read", messageId: "m", senderId: "sender", sessionKey, runId,
     media: [{ path: file }] }, { channelId: "qqbot", accountId: "default", senderId: "sender", sessionKey, messageId: "m", runId }, { lookupSucceeded: true, sessionId });
+  await registry.archive(config, context, client);
+  const receipts = registry.receipts(config, context);
+  assert.equal(receipts.length, 1);
+  assert.equal(receipts[0].status, "INSPECTED");
   const tool = operation => createTool(`filetools_${operation}`, operation, schemas[operation], config, context, registry, client);
   const inspection = (await tool("inspect").execute("1", {})).details;
   const attachmentId = inspection.attachments[0].attachment_id;

@@ -1,6 +1,7 @@
 """Explicit operator-only model download; processing workers are offline by default."""
 import argparse
 import json
+import hashlib
 from pathlib import Path
 
 from huggingface_hub import HfApi, snapshot_download
@@ -17,5 +18,10 @@ downloaded = snapshot_download(repository, revision=revision, cache_dir=args.cac
 Path(args.cache).mkdir(parents=True, exist_ok=True)
 manifest = {"repository": repository, "revision": revision, "snapshot": downloaded,
             "model": args.model, "instruction": "Use the immutable snapshot path as whisper_model for offline operation."}
+manifest["files"] = {}
+for file in Path(downloaded).iterdir():
+    if file.is_file():
+        with file.open("rb") as source:
+            manifest["files"][file.name] = hashlib.file_digest(source, "sha256").hexdigest()
 (Path(args.cache) / f"{args.model}-manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 print(json.dumps(manifest))

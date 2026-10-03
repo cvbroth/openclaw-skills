@@ -32,6 +32,8 @@ def check_docx(path, limits):
 
 
 def text_blocks(path, limits):
+    if Path(path).stat().st_size > limits.max_text_bytes:
+        raise Fault("TEXT_SIZE_LIMIT")
     value = Path(path).read_text(encoding="utf-8-sig", errors="strict")
     if "\0" in value:
         raise Fault("INVALID_TEXT")
@@ -279,41 +281,18 @@ class Processor:
                     progress(number - wanted[0] + 1, wanted[1] - wanted[0] + 1)
         else:
             try:
-                if self._transcriber is None:
-                    try:
-                        from faster_whisper import WhisperModel
-                    except ImportError:
-                        raise Fault("ASR_UNAVAILABLE") from None
-                    try:
-                        self._transcriber = WhisperModel(self.limits.whisper_model, device="cpu", compute_type="int8",
-                                                         cpu_threads=self.limits.engine_threads, num_workers=1,
-                                                         download_root=self.limits.model_cache,
-                                                         local_files_only=self.limits.offline)
-                    except Exception:
-                        raise Fault("MODEL_UNAVAILABLE") from None
-                # Decode only the selected audio interval; the process supervisor bounds decoding/model work.
-                import av
-                import numpy as np
-                result = subprocess.run(["ffmpeg", "-v", "error", "-ss", str(wanted[0]), "-t",
-                                         str(wanted[1] - wanted[0]), "-threads", str(self.limits.engine_threads),
-                                         "-i", str(path), "-threads", str(self.limits.engine_threads), "-ac", "1", "-ar",
-                                         "16000", "-f", "wav", str(out / "selected.wav")],
-                                        capture_output=True, timeout=self.limits.timeout_seconds, check=True)
-                del result
-                audio = []
-                with av.open(str(out / "selected.wav")) as container:
-                    for frame in container.decode(audio=0):
-                        audio.append(frame.to_ndarray().flatten())
-                samples = np.concatenate(audio).astype(np.float32) / 32768.0
-                values, _ = self._transcriber.transcribe(samples, language=config.get("language"),
-                                                        beam_size=5, vad_filter=True)
-                for s in values:
-                    source = {"start": round(wanted[0] + s.start, 3), "end": round(wanted[0] + s.end, 3)}
-                    add(s.text.strip(), source, "faster-whisper")
-                    progress(min(s.end, wanted[1] - wanted[0]), wanted[1] - wanted[0])
-                (out / "selected.wav").unlink(missing_ok=True)
+                from .audio import transcribe
+                for chunk in transcribe(self, path, wanted, config, out, progress):
+                    if chunk["status"] != "DONE":
+                        failures.append({"source": {"start": chunk["start"], "end": chunk["end"]}, "code": chunk["code"]})
+                    for segment in chunk["segments"]:
+                        try:
+                            add(segment["text"], segment["source"], "faster-whisper")
+                        except Fault as error:
+                            failed(segment["source"], error)
             except Exception as error:
                 failed({"start": wanted[0], "end": wanted[1]}, error)
+            warnings.append("Chunk overlap uses word midpoint ownership; boundary recognition can still differ. Review timestamps.")
         if not segments and not failures:
             failures.append({"source": {}, "code": "NO_CONTENT"})
         status = "FAILED" if not segments or all(s.get("image_only") for s in segments) else "PARTIAL" if failures else "SUCCEEDED"

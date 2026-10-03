@@ -113,7 +113,7 @@ def test_limits_and_bounded_preview(samples, tmp_path, identity):
     with pytest.raises(Fault, match="PIXEL_LIMIT"):
         probe(samples / "printed.png", replace(Limits(), max_image_pixels=100))
     with pytest.raises(Fault, match="SIZE_LIMIT"):
-        register(Store(tmp_path / "tiny", replace(Limits(), max_bytes=10)), identity, samples / "text.pdf")
+        register(Store(tmp_path / "tiny", replace(Limits(), max_receive_bytes=10, max_process_bytes=10)), identity, samples / "text.pdf")
     info = probe(samples / "mixed.pdf", replace(Limits(), preview_pages=1, large_pages=1))
     assert len(info["preview"]) == 1 and info["preview_coverage"] == [1]
     assert info["requires_explicit_scope"]
@@ -177,7 +177,7 @@ def test_cleanup_preserves_originals_and_active_jobs(store, identity, samples):
     removed = store.cleanup()
     assert removed["removed_jobs"] == [result["job_id"]] and removed["originals_deleted"] == 0
     assert store.task(pending["job_id"]).exists()
-    assert list((store.root / "originals").rglob("*.md"))
+    assert list((store.root / "agents" / "chen" / "snapshots").rglob("*.md"))
     assert (samples / "notes.md").exists()
 
 

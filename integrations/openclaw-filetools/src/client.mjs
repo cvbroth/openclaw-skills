@@ -3,9 +3,10 @@ import http from "node:http";
 export const SOCKET = "/run/nas-filetools/service.sock";
 const RESPONSE_LIMIT = 2 * 1024 * 1024;
 
-export function exchange(route, identity, params, opened, signal) {
+export function exchange(route, identity, params, opened, signal, limits) {
   return new Promise((resolve, reject) => {
     const payload = opened ? null : Buffer.from(JSON.stringify({ identity, ...params }));
+    if (payload && limits && payload.length > limits.max_control_bytes) { reject(new Error("REQUEST_LIMIT")); return; }
     const request = http.request({ socketPath: SOCKET, path: route, method: "POST",
       headers: { "Content-Length": opened ? String(opened.stat.size) : payload.length,
         "Content-Type": opened ? "application/octet-stream" : "application/json",
@@ -20,7 +21,7 @@ export function exchange(route, identity, params, opened, signal) {
       let bytes = 0;
       response.on("data", part => {
         bytes += part.length;
-        if (bytes > RESPONSE_LIMIT) request.destroy(new Error("RESPONSE_LIMIT"));
+        if (bytes > (limits?.max_response_bytes ?? RESPONSE_LIMIT)) request.destroy(new Error("RESPONSE_LIMIT"));
         else chunks.push(part);
       });
       response.on("aborted", () => finish(new Error("RESPONSE_ABORTED")));
@@ -39,7 +40,7 @@ export function exchange(route, identity, params, opened, signal) {
     let settled = false;
     let stream;
     const abort = () => request.destroy(new Error("REQUEST_ABORTED"));
-    const timer = setTimeout(() => request.destroy(new Error("SERVICE_TIMEOUT")), 60_000);
+    const timer = setTimeout(() => request.destroy(new Error("SERVICE_TIMEOUT")), opened ? (limits?.upload_timeout_seconds ?? 3600)*1000 : 60_000);
     function finish(error, result) {
       if (settled) return;
       settled = true;
@@ -60,6 +61,15 @@ export function exchange(route, identity, params, opened, signal) {
 }
 
 export const client = {
-  call: (identity, operation, params, signal) => exchange("/v1/tool", identity, { operation, params }, null, signal),
-  upload: (identity, id, opened, signal) => exchange("/v1/attachment", identity, { attachment_id: id }, opened, signal),
+  capabilities: async identity => exchange("/v1/tool", { user_id: identity.user_id, agent_id: identity.agent_id,
+    session_hash: identity.session_hash }, { operation: "capabilities", params: {} }),
+  async call(identity, operation, params, signal) {
+    const { limits } = await this.capabilities(identity);
+    return exchange("/v1/tool", identity, { operation, params }, null, signal, limits);
+  },
+  async upload(identity, id, opened, signal) {
+    const { limits } = await this.capabilities(identity);
+    if (opened.stat.size > BigInt(limits.max_receive_bytes)) throw new Error("RECEIVE_SIZE_LIMIT");
+    return exchange("/v1/attachment", identity, { attachment_id: id }, opened, signal, limits);
+  },
 };

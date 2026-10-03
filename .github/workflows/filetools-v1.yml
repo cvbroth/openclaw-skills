@@ -1,4 +1,4 @@
-name: FileTools V1
+name: FileTools V1.1
 on: [push, pull_request]
 jobs:
   core:
@@ -8,11 +8,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core libseccomp2
       - run: python -m pip install -c requirements.lock.txt -e '.[engines,test]'
       - run: python -m ruff check src tests scripts
       - run: python -m pytest -q
-      - run: FILETOOLS_REAL_ENGINES=1 python -m pytest tests/test_engines.py -q
+      - name: Prepare pinned licensed speech sample and offline small model
+        run: |
+          python scripts/fetch_test_audio.py --output "$RUNNER_TEMP/filetools-samples"
+          python scripts/prepare_models.py --model small --cache "$RUNNER_TEMP/filetools-models" --revision 536b0662742c02347bc0e980a01041f333bce120
+          FILETOOLS_REAL_ENGINES=1 FILETOOLS_AUDIO_SAMPLE="$RUNNER_TEMP/filetools-samples/jfk.flac" FILETOOLS_WHISPER_MODEL="$RUNNER_TEMP/filetools-models/models--Systran--faster-whisper-small/snapshots/536b0662742c02347bc0e980a01041f333bce120" FILETOOLS_AUDIO_EXPECT=country python -m pytest tests/test_engines.py -q
       - uses: actions/setup-node@v4
         with:
           node-version: '24.16.0'

@@ -44,3 +44,5 @@ tokenizers==0.23.2
 tqdm==4.70.1
 typing_extensions==4.16.0
 urllib3==2.8.0
+openpyxl==3.1.5
+et-xmlfile==2.0.0

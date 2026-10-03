@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="2.498" timestamp="2026-10-04T00:36:57.753049+08:00" hostname="local-development"><testcase classname="tests.test_v11" name="test_real_201_mib_inbox_stream_and_4gib_counter_only" time="2.100" /></testsuite></testsuites>

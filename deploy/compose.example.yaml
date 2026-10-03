@@ -4,7 +4,7 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile
-    image: nas-filetools:1.0.0
+    image: nas-filetools:1.1.0
     user: "10001:${FILETOOLS_SOCKET_GID:?Set the verified shared socket GID}"
     restart: unless-stopped
     network_mode: none
@@ -16,7 +16,7 @@ services:
     pids_limit: 96
     stop_grace_period: 15s
     volumes:
-      - /var/lib/nas-filetools:/var/lib/nas-filetools
+      - /var/lib/nas-filetools-v11:/var/lib/nas-filetools
       - /var/cache/nas-filetools:/var/cache/nas-filetools:ro
       - /run/nas-filetools:/run/nas-filetools
       - /etc/nas-filetools/config.json:/etc/nas-filetools/config.json:ro

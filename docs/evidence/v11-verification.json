@@ -1,0 +1,90 @@
+{
+  "recorded_at": "2026-10-03T16:38:37.088238+00:00",
+  "python_runs": {
+    "v11-local-pytest.xml": {
+      "tests": "63",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "3",
+      "time": "51.472",
+      "timestamp": "2026-10-04T00:33:06.776028+08:00"
+    },
+    "v11-script-quota-pytest.xml": {
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "16.468",
+      "timestamp": "2026-10-04T00:28:59.141305+08:00"
+    },
+    "v11-inbox-pytest.xml": {
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "2.498",
+      "timestamp": "2026-10-04T00:36:57.753049+08:00"
+    }
+  },
+  "full_python": {
+    "passed": 60,
+    "skipped": 3,
+    "failed": 0,
+    "seconds": 51.472
+  },
+  "plugin": {
+    "passed": 14,
+    "skipped": 1,
+    "failed": 0,
+    "sdk": "2026.9.4",
+    "context_transport": "mostly injected; one real Python worker integration"
+  },
+  "knowledge_reference": {
+    "passed": 49,
+    "skipped": 1,
+    "failed": 0,
+    "tracked_changes": false,
+    "commit": "623aa73abcd0dc7f4854a58a8a42e8b6c4725072"
+  },
+  "static": {
+    "ruff": "PASS",
+    "compileall": "PASS",
+    "pip_check": "PASS",
+    "skill_validator_utf8": "PASS",
+    "plugin_build": "PASS",
+    "plugin_validate": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "actual_host_stdlib_only": {
+    "method": "Python -S scripts/filetools_admin.py install/diagnose --local-only",
+    "workspace_initialized": true,
+    "runtime_installed": false,
+    "runtime_verified": false
+  },
+  "large_input": {
+    "actual_bytes_written_copied": 210763776,
+    "method": "NAS inbox local file stream, not Unix socket or QQ",
+    "four_gib": "counter boundary only; no full 4 GiB write/transfer"
+  },
+  "long_audio": "4-hour generated scheduling metadata; 24-second generated waveform with real ffmpeg decode and injected ASR. Not hours of real speech recognition.",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.3",
+  "dependencies": {
+    "PyMuPDF": "1.25.5",
+    "python-docx": "1.1.2",
+    "Pillow": "11.1.0",
+    "openpyxl": "3.1.5",
+    "rapidocr-onnxruntime": "1.4.4",
+    "onnxruntime": "1.20.1",
+    "faster-whisper": "1.1.1",
+    "ctranslate2": "4.8.2",
+    "av": "19.0.1",
+    "numpy": "1.26.4"
+  },
+  "ci_executed": false,
+  "linux_docker_executed": false,
+  "gateway_qq_e2e_executed": false,
+  "production_connected": false,
+  "production_changed": false,
+  "github_pushed": false
+}

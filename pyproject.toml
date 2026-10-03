@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nas-filetools"
-version = "1.0.0"
+version = "1.1.0"
 description = "Isolated temporary attachment processing for OpenClaw"
 requires-python = ">=3.11,<3.13"
-dependencies = ["PyMuPDF==1.25.5", "python-docx==1.1.2", "Pillow==11.1.0"]
+dependencies = ["PyMuPDF==1.25.5", "python-docx==1.1.2", "Pillow==11.1.0", "openpyxl==3.1.5"]
 
 [project.optional-dependencies]
 engines = ["rapidocr-onnxruntime==1.4.4", "onnxruntime==1.20.1", "numpy==1.26.4", "faster-whisper==1.1.1", "requests==2.32.5"]

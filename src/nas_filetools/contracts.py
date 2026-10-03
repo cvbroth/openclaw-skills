@@ -9,46 +9,81 @@ class Fault(Exception):
     def __init__(self, code, message=""):
         self.code = code
         self.message = message or code
-        super().__init__(self.message)
+        super().__init__(code + (": " + message if message else ""))
 
 
 @dataclass(frozen=True)
 class Limits:
-    max_bytes: int = 64 * 1024 * 1024
-    max_pages: int = 500
-    max_audio_seconds: int = 7200
+    max_receive_bytes: int = 4 * 1024**3
+    max_process_bytes: int = 4 * 1024**3
+    max_control_bytes: int = 512 * 1024
+    max_response_bytes: int = 2 * 1024**2
+    max_pages: int = 10000
+    max_audio_seconds: int = 21600
+    audio_chunk_seconds: int = 600
+    audio_overlap_seconds: int = 2
     max_image_pixels: int = 24_000_000
-    max_docx_expanded_bytes: int = 128 * 1024 * 1024
+    max_docx_expanded_bytes: int = 128 * 1024**2
+    max_text_bytes: int = 16 * 1024**2
     max_output_chars: int = 2_000_000
-    max_asset_bytes: int = 32 * 1024 * 1024
-    max_read_chars: int = 12_000
-    max_segments: int = 20_000
+    max_asset_bytes: int = 32 * 1024**2
+    max_read_chars: int = 12000
+    max_segments: int = 20000
+    max_manifest_bytes: int = 64 * 1024**2
+    max_engine_log_bytes: int = 2 * 1024**2
     preview_pages: int = 3
     large_pages: int = 20
     large_audio_seconds: int = 600
     ttl_seconds: int = 72 * 3600
+    cleanup_interval_seconds: int = 3600
     timeout_seconds: int = 3600
+    audio_wall_factor: int = 8
+    max_job_seconds: int = 72 * 3600
+    stall_seconds: int = 1800
+    upload_timeout_seconds: int = 3600
+    script_timeout_seconds: int = 60
+    script_output_bytes: int = 256 * 1024**2
     concurrency: int = 1
     engine_threads: int = 2
     worker_memory_mb: int = 4096
     inspection_timeout_seconds: int = 15
     max_jobs_per_scope: int = 32
-    max_original_bytes_per_scope: int = 1024 * 1024 * 1024
+    max_references_per_session: int = 32
+    snapshot_quota_bytes: int = 100 * 1024**3
+    saved_quota_bytes: int = 50 * 1024**3
+    cache_quota_bytes: int = 20 * 1024**3
+    disk_reserve_bytes: int = 1024**3
+    quota_warning_percent: int = 80
+    enabled_agents: tuple = ("main", "chen", "liang", "ziling")
     whisper_model: str = "small"
     model_cache: str = "/var/cache/nas-filetools"
+    script_python: str = ""
+    script_isolation: str = "landlock"
     offline: bool = True
 
     def __post_init__(self):
-        numeric = [name for name, value in asdict(self).items() if name not in
-                   ("whisper_model", "model_cache", "offline")]
-        if any(type(getattr(self, name)) is not int or getattr(self, name) < 1 for name in numeric):
+        excluded = ("enabled_agents", "whisper_model", "model_cache", "script_python", "script_isolation", "offline")
+        if any(type(value) is not int or value < 1 for name, value in asdict(self).items() if name not in excluded):
             raise Fault("INVALID_CONFIG")
-        if (self.concurrency > 2 or self.engine_threads > 8 or self.worker_memory_mb < 256 or
-                self.inspection_timeout_seconds > 60 or self.max_read_chars > 12000 or self.max_pages > 500 or
-                self.max_audio_seconds > 7200 or self.max_bytes > 64 * 1024 * 1024 or
-                type(self.offline) is not bool or not isinstance(self.whisper_model, str) or
-                not isinstance(self.model_cache, str)):
+        if (self.concurrency != 1 or self.engine_threads > 8 or self.worker_memory_mb < 256 or
+                self.inspection_timeout_seconds > 60 or self.max_read_chars > 12000 or
+                self.max_receive_bytes > 2**63-1 or self.max_control_bytes < 6*self.max_read_chars+8192 or
+                self.snapshot_quota_bytes < self.max_receive_bytes or self.saved_quota_bytes < self.max_receive_bytes or
+                self.max_process_bytes > self.max_receive_bytes or self.audio_overlap_seconds >= self.audio_chunk_seconds or
+                self.quota_warning_percent > 100 or type(self.offline) is not bool):
             raise Fault("INVALID_CONFIG")
+        if (not isinstance(self.enabled_agents, (tuple, list)) or not self.enabled_agents or
+                any(not isinstance(a, str) or not re.fullmatch(r"[a-z][a-z0-9_-]{0,63}", a) for a in self.enabled_agents)):
+            raise Fault("INVALID_CONFIG")
+        object.__setattr__(self, "enabled_agents", tuple(self.enabled_agents))
+        if any(not isinstance(getattr(self, k), str) for k in ("whisper_model", "model_cache", "script_python")):
+            raise Fault("INVALID_CONFIG")
+        if self.script_isolation not in ("landlock", "development"):
+            raise Fault("INVALID_CONFIG")
+
+    @property
+    def max_bytes(self):  # Read compatibility for V1 adapters, not a second configurable limit.
+        return self.max_receive_bytes
 
     def dict(self):
         return asdict(self)
@@ -79,7 +114,8 @@ def valid_id(value):
 
 def owner(raw):
     strict(raw, ("user_id", "agent_id", "session_hash"), ("user_id", "agent_id", "session_hash"))
-    if (not isinstance(raw["agent_id"], str) or AGENT_USERS.get(raw["agent_id"]) != raw["user_id"] or
+    if (not isinstance(raw["agent_id"], str) or AGENT_USERS.get(raw["agent_id"], raw["agent_id"]) != raw["user_id"] or
+            not re.fullmatch(r"[a-z][a-z0-9_-]{0,63}", raw["agent_id"]) or
             not isinstance(raw["session_hash"], str) or not HASH.fullmatch(raw["session_hash"])):
         raise Fault("FORBIDDEN")
     return hashlib.sha256((raw["user_id"] + "\0" + raw["agent_id"] + "\0" +
@@ -102,6 +138,10 @@ def options(raw, info):
         raise Fault("INVALID_PARAMETERS")
     fields = {"pdf": "pages", "image": "pages", "audio": "time_range",
               "docx": "paragraphs", "text": "paragraphs"}
+    if info["kind"] not in fields:
+        raise Fault("UNSUPPORTED_TYPE")
+    if info.get("parse_error"):
+        raise Fault(info["parse_error"])
     field = fields[info["kind"]]
     specified = set(raw) & {"pages", "time_range", "paragraphs"}
     if specified and (specified != {field} or raw["mode"] != "range"):

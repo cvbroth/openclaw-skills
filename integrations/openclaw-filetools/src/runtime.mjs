@@ -6,7 +6,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { client as defaultClient } from "./client.mjs";
 
 export const AGENT_USERS = { main: "chen", chen: "chen", liang: "liang", ziling: "azl" };
-const MAX_BYTES = 64 * 1024 * 1024;
+
 const TTL = 72 * 3600_000;
 const same = (a, b) => ["dev", "ino", "size", "mtimeNs", "ctimeNs"].every(k => a[k] === b[k]);
 
@@ -15,12 +15,12 @@ export function binding(config, context, ingress = false) {
   const sender = ingress ? context.senderId : context.requesterSenderId;
   const channel = ingress ? context.channelId : context.messageChannel;
   const account = ingress ? context.accountId : context.agentAccountId;
-  if (!AGENT_USERS[agentId] || typeof sessionKey !== "string" || !sessionKey.startsWith(`agent:${agentId}:`) ||
+  if (typeof agentId !== "string" || !/^[a-z][a-z0-9_-]{0,63}$/.test(agentId) || typeof sessionKey !== "string" || !sessionKey.startsWith(`agent:${agentId}:`) ||
       !sessionKey.includes(":direct:") || /:(group|channel):/.test(sessionKey) ||
       typeof sender !== "string" || !sender || !account || !channel) return null;
-  const matches = (config?.bindings ?? []).filter(b => b.agent_id === agentId && b.user_id === AGENT_USERS[agentId] &&
+  const matches = (config?.bindings ?? []).filter(b => b.agent_id === agentId && (b.user_id === undefined || b.user_id === (AGENT_USERS[agentId] ?? agentId)) &&
     b.sender_id === sender && b.channel_id === channel && b.account_id === account);
-  return matches.length === 1 ? matches[0] : null;
+  return matches.length === 1 ? { ...matches[0], user_id: AGENT_USERS[agentId] ?? agentId } : null;
 }
 
 export function trustedIdentity(config, context) {
@@ -31,7 +31,7 @@ export function trustedIdentity(config, context) {
 }
 
 export class Registry {
-  constructor(now = Date.now) { this.now = now; this.sessions = new Map(); this.pending = new Map(); this.firstSessions = new Map(); }
+  constructor(now = Date.now, arrivalClient = null) { this.now = now; this.arrivalClient = arrivalClient; this.sessions = new Map(); this.pending = new Map(); this.firstSessions = new Map(); }
   lifecycle(event, context, ended = false) {
     if (!context.agentId || !context.sessionKey || event.sessionId !== context.sessionId ||
         (event.sessionKey && event.sessionKey !== context.sessionKey)) return;
@@ -44,6 +44,9 @@ export class Registry {
       if (!ended && !event.resumedFrom && !record.invalid) record.sessionId = event.sessionId;
       else record.invalid = true;
       this.firstSessions.delete(key);
+      if (record.sessionId && !record.invalid && this.arrivalClient) {
+        void this.archive(record.config, { ...record.toolContext, sessionId: record.sessionId }, this.arrivalClient);
+      }
     }
   }
   key(user, agent, session) { return `${user}\0${agent}\0${session}`; }
@@ -70,7 +73,9 @@ export class Registry {
         (event.senderId && event.senderId !== context.senderId)) return Promise.resolve();
     const key = this.key(selected.user_id, agent, session);
     let epochRecord = { agentId: agent, sessionKey: session, sessionId: observed.sessionId ?? null,
-      invalid: !observed.lookupSucceeded, created: this.now() };
+      invalid: !observed.lookupSucceeded, created: this.now(), config,
+      toolContext: { agentId: agent, sessionKey: session, requesterSenderId: context.senderId,
+        messageChannel: context.channelId, agentAccountId: context.accountId } };
     if (observed.lookupSucceeded && !observed.sessionId) {
       epochRecord = this.firstSessions.get(key) ?? epochRecord;
       this.firstSessions.set(key, epochRecord);
@@ -84,23 +89,57 @@ export class Registry {
     const next = previous.catch(() => {}).then(async () => {
       this.prune();
       const items = this.sessions.get(key) ?? [];
-      for (const media of (event.media ?? []).slice(0, 8)) {
-        if (!media.path || !path.isAbsolute(media.path) || items.length >= 8 ||
+      const current = items.filter(i => !i.epochRecord.invalid && i.epochRecord.sessionId === epochRecord.sessionId);
+      const limits = this.arrivalClient ? (await this.arrivalClient.capabilities({ ...epochRecord.toolContext,
+        user_id: selected.user_id, agent_id: agent, session_hash: createHash("sha256").update(`${session}\0${epochRecord.sessionId}`).digest("hex") }).catch(() => ({}))).limits : null;
+      for (const media of (event.media ?? [])) {
+        if (current.length >= (limits?.max_references_per_session ?? 32)) {
+          items.push({ error: "SESSION_REFERENCE_LIMIT", filename: path.basename(media.path ?? "attachment"),
+            created: this.now(), epochRecord, id: randomBytes(16).toString("hex") });
+          break;
+        }
+        if (!media.path || !path.isAbsolute(media.path) ||
             (media.messageId && media.messageId !== event.messageId) ||
             items.some(i => i.message === event.messageId && i.path === media.path)) continue;
         try {
           const stat = await lstat(media.path, { bigint: true });
           if (!stat.isFile() || stat.isSymbolicLink()) continue;
-          items.push({ id: randomBytes(16).toString("hex"), message: event.messageId, epochRecord, path: media.path,
+          const item = { id: randomBytes(16).toString("hex"), message: event.messageId, epochRecord, path: media.path,
             stat, filename: path.basename(media.path), created: this.now(), epoch: null,
-            error: stat.size <= 0n || stat.size > BigInt(MAX_BYTES) ? "SIZE_LIMIT" : null });
+            error: stat.size <= 0n || (limits && stat.size > BigInt(limits.max_receive_bytes)) ? "RECEIVE_SIZE_LIMIT" : null };
+          items.push(item); current.push(item);
         } catch { /* Unavailable canonical media never becomes selectable. */ }
       }
       if (items.length) this.sessions.set(key, items);
     });
     this.pending.set(key, next);
     void next.finally(() => { if (this.pending.get(key) === next) this.pending.delete(key); });
+    if (epochRecord.sessionId && !epochRecord.invalid && this.arrivalClient) {
+      void next.then(() => this.archive(config, { ...epochRecord.toolContext, sessionId: epochRecord.sessionId }, this.arrivalClient)).catch(() => {});
+    }
     return next;
+  }
+  async archive(config, context, client) {
+    let timer;
+    try { return await Promise.race([this.flush(config, context, client), new Promise(resolve => {
+      timer = setTimeout(() => resolve([{ status: "REGISTRATION_PENDING" }]), 5000);
+    })]); }
+    catch { return [{ status: "ERROR", code: "REGISTRATION_PENDING" }]; }
+    finally { clearTimeout(timer); }
+  }
+  receipts(config, context) {
+    const identity = trustedIdentity(config, context);
+    if (!identity) return [];
+    const items = this.sessions.get(this.key(identity.user_id, identity.agent_id, context.sessionKey)) ?? [];
+    const receipts = [];
+    for (const item of items) {
+      if (item.epochRecord.sessionId !== context.sessionId || item.receipted) continue;
+      if (item.receipt || item.error) {
+        item.receipted = true;
+        receipts.push(item.receipt ?? { status: "ERROR", code: item.error, filename: item.filename });
+      }
+    }
+    return receipts;
   }
   async flush(config, context, client, signal) {
     const identity = trustedIdentity(config, context);
@@ -144,6 +183,7 @@ export class Registry {
             sha256: hash.digest("hex") }, signal);
           // Recheck after streaming; changed bytes must never be presented as a faithful attachment.
           if (!same(await handle.stat({ bigint: true }), item.stat)) throw new Error("ATTACHMENT_CHANGED");
+          item.receipt = result;
           if (result.status === "INSPECTED") item.uploaded = true;
           return result;
         } catch (error) { return { status: "ERROR", code: /^(ATTACHMENT_CHANGED|REGISTRATION_PENDING)$/.test(error.message) ? error.message : "SERVICE_UNAVAILABLE" }; }
@@ -171,7 +211,7 @@ export function createTool(name, operation, schema, config, context, registry, c
           const errors = registrations.filter(r => r.status === "ERROR");
           if (errors.length) result = { ...result, registration_errors: errors };
         } else result = await client.call(identity, operation, params, signal);
-      } catch { result = { status: "ERROR", code: "SERVICE_UNAVAILABLE" }; }
+      } catch (error) { result = { status: "ERROR", code: error.message === "REGISTRATION_PENDING" ? error.message : "SERVICE_UNAVAILABLE" }; }
       return { content: [{ type: "text", text: JSON.stringify(result) }], details: result };
     } };
 }

@@ -48,11 +48,11 @@ function clientStub() {
   };
 }
 
-test("actual SDK registers seven factories and supported hooks", () => {
+test("actual SDK registers nine factories and supported hooks", () => {
   const factories = [], hooks = new Map();
   plugin.register({ pluginConfig: config, registerTool: (factory, metadata) => factories.push({ factory, metadata }),
     on: (name, fn) => hooks.set(name, fn) });
-  assert.equal(factories.length, 7);
+  assert.equal(factories.length, 9);
   assert.deepEqual(factories.map(f => f.metadata.name), names);
   assert.ok(hooks.has("message_received") && hooks.has("session_start") && hooks.has("session_end"));
   const ctx = context();
@@ -180,13 +180,53 @@ test("public SDK session storage and actual registered inbound hook work without
     entry: { sessionId: ctx.sessionId, updatedAt: Date.now() } });
   assert.equal(getSessionEntry({ agentId: ctx.agentId, sessionKey: ctx.sessionKey, storePath,
     readConsistency: "latest" }).sessionId, ctx.sessionId);
+  const client = clientStub();
+  client.capabilities = async () => ({ limits: { max_receive_bytes: 4*1024**3, max_references_per_session: 32 } });
+  pluginRegistry.arrivalClient = client;
   const hooks = new Map();
   plugin.register({ config: { session: { store: storePath } }, pluginConfig: config,
     registerTool() {}, on: (name, fn) => hooks.set(name, fn) });
   await hooks.get("message_received")({ messageId: "sdk-real", senderId: "qq-chen", sessionKey: ctx.sessionKey,
     media: [{ path: file }] }, { channelId: "qqbot", accountId: "default", senderId: "qq-chen",
     sessionKey: ctx.sessionKey, messageId: "sdk-real" });
-  const client = clientStub();
   await pluginRegistry.flush(config, ctx, client);
   assert.equal(client.uploads.length, 1);
+});
+
+
+test("arrival archives without inspect; receipt once and same-event task can extract", async t => {
+  const client = clientStub();
+  client.capabilities = async () => ({ limits: { max_receive_bytes: 4*1024**3, max_references_per_session: 32 } });
+  const registry = new Registry(Date.now, client), ctx = context();
+  await receive(registry, await fixture(t), ctx);
+  await registry.archive(config, ctx, client);
+  assert.equal(client.uploads.length, 1);
+  const receipts = registry.receipts(config, ctx);
+  assert.equal(receipts.length, 1);
+  assert.equal(registry.receipts(config, ctx).length, 0);
+  const extraction = createTool("filetools_extract", "extract", schemas.extract, config, ctx, registry, client);
+  await extraction.execute("1", { attachment_id: client.uploads[0].id, config: { mode: "full" } });
+  assert.equal(client.calls.at(-1).operation, "extract");
+});
+
+test("old epoch references do not consume new UUID quota; excess is explicit", async t => {
+  const client = clientStub();
+  client.capabilities = async () => ({ limits: { max_receive_bytes: 4*1024**3, max_references_per_session: 8 } });
+  const registry = new Registry(Date.now, client), ctx = context(), file = await fixture(t);
+  for (let i = 0; i < 8; i++) await receive(registry, file, ctx);
+  await registry.archive(config, ctx, client);
+  assert.equal(client.uploads.length, 8);
+  const next = { ...ctx, sessionId: randomUUID() };
+  await receive(registry, file, next);
+  await registry.archive(config, next, client);
+  assert.equal(client.uploads.length, 9);
+  await receive(registry, file, ctx);
+  const result = await registry.archive(config, ctx, client);
+  assert.ok(result.some(r => r.code === "SESSION_REFERENCE_LIMIT"));
+});
+
+test("one Agent binding does not require a second user_id identity system", () => {
+  const ctx = context(), minimal = structuredClone(config);
+  delete minimal.bindings[0].user_id;
+  assert.equal(trustedIdentity(minimal, ctx).user_id, "chen");
 });
