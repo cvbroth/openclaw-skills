@@ -1,0 +1,106 @@
+"""Administrative CLI and the same Unix protocol used by the plugin."""
+
+import argparse
+import http.client
+import json
+import os
+import signal
+import socket
+import sys
+import threading
+import uuid
+from pathlib import Path
+
+from .contracts import Fault, Limits, owner
+from .service import SOCKET, serve
+from .store import Store
+from .worker import ServiceLock
+
+
+class UnixConnection(http.client.HTTPConnection):
+    def __init__(self, path):
+        super().__init__("localhost", timeout=60)
+        self.path = path
+
+    def connect(self):
+        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.sock.settimeout(self.timeout)
+        self.sock.connect(self.path)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Temporary NAS file tools (trusted operator only)")
+    parser.add_argument("--socket", default=SOCKET)
+    parser.add_argument("--identity-file", type=Path)
+    sub = parser.add_subparsers(dest="command", required=True)
+    service = sub.add_parser("serve")
+    service.add_argument("--root", required=True)
+    service.add_argument("--config", type=Path)
+    clean = sub.add_parser("cleanup", help="Offline cleanup; refuses a running service")
+    clean.add_argument("--root", required=True)
+    register = sub.add_parser("register", help="Trusted local diagnostic upload, never expose to an Agent")
+    register.add_argument("file", type=Path)
+    register.add_argument("--attachment-id", default=None)
+    request = sub.add_parser("call")
+    request.add_argument("operation", choices=["inspect", "extract", "status", "cancel", "read", "find", "save_minutes"])
+    request.add_argument("--params", default="{}", help="JSON object")
+    args = parser.parse_args()
+    try:
+        if args.command == "serve":
+            settings = json.loads(args.config.read_text()) if args.config else {}
+            limits = Limits(**settings)
+            if not 1 <= limits.concurrency <= 2 or limits.ttl_seconds < 1 or limits.timeout_seconds < 1:
+                raise Fault("INVALID_CONFIG")
+            stop = threading.Event()
+            signal.signal(signal.SIGTERM, lambda *_: stop.set())
+            signal.signal(signal.SIGINT, lambda *_: stop.set())
+            serve(args.root, limits, args.socket, stop)
+            return
+        if args.command == "cleanup":
+            lock = ServiceLock(args.root)
+            try:
+                result = Store(args.root, Limits()).cleanup()
+            finally:
+                lock.close()
+        else:
+            if not args.identity_file:
+                raise Fault("IDENTITY_REQUIRED")
+            if os.name == "posix" and args.identity_file.stat().st_mode & 0o077:
+                raise Fault("IDENTITY_FILE_PERMISSIONS")
+            identity = json.loads(args.identity_file.read_text(encoding="utf-8"))
+            owner(identity)
+            client = UnixConnection(args.socket)
+            try:
+                if args.command == "register":
+                    size = args.file.stat().st_size
+                    if not args.file.is_file() or args.file.is_symlink() or not 0 < size <= Limits().max_bytes:
+                        raise Fault("SIZE_OR_FILE_TYPE")
+                    with args.file.open("rb") as file:
+                        import hashlib
+                        digest = hashlib.file_digest(file, "sha256").hexdigest()
+                        file.seek(0)
+                        client.request("POST", "/v1/attachment", body=file, headers={
+                            "Content-Length": str(size), "X-Filetools-Identity": json.dumps(identity),
+                            "X-Filename": json.dumps(args.file.name, ensure_ascii=True),
+                            "X-Content-SHA256": digest,
+                            "X-Attachment-Id": args.attachment_id or uuid.uuid4().hex})
+                else:
+                    client.request("POST", "/v1/tool", body=json.dumps({"identity": identity,
+                        "operation": args.operation, "params": json.loads(args.params)}).encode())
+                response = client.getresponse()
+                body = response.read(2 * 1024 * 1024 + 1)
+                if response.status != 200 or len(body) > 2 * 1024 * 1024:
+                    raise Fault("INVALID_RESPONSE")
+                result = json.loads(body)
+            finally:
+                client.close()
+        print(json.dumps(result, ensure_ascii=False))
+        if result.get("status") == "ERROR":
+            sys.exit(1)
+    except (Fault, OSError, ValueError) as error:
+        print(json.dumps({"status": "ERROR", "code": error.code if isinstance(error, Fault) else "CLI_ERROR"}))
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,24 @@
+# Separate worker only. Do not replace the existing Gateway/stockanalyse Compose file.
+services:
+  nas-filetools:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: nas-filetools:1.0.0
+    user: "10001:${FILETOOLS_SOCKET_GID:?Set the verified shared socket GID}"
+    restart: unless-stopped
+    network_mode: none
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 2.0
+    mem_limit: 4g
+    pids_limit: 96
+    stop_grace_period: 15s
+    volumes:
+      - /var/lib/nas-filetools:/var/lib/nas-filetools
+      - /var/cache/nas-filetools:/var/cache/nas-filetools:ro
+      - /run/nas-filetools:/run/nas-filetools
+      - /etc/nas-filetools/config.json:/etc/nas-filetools/config.json:ro
+    tmpfs:
+      - /tmp:size=256m,mode=1777

@@ -1,0 +1,493 @@
+{
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+  "python": "3.12.3",
+  "note": "Real engines in separate CPU workers on this development machine. Not NAS or Gateway E2E.",
+  "memory_cap_applied": false,
+  "limits": {
+    "max_bytes": 67108864,
+    "max_pages": 500,
+    "max_audio_seconds": 7200,
+    "max_image_pixels": 24000000,
+    "max_docx_expanded_bytes": 134217728,
+    "max_output_chars": 2000000,
+    "max_asset_bytes": 33554432,
+    "max_read_chars": 12000,
+    "max_segments": 20000,
+    "preview_pages": 3,
+    "large_pages": 20,
+    "large_audio_seconds": 600,
+    "ttl_seconds": 259200,
+    "timeout_seconds": 3600,
+    "concurrency": 1,
+    "engine_threads": 2,
+    "worker_memory_mb": 4096,
+    "inspection_timeout_seconds": 15,
+    "max_jobs_per_scope": 32,
+    "max_original_bytes_per_scope": 1073741824,
+    "whisper_model": "small@536b0662742c02347bc0e980a01041f333bce120",
+    "offline": true
+  },
+  "cases": [
+    {
+      "filename": "text.pdf",
+      "bytes": 1279,
+      "kind": "pdf",
+      "units": 2,
+      "duration": null,
+      "inspection_seconds": 0.0,
+      "worker_wall_seconds": 0.64,
+      "result": {
+        "status": "SUCCEEDED",
+        "job_id": "e43ef9c633cf46a2848a1a10fcd41e78",
+        "attachment_id": "1722849ea3e94c12982eb7e499314b21",
+        "progress": 1.0,
+        "expires_at": 1791286640.5705516,
+        "cancel_requested": false,
+        "coverage": {
+          "kind": "pdf",
+          "requested": [
+            1,
+            2
+          ],
+          "mode": "full",
+          "total_units": 2,
+          "total_duration": null,
+          "full_document": true,
+          "processed_count": 2,
+          "processed_sample": [
+            {
+              "page": 1
+            },
+            {
+              "page": 2
+            }
+          ]
+        },
+        "failures": [],
+        "failure_count": 0,
+        "warnings": [
+          "Preview is bounded; text presence does not prove complete extraction.",
+          "PDF reading order is geometric/engine order; columns, formulas and complex tables need review."
+        ],
+        "warning_count": 2,
+        "artifacts": [
+          {
+            "artifact_id": "325c4082929c42b884ce28c867e3e42e",
+            "file": "content.md",
+            "kind": "content"
+          },
+          {
+            "artifact_id": "1eac8037754a4e988a0659ef6d952cc4",
+            "file": "sources.json",
+            "kind": "sources"
+          }
+        ],
+        "artifact_count": 2,
+        "metadata_truncated": false
+      }
+    },
+    {
+      "filename": "scan.pdf",
+      "bytes": 1080791,
+      "kind": "pdf",
+      "units": 1,
+      "duration": null,
+      "inspection_seconds": 0.0,
+      "worker_wall_seconds": 2.406,
+      "result": {
+        "status": "SUCCEEDED",
+        "job_id": "8456db0645714d78ae0cf0acd04c81b4",
+        "attachment_id": "a64e3ea2334e48b1b4d5ef6411452f05",
+        "progress": 1.0,
+        "expires_at": 1791286641.2387323,
+        "cancel_requested": false,
+        "coverage": {
+          "kind": "pdf",
+          "requested": [
+            1,
+            1
+          ],
+          "mode": "full",
+          "total_units": 1,
+          "total_duration": null,
+          "full_document": true,
+          "processed_count": 1,
+          "processed_sample": [
+            {
+              "page": 1
+            }
+          ]
+        },
+        "failures": [],
+        "failure_count": 0,
+        "warnings": [
+          "Preview is bounded; text presence does not prove complete extraction.",
+          "PDF reading order is geometric/engine order; columns, formulas and complex tables need review."
+        ],
+        "warning_count": 2,
+        "artifacts": [
+          {
+            "artifact_id": "53228783b66d4e2d971ffa7fbb418c6f",
+            "file": "content.md",
+            "kind": "content"
+          },
+          {
+            "artifact_id": "0751ebe592dd40deb8d3328f7577a298",
+            "file": "sources.json",
+            "kind": "sources"
+          },
+          {
+            "artifact_id": "3f204ac0ea0d7d401d2387b2f9b2bae7",
+            "file": "assets/3f204ac0ea0d7d401d2387b2f9b2bae7.png",
+            "source": {
+              "page": 1
+            },
+            "bytes": 35403,
+            "kind": "image"
+          }
+        ],
+        "artifact_count": 3,
+        "metadata_truncated": false
+      }
+    },
+    {
+      "filename": "mixed.pdf",
+      "bytes": 1081916,
+      "kind": "pdf",
+      "units": 3,
+      "duration": null,
+      "inspection_seconds": 0.0,
+      "worker_wall_seconds": 3.766,
+      "result": {
+        "status": "SUCCEEDED",
+        "job_id": "c2a17ba965874694ab23623bbfb92faa",
+        "attachment_id": "5aa4161d85324f16b26b8795075ea479",
+        "progress": 1.0,
+        "expires_at": 1791286643.7105746,
+        "cancel_requested": false,
+        "coverage": {
+          "kind": "pdf",
+          "requested": [
+            1,
+            3
+          ],
+          "mode": "full",
+          "total_units": 3,
+          "total_duration": null,
+          "full_document": true,
+          "processed_count": 3,
+          "processed_sample": [
+            {
+              "page": 1
+            },
+            {
+              "page": 2
+            },
+            {
+              "page": 3
+            }
+          ]
+        },
+        "failures": [],
+        "failure_count": 0,
+        "warnings": [
+          "Preview is bounded; text presence does not prove complete extraction.",
+          "PDF reading order is geometric/engine order; columns, formulas and complex tables need review."
+        ],
+        "warning_count": 2,
+        "artifacts": [
+          {
+            "artifact_id": "218af9e287c24d92a3e472a0b19099b0",
+            "file": "content.md",
+            "kind": "content"
+          },
+          {
+            "artifact_id": "295aaf90d9124c92bfa1b31dd1310f71",
+            "file": "sources.json",
+            "kind": "sources"
+          },
+          {
+            "artifact_id": "3f204ac0ea0d7d401d2387b2f9b2bae7",
+            "file": "assets/3f204ac0ea0d7d401d2387b2f9b2bae7.png",
+            "source": {
+              "page": 2
+            },
+            "bytes": 35403,
+            "kind": "image"
+          },
+          {
+            "artifact_id": "fcfc4b905af159c7aeaefbde77cda969",
+            "file": "assets/fcfc4b905af159c7aeaefbde77cda969.png",
+            "source": {
+              "page": 3
+            },
+            "bytes": 47536,
+            "kind": "image"
+          }
+        ],
+        "artifact_count": 4,
+        "metadata_truncated": false
+      }
+    },
+    {
+      "filename": "ordered.docx",
+      "bytes": 46616,
+      "kind": "docx",
+      "units": 5,
+      "duration": null,
+      "inspection_seconds": 0.016,
+      "worker_wall_seconds": 1.0,
+      "result": {
+        "status": "PARTIAL",
+        "job_id": "95fed65dbd344230a52145f70a904738",
+        "attachment_id": "58efe9c3898e45ab9442b802dcf5ba16",
+        "progress": 1.0,
+        "expires_at": 1791286647.53149,
+        "cancel_requested": false,
+        "coverage": {
+          "kind": "docx",
+          "requested": [
+            1,
+            5
+          ],
+          "mode": "full",
+          "total_units": 5,
+          "total_duration": null,
+          "full_document": false,
+          "processed_count": 5,
+          "processed_sample": [
+            {
+              "paragraph": 1
+            },
+            {
+              "paragraph": 2
+            },
+            {
+              "paragraph": 3
+            },
+            {
+              "paragraph": 4
+            },
+            {
+              "paragraph": 5
+            }
+          ]
+        },
+        "failures": [
+          {
+            "source": {
+              "paragraph": 4
+            },
+            "code": "IMAGE_TEXT_NOT_EXTRACTED",
+            "error_type": "Fault"
+          }
+        ],
+        "failure_count": 1,
+        "warnings": [
+          "Body blocks only; headers, footers, text boxes and layout are not reconstructed.",
+          "Embedded images are preserved, not OCRed; image-only content requires a separate OCR task.",
+          "Block 2: table cells retained; merged/nested geometry may be approximate."
+        ],
+        "warning_count": 3,
+        "artifacts": [
+          {
+            "artifact_id": "47c5f94bb567473c9350de2ed9c2773d",
+            "file": "content.md",
+            "kind": "content"
+          },
+          {
+            "artifact_id": "4f44e20439bc409d931eed54f1b82854",
+            "file": "sources.json",
+            "kind": "sources"
+          },
+          {
+            "artifact_id": "ac7797208b84195c15614972fa4cbfa0",
+            "file": "assets/ac7797208b84195c15614972fa4cbfa0.png",
+            "source": {
+              "paragraph": 4
+            },
+            "bytes": 11757,
+            "kind": "image"
+          }
+        ],
+        "artifact_count": 3,
+        "metadata_truncated": false
+      }
+    },
+    {
+      "filename": "printed.png",
+      "bytes": 11757,
+      "kind": "image",
+      "units": 1,
+      "duration": null,
+      "inspection_seconds": 0.0,
+      "worker_wall_seconds": 2.5,
+      "result": {
+        "status": "SUCCEEDED",
+        "job_id": "3332a4f388ed43ebb1ddb1392a71e142",
+        "attachment_id": "f21395accd8d468aa679909a4eee3d2d",
+        "progress": 1.0,
+        "expires_at": 1791286648.572841,
+        "cancel_requested": false,
+        "coverage": {
+          "kind": "image",
+          "requested": [
+            1,
+            1
+          ],
+          "mode": "full",
+          "total_units": 1,
+          "total_duration": null,
+          "full_document": true,
+          "processed_count": 1,
+          "processed_sample": [
+            {
+              "page": 1
+            }
+          ]
+        },
+        "failures": [],
+        "failure_count": 0,
+        "warnings": [
+          "Printed text OCR only; no scene understanding, handwriting or formula guarantee."
+        ],
+        "warning_count": 1,
+        "artifacts": [
+          {
+            "artifact_id": "ca3de5c61f624aa19d41c0b3b824b58c",
+            "file": "content.md",
+            "kind": "content"
+          },
+          {
+            "artifact_id": "e7664c86aa094e438daabb021f9271bb",
+            "file": "sources.json",
+            "kind": "sources"
+          }
+        ],
+        "artifact_count": 2,
+        "metadata_truncated": false
+      }
+    },
+    {
+      "filename": "notes.md",
+      "bytes": 91,
+      "kind": "text",
+      "units": 3,
+      "duration": null,
+      "inspection_seconds": 0.0,
+      "worker_wall_seconds": 0.703,
+      "result": {
+        "status": "SUCCEEDED",
+        "job_id": "2aea5f06c98e4b7eb422b285a10e9d02",
+        "attachment_id": "b60cc67ace204cb6a8de47a1f45442c8",
+        "progress": 1.0,
+        "expires_at": 1791286651.1015959,
+        "cancel_requested": false,
+        "coverage": {
+          "kind": "text",
+          "requested": [
+            1,
+            3
+          ],
+          "mode": "full",
+          "total_units": 3,
+          "total_duration": null,
+          "full_document": true,
+          "processed_count": 3,
+          "processed_sample": [
+            {
+              "paragraph": 1
+            },
+            {
+              "paragraph": 2
+            },
+            {
+              "paragraph": 3
+            }
+          ]
+        },
+        "failures": [],
+        "failure_count": 0,
+        "warnings": [],
+        "warning_count": 0,
+        "artifacts": [
+          {
+            "artifact_id": "8c91c38288d94c6aa77dd877be90ae51",
+            "file": "content.md",
+            "kind": "content"
+          },
+          {
+            "artifact_id": "12711895619640b7ab8808398eddb861",
+            "file": "sources.json",
+            "kind": "sources"
+          }
+        ],
+        "artifact_count": 2,
+        "metadata_truncated": false
+      }
+    },
+    {
+      "filename": "jfk.flac",
+      "bytes": 1152693,
+      "kind": "audio",
+      "units": 1,
+      "duration": 11.0,
+      "inspection_seconds": 0.047,
+      "worker_wall_seconds": 6.797,
+      "result": {
+        "status": "SUCCEEDED",
+        "job_id": "ad27b870e4bc40b49d031e0a08a3404d",
+        "attachment_id": "842bf10b0f334bfbac0a4a4c05ef6a78",
+        "progress": 1.0,
+        "expires_at": 1791286651.9175,
+        "cancel_requested": false,
+        "coverage": {
+          "kind": "audio",
+          "requested": [
+            0,
+            11.0
+          ],
+          "mode": "full",
+          "total_units": 1,
+          "total_duration": 11.0,
+          "full_document": true,
+          "processed_count": 1,
+          "processed_sample": [
+            {
+              "start": 0.0,
+              "end": 11.0
+            }
+          ]
+        },
+        "failures": [],
+        "failure_count": 0,
+        "warnings": [
+          "Transcript is not a verified record; no speaker identification.",
+          "No minutes generated. Any later minutes must be stored separately from transcript.md."
+        ],
+        "warning_count": 2,
+        "artifacts": [
+          {
+            "artifact_id": "81de3762c1634d4f8cdb2b01a037a901",
+            "file": "content.md",
+            "kind": "content"
+          },
+          {
+            "artifact_id": "180de5d775504cd18fdf01a1e7d09a68",
+            "file": "sources.json",
+            "kind": "sources"
+          },
+          {
+            "artifact_id": "d1b49ba3dace4a08abeb883d03d69973",
+            "file": "transcript.md",
+            "kind": "transcript"
+          }
+        ],
+        "artifact_count": 3,
+        "metadata_truncated": false
+      }
+    }
+  ],
+  "execution_date": "2026-10-03"
+}

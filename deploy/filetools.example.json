@@ -1,0 +1,11 @@
+{
+  "concurrency": 1,
+  "engine_threads": 2,
+  "worker_memory_mb": 4096,
+  "timeout_seconds": 3600,
+  "inspection_timeout_seconds": 15,
+  "ttl_seconds": 259200,
+  "model_cache": "/var/cache/nas-filetools",
+  "whisper_model": "/var/cache/nas-filetools/models--Systran--faster-whisper-small/snapshots/536b0662742c02347bc0e980a01041f333bce120",
+  "offline": true
+}

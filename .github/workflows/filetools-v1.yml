@@ -1,0 +1,22 @@
+name: FileTools V1
+on: [push, pull_request]
+jobs:
+  core:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - run: python -m pip install -c requirements.lock.txt -e '.[engines,test]'
+      - run: python -m ruff check src tests scripts
+      - run: python -m pytest -q
+      - run: FILETOOLS_REAL_ENGINES=1 python -m pytest tests/test_engines.py -q
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.16.0'
+      - working-directory: integrations/openclaw-filetools
+        run: npm ci --ignore-scripts && FILETOOLS_TEST_PYTHON=$(which python) npm test
+      - working-directory: integrations/openclaw-filetools
+        run: npm run plugin:build && npm run plugin:validate

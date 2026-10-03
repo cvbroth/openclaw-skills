@@ -1,0 +1,67 @@
+{
+  "id": "nas-filetools",
+  "name": "NAS FileTools",
+  "description": "Temporary file evidence tools",
+  "version": "1.0.0",
+  "configSchema": {
+    "type": "object",
+    "required": [
+      "bindings"
+    ],
+    "properties": {
+      "bindings": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "user_id",
+            "agent_id",
+            "sender_id",
+            "channel_id",
+            "account_id"
+          ],
+          "properties": {
+            "user_id": {
+              "type": "string"
+            },
+            "agent_id": {
+              "type": "string"
+            },
+            "sender_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "channel_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "account_id": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "maxItems": 16
+      }
+    },
+    "additionalProperties": false
+  },
+  "activation": {
+    "onStartup": true
+  },
+  "skills": [
+    "./skills"
+  ],
+  "contracts": {
+    "tools": [
+      "filetools_inspect",
+      "filetools_extract",
+      "filetools_status",
+      "filetools_cancel",
+      "filetools_read",
+      "filetools_find",
+      "filetools_save_minutes"
+    ]
+  }
+}

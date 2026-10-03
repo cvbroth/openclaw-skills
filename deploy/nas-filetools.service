@@ -1,0 +1,33 @@
+[Unit]
+Description=Temporary NAS file processing service
+After=local-fs.target
+
+[Service]
+Type=simple
+User=nas-filetools
+Group=openclaw
+UMask=0077
+RuntimeDirectory=nas-filetools
+RuntimeDirectoryMode=0750
+StateDirectory=nas-filetools
+StateDirectoryMode=0700
+CacheDirectory=nas-filetools
+CacheDirectoryMode=0700
+ExecStart=/opt/nas-filetools/.venv/bin/nas-filetools serve --root /var/lib/nas-filetools --config /etc/nas-filetools/config.json
+Restart=on-failure
+RestartSec=5
+KillMode=control-group
+TimeoutStopSec=15
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+RestrictAddressFamilies=AF_UNIX
+ReadWritePaths=/var/lib/nas-filetools /var/cache/nas-filetools /run/nas-filetools
+MemoryMax=4G
+MemoryHigh=3G
+CPUQuota=200%
+TasksMax=96
+
+[Install]
+WantedBy=multi-user.target

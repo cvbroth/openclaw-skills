@@ -1,5 +1,22 @@
 # OpenClaw Skills
 
+## 统一文件处理 V1（开发交付，生产待验收）
+
+新增独立 CPU 文件处理核心、SQLite 后台任务、OpenClaw 2026.9.4 插件和 Skill：支持 PDF/DOCX/UTF-8 MD/TXT、图片印刷文字 OCR、音频转写，按可信用户/Agent/会话隔离、默认 72 小时临时产物，不自动进入永久知识库。模型使用真正注册的 filetools_* 工具，不传服务器路径或身份。群聊 V1 拒绝，具体限制见文档。
+
+- [基线与生产信息](docs/BASELINE.md)
+- [架构与重要取舍](docs/ARCHITECTURE.md)
+- [工具/产物契约](docs/INTERFACE.md)
+- [格式支持、资源和质量限制 / V2 路线图](docs/SUPPORT.md)
+- [独立安装、资源控制与回滚](docs/INSTALL.md)
+- [部署后验收步骤](docs/ACCEPTANCE.md)
+- [开发验证报告](docs/VALIDATION.md)
+- [OpenClaw 插件](integrations/openclaw-filetools/README.md)
+
+开发复现：独立 Python 3.12 venv，`pip install -c requirements.lock.txt -e '.[engines,test]'`；`python -m pytest -q` 和 `python -m ruff check src tests scripts`。真实引擎用 `FILETOOLS_REAL_ENGINES=1`；真实音频另指定 FILETOOLS_AUDIO_SAMPLE、FILETOOLS_WHISPER_MODEL（离线 snapshot）及预期关键词 FILETOOLS_AUDIO_EXPECT。普通单元测试不下载模型。
+
+下列原独立脚本继续保留，未被统一 V1 接管或重写。
+
 ## filetools — 文件处理工具箱
 
 本地 CPU 可跑，不需要 GPU。两类功能：
