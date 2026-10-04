@@ -1,5 +1,7 @@
 # V1.2.1 验证与生产待验收
 
+本文主体保留 `69c194c` 的历史验收记录；后续同 UID Samba 小补丁的本轮测试、模式区别及待验收项见 [UID 修复报告](V121_SAMBA_UID_FIX.md)，不能把旧结果当成本轮重测。
+
 执行范围仅开发机 Windows、Docker Desktop Linux。所有测试文档为自制样本，11秒英语 JFK 录音沿用固定 MIT 许可样本；模型固定 small 离线快照。没有连接NAS/QQ/远程Docker或运行GitHub CI。原引擎和覆盖/来源行为保留，扫描提取非空不等于完整还原。
 
 ## 实际结果及边界
@@ -69,5 +71,5 @@ privileged仅用于本地一次性容器内实际bind mount，没有宿主生产
 2. **QQ私聊**：同一用户上传附件-only与附件+任务；模拟较慢登记可见pending，不重传；完成后下一次运行/查询见ID；先检查再按范围处理/读取引用；故障恢复同ID重试；/new旧epoch不得采用旧附件。chen/liang/azl及main独立目录均验证，发真实结果后由客户端下载核对哈希。
 3. **QQ群聊**：当前策略明确拒绝群聊FileTools工厂/登记，不读取任何私聊附件或跨人文件，不把群员正文当可信身份。同群两个用户也不可共享private ID。群聊授权扩展不属于此版，不能配置成任意sender。
 4. **NAS大文件**：Uploading中的文件拒绝；完成移动Incoming后容器真实UID可读且不可改；分别快照/引用、来源变更拒绝、取消与重启状态。4GiB与4小时中文录音、长PDF实际资源/速度和共享服务峰值需实测，再调线程/超时/内存。
-5. **Samba结果**：先plan/testparm/ACL/路径遍历，再apply；旧文件和保存新版本可从对应个人账号立即下载、图片和JSON完整、无缓存/登记表暴露；所有交叉账号和guest拒绝，上传/覆盖/删除拒绝，Gateway/Worker保存仍可用。检查全局write-list/admin/force参数不会泄入本共享。
+5. **Samba结果**：先plan/testparm/ACL/路径遍历，再apply；核对每个share的permission_mode，同UID保留所有者本地权限，不同UID检查读者Unix不可写。旧文件和保存新版本可从对应个人账号立即下载、图片和JSON完整、无缓存/登记表暴露；所有交叉账号和guest拒绝，上传/覆盖/删除/重命名拒绝，Gateway/Worker保存仍可用。检查全局write-list/admin/force参数不会泄入本共享。
 6. **重启与回滚**：真实systemd开机持久挂载、源目录缺失明确失败、重复apply不叠mount、错误mount/后续配置变动诊断、真实smbd reload；先撤Samba再撤插件，保存数据和原个人/Family/隧道/知识库配置保持。Windows/macOS/iPhone与远程既有客户端各自下载验证，不能只看ls成功。

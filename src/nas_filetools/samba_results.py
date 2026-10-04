@@ -20,6 +20,22 @@ from .registry_lock import RegistryLock
 from .saved_permissions import ACCESS, DEFAULT, acl_bytes, readers, set_read_acl
 
 MARKER = "# NAS FileTools saved results (managed V1.2.1)"
+OWNER_MODE = "owner_samba_readonly"
+ACL_MODE = "reader_acl"
+
+
+def permission_mode(share):
+    # Records made before this patch could only be for distinct reader UIDs.
+    return share.get("permission_mode", ACL_MODE)
+
+
+def identities_match(record, shares):
+    return [(s["agent"], s["uid"], s["writer_uid"], permission_mode(s)) for s in record["shares"]] == [
+        (s["agent"], s["uid"], s["writer_uid"], permission_mode(s)) for s in shares]
+
+
+def acl_matches(share):
+    return permission_mode(share) == OWNER_MODE or readers(share["saved"]) == [share["uid"]]
 
 
 def path_value(value):
@@ -62,15 +78,16 @@ def settings(config):
             account = pwd.getpwnam(item["samba_user"])
         except KeyError:
             raise Fault("EXISTING_SAMBA_UNIX_ACCOUNT_REQUIRED") from None
-        if account.pw_uid == 0 or account.pw_uid == saved.stat().st_uid:
-            raise Fault("SHARE_READER_IS_WRITER", "Samba account must differ from the verified Gateway/Worker owner.")
+        if account.pw_uid == 0:
+            raise Fault("INVALID_SHARE_IDENTITY", "Root cannot be a results share account.")
         destination = root/(item["samba_user"]+"-main" if item["agent"] == "main" else item["samba_user"])
         if any(key in seen for key in (item["name"], str(saved), str(destination))):
             raise Fault("DUPLICATE_RESULTS_SHARE")
         seen.update((item["name"], str(saved), str(destination)))
         unit = command(["systemd-escape", "--path", "--suffix=mount", str(destination)]).strip()
         shares.append({**item, "saved": str(saved), "entry": str(destination), "uid": account.pw_uid,
-                       "gid": account.pw_gid, "writer_uid": saved.stat().st_uid, "unit": unit})
+                       "gid": account.pw_gid, "writer_uid": saved.stat().st_uid, "unit": unit,
+                       "permission_mode": OWNER_MODE if account.pw_uid == saved.stat().st_uid else ACL_MODE})
     paths = [state, root, conf, units]
     if state == root or any(state.is_relative_to(Path(s["saved"])) or root.is_relative_to(Path(s["saved"])) or
                             Path(s["saved"]).is_relative_to(root) for s in shares):
@@ -153,9 +170,10 @@ def _results(raw, paths, shares, action, apply):
     include = f"\n[global]\n{MARKER}\ninclude = {state}/results.conf\n"
     plan = {"status": "RESULTS_PLAN", "shares": shares, "fragment": fragment(shares),
             "mount_units": {s["unit"]: unit_text(s) for s in shares}, "changes_applied": False,
-            "requires": ["root administrator, existing Unix and Samba accounts, POSIX ACL filesystem",
+            "requires": ["root administrator, existing Unix and Samba accounts; distinct UIDs require POSIX ACL support",
                          "existing saved owner must be verified Gateway/Worker UID; no force user or group grants",
-                         "apply grants saved-only read ACLs, creates bind mount units, adds one include; smbd reload remains explicit",
+                         "same UID preserves saved permissions; distinct UID grants saved-only read ACLs; Samba always read-only",
+                         "creates bind mount units, adds one include; smbd reload remains explicit",
                          "incoming source binds must be configured separately; production QQ acceptance is pending"]}
     if action == "plan":
         # Plan does not create directories/config/ACLs or read Samba credentials.
@@ -164,12 +182,15 @@ def _results(raw, paths, shares, action, apply):
         return plan
     if action == "diagnose":
         checks, issues = {}, []
+        if record_path.exists() and not identities_match(json.loads(record_path.read_text()), shares):
+            issues.append("RESULTS_IDENTITY_OR_PERMISSION_MODE_CHANGED")
         for share in shares:
             valid = binding_matches(share)
-            checks[share["agent"]] = {"bind_matches_saved": valid, "writer_uid": share["writer_uid"], "reader_uid": share["uid"]}
+            checks[share["agent"]] = {"bind_matches_saved": valid, "writer_uid": share["writer_uid"], "reader_uid": share["uid"],
+                                      "permission_mode": permission_mode(share)}
             if not valid:
                 issues.append("RESULTS_BIND_MISSING_OR_CHANGED:"+share["agent"])
-            if readers(share["saved"]) != [share["uid"]]:
+            if not acl_matches(share):
                 issues.append("SAVED_DEFAULT_ACL_MISSING_OR_CHANGED:"+share["agent"])
             checks[share["agent"]]["systemd_unit_exists"] = (units/share["unit"]).is_file()
             if not checks[share["agent"]]["systemd_unit_exists"]:
@@ -178,17 +199,31 @@ def _results(raw, paths, shares, action, apply):
                 try:
                     command(["runuser", "-u", share["samba_user"], "--", "test", "-r", share["entry"]], 30)
                     command(["runuser", "-u", share["samba_user"], "--", "test", "-x", share["entry"]], 30)
-                    # A reader must also be unable to create/delete files at the root.
-                    command(["runuser", "-u", share["samba_user"], "--", "test", "!", "-w", share["entry"]], 30)
-                    checks[share["agent"]]["unix_reader_access"] = "READ_TRAVERSE_NO_WRITE"
+                    if permission_mode(share) == ACL_MODE:
+                        command(["runuser", "-u", share["samba_user"], "--", "test", "!", "-w", share["entry"]], 30)
+                        checks[share["agent"]]["unix_reader_access"] = "READ_TRAVERSE_NO_WRITE"
+                    else:
+                        checks[share["agent"]]["unix_reader_access"] = "READ_TRAVERSE_OWNER_PERMISSIONS_PRESERVED"
+                        checks[share["agent"]]["permission_note"] = "Samba 访问只读，服务器本地所有者仍可写。"
                 except Fault:
                     issues.append("RESULTS_UNIX_ACCESS_FAILED:"+share["agent"])
         try:
             command(["testparm", "-s", str(conf)], 30)
             checks["testparm"] = "PASSED"
+            for share in shares:
+                policy = {"valid users": share["samba_user"], "read only": "yes", "guest ok": "no",
+                          "write list": "", "admin users": "", "force user": "", "force group": ""}
+                actual = {key: command(["testparm", "-s", str(conf), "--section-name="+share["name"],
+                                        "--parameter-name="+key], 30).strip() for key in policy}
+                safe = all(actual[key].lower() == expected if key in ("read only", "guest ok")
+                           else actual[key] == expected for key, expected in policy.items())
+                checks[share["agent"]]["samba_policy"] = "READ_ONLY_CONFIGURED" if safe else "CHANGED"
+                if not safe:
+                    issues.append("RESULTS_SAMBA_POLICY_CHANGED:"+share["agent"])
         except Fault as error:
             issues.append(error.code)
         return {"status": "RESULTS_DIAGNOSED", "checks": checks, "issues": issues,
+                "smb_protocol_acceptance": "NOT_RUN",
                 "smb_account_read_write_and_cross_user": "Run documented smbclient checks with real accounts; no credentials in CLI output",
                 "production_acceptance": "PENDING"}
     if action == "rollback":
@@ -197,8 +232,10 @@ def _results(raw, paths, shares, action, apply):
         record = json.loads(record_path.read_text())
         if record["settings"] != raw:
             raise Fault("RESULTS_CONFIG_CHANGED")
+        if not identities_match(record, shares):
+            raise Fault("RESULTS_IDENTITY_OR_PERMISSION_MODE_CHANGED")
         if not apply:
-            return {"status": "RESULTS_ROLLBACK_PLAN", "record": str(record_path), "saved_data_preserved": True}
+            return {"status": "RESULTS_ROLLBACK_PLAN", "record": str(record_path), "shares": shares, "saved_data_preserved": True}
         return undo(record, record_path)
     if action != "apply" or not apply:
         raise Fault("EXPLICIT_APPLY_REQUIRED")
@@ -208,7 +245,9 @@ def _results(raw, paths, shares, action, apply):
         record = json.loads(record_path.read_text())
         if record["settings"] != raw or record.get("rolled_back") or digest(conf) != record["installed_conf_sha"]:
             raise Fault("RESULTS_CONFIG_CHANGED")
-        if any(not binding_matches(s) or readers(s["saved"]) != [s["uid"]] for s in shares) or digest(state/"results.conf") != record["fragment_sha"] or any(
+        if not identities_match(record, shares):
+            raise Fault("RESULTS_IDENTITY_OR_PERMISSION_MODE_CHANGED")
+        if any(not binding_matches(s) or not acl_matches(s) for s in shares) or digest(state/"results.conf") != record["fragment_sha"] or any(
                 not Path(unit["path"]).is_file() or digest(unit["path"]) != unit["sha"] for unit in record["created_units"]):
             raise Fault("RESULTS_INSTALLATION_DRIFT", "Diagnose mount units/ACLs before reapplying; do not overlay another mount.")
         return {"status": "RESULTS_ALREADY_APPLIED", "record": str(record_path), "changes_applied": False}
@@ -222,6 +261,9 @@ def _results(raw, paths, shares, action, apply):
             raise Fault("SAMBA_ADMIN_DEPENDENCY_MISSING")
     permissions = []
     for share in shares:
+        if permission_mode(share) == OWNER_MODE:
+            walk(share["saved"])  # Validate the tree, but never snapshot/replace its existing ACLs.
+            continue
         for path in walk(share["saved"]):
             if path.stat().st_uid != share["writer_uid"]:
                 raise Fault("SAVED_OWNERSHIP_REQUIRES_REVIEW", "Review inconsistent saved owners; this command never recursively chowns a workspace.")
@@ -249,8 +291,9 @@ def _results(raw, paths, shares, action, apply):
         os.chmod(state/"results.conf", 0o600)
         record["fragment_sha"] = digest(state/"results.conf")
         for share in shares:
-            for path in walk(share["saved"]):
-                set_read_acl(path, [share["uid"]])
+            if permission_mode(share) == ACL_MODE:
+                for path in walk(share["saved"]):
+                    set_read_acl(path, [share["uid"]])
             entry = Path(share["entry"])
             entry.mkdir(mode=0o700)
             record["created_entries"].append(str(entry))
@@ -313,6 +356,8 @@ def undo(record, record_path):
         command(["systemctl", "daemon-reload"], 30)
     previous = {r["path"]: r for r in record["permissions"]}
     for share in record["shares"]:
+        if permission_mode(share) == OWNER_MODE:
+            continue  # Neither old nor new saved permissions were ours to change.
         for path in walk(share["saved"]):
             if str(path) in previous:
                 restore_permissions(previous[str(path)])

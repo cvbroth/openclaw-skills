@@ -4,5 +4,5 @@ FROM ${FILETOOLS_TEST_IMAGE}
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends samba smbclient acl systemd util-linux \
     && rm -rf /var/lib/apt/lists/* \
-    && useradd -u 24001 -M chen && useradd -u 24002 -M liang && useradd -u 24003 -M azl
+    && useradd -u 1000 -M chen && useradd -u 24002 -M liang && useradd -u 24003 -M azl
 ENTRYPOINT ["/opt/nas-filetools/.venv/bin/python"]

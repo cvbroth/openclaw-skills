@@ -14,13 +14,16 @@ from pathlib import Path
 import pytest
 
 from nas_filetools.contracts import Fault
-from nas_filetools.samba_results import results, binding_matches
+from nas_filetools.samba_results import ACL_MODE, OWNER_MODE, results, binding_matches, permission_record
 
 pytestmark = pytest.mark.skipif(sys.platform != "linux" or os.getenv("FILETOOLS_SAMBA_TEST") != "1",
                                reason="Opt-in isolated root Docker Samba/ACL/bind integration")
 
 
-def test_actual_accounts_new_old_saved_bind_idempotence_rollback(tmp_path, monkeypatch):
+@pytest.mark.parametrize("mode", [ACL_MODE, OWNER_MODE])
+def test_actual_accounts_new_old_saved_bind_idempotence_rollback(tmp_path, monkeypatch, mode):
+    import pwd
+    assert (pwd.getpwnam("chen").pw_uid, pwd.getpwnam("chen").pw_gid) == (1000, 1000)
     import nas_filetools.samba_results as module
     original_command, systemd_calls = module.command, []
     fail_unmount = {"remaining": 0}
@@ -39,18 +42,32 @@ def test_actual_accounts_new_old_saved_bind_idempotence_rollback(tmp_path, monke
     os.chmod(tmp_path.parent.parent, 0o755)
     units = tmp_path/"units"
     units.mkdir()
-    originals = {}
+    originals, original_permissions, writers = {}, {}, {}
     shares = []
     for agent, user, name in (("chen", "chen", "Chen-Results"), ("liang", "liang", "Liang-Results"), ("ziling", "azl", "AZL-Results")):
         saved = tmp_path/agent/"filetools"/"saved"
         saved.mkdir(parents=True)
-        os.chown(saved.parent, 10001, 10001)
-        os.chown(saved.parent.parent, 10001, 10001)
+        writer = pwd.getpwnam(user if mode == OWNER_MODE else "filetools")
+        writers[agent] = writer.pw_name
+        os.chown(saved.parent, writer.pw_uid, writer.pw_gid)
+        os.chown(saved.parent.parent, writer.pw_uid, writer.pw_gid)
         old = saved/"old.md"
         old.write_text("Saved evidence "+agent)
         for path in (saved, old):
-            os.chown(path, 10001, 10001)
-            os.chmod(path, 0o700 if path.is_dir() else 0o440)
+            os.chown(path, writer.pw_uid, writer.pw_gid)
+            os.chmod(path, 0o700 if path.is_dir() else (0o600 if mode == OWNER_MODE else 0o440))
+        if mode == OWNER_MODE:
+            # Preexisting, redundant named-owner + custom group ACLs are not ours.
+            # The owner entry must not become a reader policy in the publisher.
+            original_command(["setfacl", "-m", f"u:{writer.pw_uid}:r-x,g:24003:r--", str(saved)])
+            original_command(["setfacl", "-m", f"d:u:{writer.pw_uid}:r-x,d:g:24003:r--", str(saved)])
+            original_command(["setfacl", "-m", "g:24003:r--", str(old)])
+        original_permissions[agent] = [permission_record(p) for p in (saved, old)]
+        if mode == OWNER_MODE:
+            from nas_filetools.saved_permissions import set_read_acl, readers
+            set_read_acl(saved, [writer.pw_uid])
+            assert readers(saved) == []
+            assert permission_record(saved) == original_permissions[agent][0]
         originals[agent] = old.read_bytes()
         shares.append({"agent": agent, "samba_user": user, "name": name, "saved": str(saved)})
     legacy = tmp_path/"legacy-personal"
@@ -66,14 +83,55 @@ def test_actual_accounts_new_old_saved_bind_idempotence_rollback(tmp_path, monke
                                "smb_conf": str(conf), "unit_dir": str(units), "shares": shares}))
     planned = results(cfg)
     assert planned["status"] == "RESULTS_PLAN"
+    assert all(s["permission_mode"] == mode for s in planned["shares"])
     assert not (tmp_path/"admin").exists() and conf.read_bytes() == previous
     applied = results(cfg, "apply", True)
     assert applied["status"] == "RESULTS_APPLIED"
     assert results(cfg, "apply", True)["status"] == "RESULTS_ALREADY_APPLIED"
     assert all(binding_matches(s) for s in planned["shares"])
-    assert results(cfg, "diagnose")["issues"] == []
+    diagnosis = results(cfg, "diagnose")
+    assert diagnosis["issues"] == []
+    record_path = tmp_path/"admin"/"results-rollback.json"
+    record = json.loads(record_path.read_text())
+    assert all(s["permission_mode"] == mode for s in record["shares"])
+    if mode == OWNER_MODE:
+        assert record["permissions"] == []
+        assert diagnosis["checks"]["chen"]["permission_note"] == "Samba 访问只读，服务器本地所有者仍可写。"
+        for share in shares:
+            assert [permission_record(p) for p in (Path(share["saved"]), Path(share["saved"])/"old.md")] == original_permissions[share["agent"]]
+            original_command(["runuser", "-u", share["samba_user"], "--", "test", "-w", share["saved"]])
+    else:
+        assert diagnosis["checks"]["chen"]["unix_reader_access"] == "READ_TRAVERSE_NO_WRITE"
+        # Earlier V1.2.1 records have no explicit mode and remain ACL-compatible.
+        for share in record["shares"]:
+            share.pop("permission_mode")
+        record_path.write_text(json.dumps(record))
+        assert results(cfg, "apply", True)["status"] == "RESULTS_ALREADY_APPLIED"
+    # Recorded identity/mode drift must not silently switch permission strategies.
+    original_stat = Path(shares[0]["saved"]).stat()
+    os.chown(shares[0]["saved"], 24003, -1)
+    try:
+        assert "RESULTS_IDENTITY_OR_PERMISSION_MODE_CHANGED" in results(cfg, "diagnose")["issues"]
+        for action in ("apply", "rollback"):
+            with pytest.raises(Fault, match="RESULTS_IDENTITY_OR_PERMISSION_MODE_CHANGED"):
+                results(cfg, action, True)
+    finally:
+        os.chown(shares[0]["saved"], original_stat.st_uid, -1)
     for parameter in ("write list", "admin users", "force user", "force group"):
         assert original_command(["testparm", "-s", str(conf), "--section-name=Chen-Results", "--parameter-name="+parameter]).strip() == ""
+    for parameter, expected in (("read only", "yes"), ("guest ok", "no"), ("valid users", "chen")):
+        assert original_command(["testparm", "-s", str(conf), "--section-name=Chen-Results", "--parameter-name="+parameter]).strip().lower() == expected
+    assert diagnosis["smb_protocol_acceptance"] == "NOT_RUN"
+    assert diagnosis["checks"]["chen"]["samba_policy"] == "READ_ONLY_CONFIGURED"
+    fragment_path = tmp_path/"admin"/"results.conf"
+    original_fragment = fragment_path.read_text()
+    fragment_path.write_text(original_fragment.replace("read only = yes", "read only = no"))
+    try:
+        assert "RESULTS_SAMBA_POLICY_CHANGED:chen" in results(cfg, "diagnose")["issues"]
+        with pytest.raises(Fault, match="RESULTS_INSTALLATION_DRIFT"):
+            results(cfg, "apply", True)
+    finally:
+        fragment_path.write_text(original_fragment)
     assert all((units/s["unit"]).exists() for s in planned["shares"])
     assert len([c for c in systemd_calls if c[1] == "enable"]) == 3
     credentials = {}
@@ -103,9 +161,12 @@ def test_actual_accounts_new_old_saved_bind_idempotence_rollback(tmp_path, monke
             downloaded = tmp_path/(agent+"-download.md")
             assert smb(user, name, f"get old.md {downloaded}").returncode == 0
             assert downloaded.read_bytes() == originals[agent]
-            denied = smb(user, name, f"put {downloaded} overwrite.md")
-            assert "NT_STATUS_ACCESS_DENIED" in denied.stdout+denied.stderr
+            for operation in (f"put {downloaded} overwrite.md", f"put {downloaded} old.md", "del old.md", "rename old.md moved.md"):
+                denied = smb(user, name, operation)
+                assert "NT_STATUS_ACCESS_DENIED" in denied.stdout+denied.stderr, operation
             assert not (Path(share["saved"])/"overwrite.md").exists()
+            assert not (Path(share["saved"])/"moved.md").exists()
+            assert (Path(share["saved"])/"old.md").read_bytes() == originals[agent]
             for other in credentials:
                 if other != user:
                     response = smb(other, name, "ls")
@@ -118,7 +179,7 @@ def test_actual_accounts_new_old_saved_bind_idempotence_rollback(tmp_path, monke
                       "f=p/'content.md';f.write_text('New result');os.chmod(f,0o440);"
                       "atomic_json(p/'saved.json',{'version':1});publish_saved_permissions(saved,p);"
                       "atomic_json(p/'saved.json',{'version':2});publish_saved_permissions(saved,p)")
-            writer = subprocess.run(["runuser", "-u", "filetools", "--", sys.executable, "-c", script],
+            writer = subprocess.run(["runuser", "-u", writers[agent], "--", sys.executable, "-c", script],
                                     text=True, capture_output=True)
             assert writer.returncode == 0, writer.stderr
             new_download = tmp_path/(agent+"-new.md")
@@ -154,13 +215,17 @@ try:
  print(json.dumps({'relative':str(Path(row[0]).relative_to('saved')),'artifact_file':state['artifacts'][0]['file'],'saved':saved}))
 finally:worker.close()
 '''
-        completed = subprocess.run(["runuser", "-u", "filetools", "--", sys.executable, "-c", core, str(workspace)],
+        completed = subprocess.run(["runuser", "-u", writers["chen"], "--", sys.executable, "-c", core, str(workspace)],
                                    capture_output=True, text=True, timeout=30)
         assert completed.returncode == 0, completed.stderr
         published = json.loads(completed.stdout)
         retrieved = tmp_path/"core-saved.md"
         assert smb("chen", "Chen-Results", f"get {published['relative']}/{published['artifact_file']} {retrieved}").returncode == 0
         assert "Actual core saved evidence" in retrieved.read_text()
+        # Same-UID reapply also accepts old custom ACLs and new saved versions.
+        assert results(cfg, "apply", True)["status"] == "RESULTS_ALREADY_APPLIED"
+        before_rollback = {str(p): permission_record(p) for share in shares for p in module.walk(share["saved"])}
+        assert all(s["permission_mode"] == mode for s in results(cfg, "rollback")["shares"])
         # Later admin edits are protected; no rollback overwrites an unrelated share edit.
         with conf.open("a") as output:
             output.write("\n# Later administrator change\n")
@@ -187,6 +252,11 @@ finally:worker.close()
         for share in shares:
             assert (Path(share["saved"])/"old.md").read_bytes() == originals[share["agent"]]
             assert (Path(share["saved"])/"text"/"new-version"/"content.md").read_text() == "New result"
+            if mode == OWNER_MODE:
+                assert {str(p): permission_record(p) for p in module.walk(share["saved"])} == {
+                    k: v for k, v in before_rollback.items() if Path(k).is_relative_to(Path(share["saved"]))}
+            else:
+                assert [permission_record(p) for p in (Path(share["saved"]), Path(share["saved"])/"old.md")] == original_permissions[share["agent"]]
     finally:
         daemon.terminate()
         daemon.wait(timeout=10)
@@ -194,14 +264,17 @@ finally:worker.close()
             auth.unlink(missing_ok=True)
 
 
-def test_apply_failure_restores_acl_and_saved_data(tmp_path, monkeypatch):
+@pytest.mark.parametrize("mode", [ACL_MODE, OWNER_MODE])
+def test_apply_failure_restores_acl_and_saved_data(tmp_path, monkeypatch, mode):
+    import pwd
     import nas_filetools.samba_results as module
     saved = tmp_path/"agent"/"filetools"/"saved"
     saved.mkdir(parents=True)
     old = saved/"old.txt"
     old.write_text("Retained")
-    os.chown(saved, 10001, 10001)
-    os.chown(old, 10001, 10001)
+    writer = pwd.getpwnam("chen" if mode == OWNER_MODE else "filetools")
+    os.chown(saved, writer.pw_uid, writer.pw_gid)
+    os.chown(old, writer.pw_uid, writer.pw_gid)
     units = tmp_path/"units"
     units.mkdir()
     conf = tmp_path/"smb.conf"
@@ -212,6 +285,11 @@ def test_apply_failure_restores_acl_and_saved_data(tmp_path, monkeypatch):
         {"agent": "chen", "samba_user": "chen", "name": "Chen-Results", "saved": str(saved)}]}))
     previous = conf.read_bytes()
     original = module.command
+    if mode == OWNER_MODE:
+        original(["setfacl", "-m", "g:24003:r--", str(saved)])
+        original(["setfacl", "-m", "d:g:24003:r--", str(saved)])
+        original(["setfacl", "-m", "g:24003:r--", str(old)])
+    prior_permissions = [permission_record(p) for p in (saved, old)]
     def run(args, timeout=60):
         if args[0] == "systemctl":
             return ""
@@ -224,3 +302,4 @@ def test_apply_failure_restores_acl_and_saved_data(tmp_path, monkeypatch):
     assert old.read_text() == "Retained" and conf.read_bytes() == previous
     assert not (tmp_path/"results").exists()
     assert not any(units.iterdir())
+    assert [permission_record(p) for p in (saved, old)] == prior_permissions

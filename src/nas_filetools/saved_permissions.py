@@ -32,15 +32,22 @@ def readers(path):
         return []
     if struct.unpack_from("<I", raw)[0] != 2 or (len(raw)-4) % 8:
         raise Fault("SAVED_ACL_INVALID")
-    return [uid for tag, perms, uid in struct.iter_unpack("<HHI", raw[4:]) if tag == 2 and perms == 5]
+    owner = Path(path).stat().st_uid
+    return [uid for tag, perms, uid in struct.iter_unpack("<HHI", raw[4:])
+            if tag == 2 and perms == 5 and uid != owner]
 
 
 def set_read_acl(path, uids):
     path = Path(path)
     if path.is_symlink() or not (path.is_dir() or path.is_file()):
         raise Fault("SAVED_SYMLINK_DENIED")
-    if not uids or any(type(uid) is not int or uid <= 0 or uid == path.stat().st_uid for uid in uids):
+    if any(type(uid) is not int or uid <= 0 for uid in uids):
         raise Fault("INVALID_SAVED_READER_IDENTITY")
+    # The owner is governed by USER_OBJ, not a named reader ACL. In particular,
+    # a Samba account sharing the writer UID must keep its local owner rights.
+    uids = [uid for uid in uids if uid != path.stat().st_uid]
+    if not uids:
+        return
     directory = path.is_dir()
     # Sole owner is the already verified Gateway/Worker user. Group and other do
     # not receive broad access; each existing personal Samba account is explicit.

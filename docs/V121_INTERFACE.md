@@ -19,6 +19,8 @@
 
 宿主映射查找与可写要求分离，最深 bind 优先；workspace必须RW，来源可RO，拒绝非绝对路径/..。Worker NAS reference一直默认RO。只读和版本检查不等于判断上传已完成；Uploading/Incoming为用户显式发布约定。
 
-Samba是可选管理员功能，结果仅暴露saved，state_dir权限备份是部署审计文件，不是第二套文件数据库。Linux默认ACL作为可信管理员设置；saved发布器仅在有指定只读named-user默认ACL时为新版本修复access/defaultACL。保留服务所有者权限，限制group/other与指定用户，不增加Gateway广泛组。已有自定义ACL拒绝自动覆盖，保持家庭NAS的简单边界。
+Samba是可选管理员功能，结果仅暴露saved，state_dir权限备份是部署审计文件，不是第二套文件数据库。plan、rollback计划及安装记录中每个share返回 `permission_mode`：同UID为 `owner_samba_readonly`，不同UID为 `reader_acl`。同UID不改新旧保存区ACL/所有者权限，依靠Samba只读配置；不同UID保留现有读者ACL修复及Unix不可写检查，已有自定义named ACL拒绝自动覆盖。saved发布器忽略所有者自己的named-reader条目，仅有非所有者只读named-user默认ACL时修复新版本access/defaultACL。没有读者ACL时发布行为不变。不增加Gateway广泛组，不扩展身份系统。
+
+重复apply、diagnose和rollback比较当前UID/模式与安装记录，身份/模式改变拒绝自动处理。旧记录没有模式时明确按reader_acl解释。diagnose同UID返回 `unix_reader_access:READ_TRAVERSE_OWNER_PERMISSIONS_PRESERVED` 及“Samba 访问只读，服务器本地所有者仍可写。”；不同UID返回 `READ_TRAVERSE_NO_WRITE`。两者仍返回 `production_acceptance:PENDING`，实际SMB读写及账号隔离须单独验证。
 
 保存目录仍为分类/版本ID/产物、saved.json、sources.json和必要图片。原转写和派生纪要保留独立来源。不扩展引擎、向量索引、Family授权、数据库/Embedding/搜索算法。真实QQ、生产长附件与开机挂载验收见 [测试及生产清单](V121_TESTING.md)。

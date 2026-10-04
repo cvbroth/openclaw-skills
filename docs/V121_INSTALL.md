@@ -46,7 +46,14 @@ Agent 调 `filetools_register({source_root:"incoming",source_path:"report.pdf",m
 
 核心 FileTools 不强制安装 Samba。复用 NAS 已有 Unix/Samba 用户 chen、liang、azl，不创建账号，不读取密码；azl→ziling，main 默认无结果共享。
 
-[samba-results.example.json](../deploy/samba-results.example.json) 中 saved 必须是实际已初始化的 `filetools/saved`，不能误填 cache 或整个workspace。CLI 基于 pwd 查真实账号 UID，核对其不是 saved 的写入所有者；不猜 UID。计划不创建文件/挂载/ACL，不连接 Docker、Gateway 或生产网络。
+[samba-results.example.json](../deploy/samba-results.example.json) 中 saved 必须是实际已初始化的 `filetools/saved`，不能误填 cache 或整个workspace。CLI 基于 pwd 查真实账号 UID，与 saved 的实际所有者 UID 比较，不猜 UID，不允许 root 共享账号。计划不创建文件/挂载/ACL，不连接 Docker、Gateway 或生产网络。
+
+两种模式自动选择并写入计划及 `results-rollback.json` 的每个 share：
+
+- `owner_samba_readonly`：账号 UID 等于 saved 所有者（例如已核实的 Gateway/chen UID 1000）。保留保存区现有权限和 ACL，不给所有者添加只读 ACL。Samba 访问只读，服务器本地所有者仍可写。
+- `reader_acl`：账号 UID 与 saved 所有者不同，沿用指定读者只读 ACL，保留 FileTools 服务所有者写入权限；需要 POSIX ACL 支持。
+
+不改变 Gateway 用户，不递归 chown/chmod 工作区，也不扩大其他目录权限。同 UID 时，知道同一 Unix 身份的本地进程仍受原所有者权限控制；Samba 只读并不构成服务器本地所有者的写入隔离。
 
 ```bash
 python3 scripts/filetools_admin.py samba-results --config /path/results.json
@@ -58,14 +65,16 @@ sudo systemctl reload smbd
 
 apply 只做以下修改：
 
-- 给 explicit saved 树安装“服务所有者原权限 + 指定用户只读/遍历”的 POSIX ACL，group/other不获额外访问。旧文件须为同一个已核验写入 UID，已有自定义 named ACL/所有者不一致要求人工审查，不自动覆盖。锁住现有 `.registry.lock` 与保存操作协调；100000节点上限避免无界权限快照。
+- 仅在 `reader_acl` 模式给 explicit saved 树安装“服务所有者原权限 + 指定用户只读/遍历”的 POSIX ACL，group/other不获额外访问。该模式旧文件须为同一个已核验写入 UID，已有自定义 named ACL/所有者不一致要求人工审查，不自动覆盖。`owner_samba_readonly` 不修改保存区 ACL，包括原来已有的自定义 ACL。锁住现有 `.registry.lock` 与保存操作协调；两种模式都限制树检查为100000节点。
 - 以 bind 在 `/srv/storage/results/<user>` 暴露同份 saved 数据，绕开 /root 路径遍历，不放宽 /root。既有 results 根不改权限；若其上级不可遍历，diagnose 报 Unix access 失败，管理员仅审查该公共入口祖先权限。
 - 创建自己的 systemd `.mount` 单元，`RequiresMountsFor=原saved`、`Before=smbd.service`、启用 local-fs.target。首次目录不存在则拒绝，重启后挂载/失效需 diagnose；不覆盖现有入口或单位，不叠加未知 mount。
 - 私有 state_dir 保存配置片段与权限/配置备份，末尾新增自己的 `[global]` include。`valid users`、`read only=yes`、`guest ok=no`；本共享显式清空继承的 write list/admin users/force user/force group，不借既有全局特权覆盖只读身份。隐藏并禁止访问未完成 `.saving-*`、`.migration-*`、`*.tmp-*`。testparm 校验前后配置，原来的个人/Family 共享不改。
 
-bind 本身不复制也不改变所有者，不把 Worker 原 saved 入口整体 remount成只读。只读来自 Samba 和账号 ACL；服务所有者仍可在原入口写入。新版发布器在生成独立版本、chmod0440/0600和最后原子 JSON 替换之后重新设置文件 read ACL/掩码，避免继承 ACL 被缩窄。运行时用 Python stdlib xattr，不需要临时安装 setfacl。匿名本地测试验证新旧文件和完整 save 流程；NAS 实际 FS、systemd 启动及账号仍待验收。
+bind 本身不复制也不改变所有者，不把 Worker 原 saved 入口整体 remount成只读。两种模式都依靠 Samba 配置禁止上传、覆盖、删除、重命名；不同 UID 还由读者 ACL 限制 Unix 写入。发布器忽略 named-owner 读者条目，没有非所有者读者默认 ACL 时保持原发布行为；有读者时在独立版本、chmod0440/0600及最后原子 JSON 替换后修复 read ACL/掩码。运行时用 Python stdlib xattr，不需要临时安装 setfacl。测试边界见 [UID 修复报告](V121_SAMBA_UID_FIX.md)；NAS 实际 FS、systemd 启动及账号仍待验收。
 
-同配置重复 apply 核验 mount/default ACL/单位/配置哈希，返回 RESULTS_ALREADY_APPLIED；发现漂移拒绝继续并要求诊断。系统修改中失败会按记录尝试回滚，保留 saved。若系统命令失败或后续管理员改过配置，保留回滚记录并报告，不覆盖后续变动。
+同配置重复 apply 核验身份/权限模式、mount、单位和配置哈希；仅不同 UID 模式检查读者默认 ACL。返回 RESULTS_ALREADY_APPLIED；UID/模式变化报 RESULTS_IDENTITY_OR_PERMISSION_MODE_CHANGED，不自动切换策略。旧 V1.2.1 未记录模式的已安装 share 按 reader_acl 兼容，无数据迁移。系统修改中失败会按记录尝试回滚，保留 saved。若系统命令失败或后续管理员改过配置，保留回滚记录并报告，不覆盖后续变动。
+
+diagnose 两种模式检查账号读取/遍历 bind 入口；不同 UID 额外检查 Unix 不可写，同 UID 保留本地所有者权限并明确报告上述区别。diagnose 不读取密码、不代表真实 SMB 操作已通过。管理员必须用实际账号运行下载及四种写操作拒绝检查，错误账号亦不得进入；见修复报告中的部署后清单。
 
 ## 回滚及迁移
 
@@ -79,7 +88,7 @@ python3 scripts/filetools_admin.py rollback --record /DATA/installation/1.2.1/ro
 python3 scripts/filetools_admin.py rollback --record /DATA/installation/1.2.1/rollback.json --apply
 ```
 
-Samba rollback 核对配置/自己的单位/挂载来源，恢复原smb.conf、旧saved ACL和模式，移除新结果的本功能 ACL，仅卸载自己的入口/单位、空目录。不删除任何 saved、原件、registry、缓存、账号或隧道；保存回滚审计记录。后续改过smb.conf则拒绝自动覆盖，需审查后只移除本功能include。再次部署使用新 state_dir 保存新回滚记录。
+Samba rollback 核对身份/权限模式、配置、自己的单位及挂载来源。仅 `reader_acl` 恢复旧 saved ACL/模式并移除新结果的本功能 ACL；`owner_samba_readonly` 不改新旧文件 ACL 或所有者权限。恢复原 smb.conf，仅卸载自己的入口/单位、空目录。不删除任何 saved、原件、registry、缓存、账号或隧道；保存回滚审计记录。后续改过smb.conf则拒绝自动覆盖，需审查后只移除本功能include。再次部署使用新 state_dir 保存新回滚记录。
 
 若卸载返回busy或systemctl暂时失败，关闭客户端对本结果共享的打开文件，按同一record/config重试rollback。已恢复到准确原配置/已撤销的单位和入口可续作，非本功能配置/片段修改仍拒绝覆盖；不用lazy/force卸载隐藏活动访问。若卸载失败，尚存ACL/挂载应按diagnose检查，不能先删除源saved。
 

@@ -149,3 +149,17 @@ def test_saved_atomic_json_and_0440_mask_repair(tmp_path):
         entries = list(struct.iter_unpack("<HHI", acl_bytes(path, ACCESS)[4:]))
         assert (2, 4, reader) in entries and (16, 4, 0xffffffff) in entries
         assert path.stat().st_uid == os.getuid()
+
+
+def test_publish_without_reader_acl_keeps_existing_permissions(tmp_path):
+    from nas_filetools.saved_permissions import publish_saved_permissions
+    saved = tmp_path/"saved"
+    version = saved/"text"/"version"
+    version.mkdir(parents=True)
+    content = version/"content.md"
+    content.write_text("Retained")
+    os.chmod(content, 0o600)
+    before = {p: p.stat().st_mode for p in (saved, version.parent, version, content)}
+    publish_saved_permissions(saved, version)
+    assert {p: p.stat().st_mode for p in before} == before
+    assert content.read_text() == "Retained"
