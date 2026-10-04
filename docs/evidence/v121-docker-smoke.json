@@ -1,0 +1,20 @@
+{
+  "status": "PASSED",
+  "production": "NOT_ACCESSED",
+  "qq_gateway_e2e": "NOT_RUN",
+  "dependency_image": "nas-filetools-test:1.2.1",
+  "roles": "Linux root manager container + two actual UID10001 role containers; not OpenClaw daemon",
+  "real_checks": [
+    "umask022/077 marker ownership660",
+    "nonroot Gateway/Worker sequential read/write",
+    "marker cleanup",
+    "actual readonly NAS mounts; snapshot/reference registration",
+    "external remove dereferences only",
+    "outside change rejects prior reference",
+    "worker saved original entrance writable"
+  ],
+  "ids": {
+    "snapshot": "9792ea7a6e4e40e18c0b908e676a4788",
+    "reference": "5cc5a78cf6fb408c9558041f4311e00b"
+  }
+}

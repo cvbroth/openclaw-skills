@@ -1,0 +1,27 @@
+✔ actual SDK registers ten factories and supported hooks (2.263699ms)
+✔ canonical trusted attachment -> registered ID -> read evidence; repeated inspect does not upload twice (3508.708526ms)
+✔ new session UUID refuses even an unprocessed old attachment (1.989227ms)
+✔ sender/account/agent/group sessions cannot select another user's attachments (0.278106ms)
+✔ model cannot supply path, owner or session, and malformed ranges are rejected (1.133839ms)
+✔ staging/URL/text paths/mismatched runtime facts never become registered attachments (2.33575ms)
+✔ changed inode/content is refused without uploading (3.02502ms)
+✔ concurrent inspect uploads once and failed transport never masquerades as no content (3.584445ms)
+✔ ordinary 2026.9.4 event without runId binds the trusted stored epoch (3.685222ms)
+✔ first session creation resolves pending media; reset and failed store never adopt old media (2.812916ms)
+[state/agent-db] slow OpenClaw agent database open
+✔ public SDK session storage and actual registered inbound hook work without runId (1656.109382ms)
+✔ arrival archives without inspect; receipt once and same-event task can extract (3.735611ms)
+✔ old epoch references do not consume new UUID quota; excess is explicit (10.361893ms)
+✔ one Agent binding does not require a second user_id identity system (0.195422ms)
+✔ slow registration is bounded; pending does not consume terminal success (43.925444ms)
+✔ persistent failure receipt, same-ID retry success and bounded valid JSON continuation (17.169568ms)
+✔ actual registered prompt hook reports pending as parseable JSON without swallowing completion (13.054283ms)
+✔ quota overflow reports remaining count, and duplicate canonical event does not become a new quota failure (11.887605ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 48403.577974

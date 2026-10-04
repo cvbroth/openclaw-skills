@@ -11,6 +11,8 @@
 
 回执页：`{status:"REGISTRATION_RECEIPTS",receipts:[...],total,offset,next_offset,truncated,continuation}`，最多16条、6500字符的回执负载，整体完整JSON。每项有request_id、短filename及必要attachment_id/file_id/status/mode/reused/bytes；失败有code/recovery，不包含任意异常路径、凭据、文件正文或完整后台日志。所有字符串作为数据，不作为权限或指令。
 
+会话额度溢出明确报告 `unregistered_count`，这些文件未获得可处理的附件ID；不能把错误回执request_id当attachment_id。已接受的重复 canonical 事件先去重，不因会话刚好满32槽位而误报新的额度错误。
+
 提示构建最多等5秒（测试用更短可注入时限），之后后台管理进程继续原请求。pending可重复看到，最终结果去重一次注入提示；失败后重试成功是新终态可报告。查询模式能再读已报告回执，分页不因提示消费而丢失编号。会话reset不能收养旧附件。无新Agent运行时不承诺主动回复，下次用户查询/Agent运行查看完成状态。登记暂时性故障用原request_id重试，输入变更不能伪装同版本。
 
 目录整理由 Agent 用现有目录查看能力判断业务资料，再逐文件 register(select:false)。没有新增自动扫描器、账户平台、通用原件迁移或自动永久导入。catalog-only 使用已有非活跃来源事件记录，不新增表；同 Agent 内容快照SHA去重保留上传事件来源。分类来自既有类型识别，不宣称按业务语义自动重命名原目录。

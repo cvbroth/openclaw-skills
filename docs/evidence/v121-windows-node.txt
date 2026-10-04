@@ -1,0 +1,28 @@
+✔ registered attachment bytes flow through real core, background worker and evidence reader (3060.2243ms)
+✔ actual SDK registers ten factories and supported hooks (9.3093ms)
+✔ canonical trusted attachment -> registered ID -> read evidence; repeated inspect does not upload twice (287.5967ms)
+✔ new session UUID refuses even an unprocessed old attachment (3.7896ms)
+✔ sender/account/agent/group sessions cannot select another user's attachments (0.2372ms)
+✔ model cannot supply path, owner or session, and malformed ranges are rejected (0.9315ms)
+✔ staging/URL/text paths/mismatched runtime facts never become registered attachments (3.4962ms)
+✔ changed inode/content is refused without uploading (4.2483ms)
+✔ concurrent inspect uploads once and failed transport never masquerades as no content (4.6886ms)
+✔ ordinary 2026.9.4 event without runId binds the trusted stored epoch (4.2354ms)
+✔ first session creation resolves pending media; reset and failed store never adopt old media (5.3467ms)
+﹣ public SDK session storage and actual registered inbound hook work without runId (0.0939ms) # SDK lifecycle locks require a real writable Linux runtime
+✔ arrival archives without inspect; receipt once and same-event task can extract (4.9565ms)
+✔ old epoch references do not consume new UUID quota; excess is explicit (11.0347ms)
+✔ one Agent binding does not require a second user_id identity system (0.3003ms)
+✔ slow registration is bounded; pending does not consume terminal success (38.6513ms)
+✔ persistent failure receipt, same-ID retry success and bounded valid JSON continuation (74.5404ms)
+✔ actual registered prompt hook reports pending as parseable JSON without swallowing completion (25.0395ms)
+✔ quota overflow reports remaining count, and duplicate canonical event does not become a new quota failure (43.255ms)
+✔ shared canonical relative attachment registers without byte upload; text/XLSX outputs can be fetched (6295.3525ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 8673.2421

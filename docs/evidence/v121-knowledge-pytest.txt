@@ -1,0 +1,57 @@
+
+=================================== ERRORS ====================================
+______________ ERROR collecting tests/test_knowledge_importer.py ______________
+ImportError while importing test module 'C:\Users\18296\Documents\Codex\2026-10-03\nas-openclaw-v1-https-github-com\work\vector-search-engine\tests\test_knowledge_importer.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+tests\test_knowledge_importer.py:24: in <module>
+    from pypdf import PdfWriter
+E   ModuleNotFoundError: No module named 'pypdf'
+__________________ ERROR collecting tests/test_scope_lock.py __________________
+ImportError while importing test module 'C:\Users\18296\Documents\Codex\2026-10-03\nas-openclaw-v1-https-github-com\work\vector-search-engine\tests\test_scope_lock.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+tests\test_scope_lock.py:17: in <module>
+    import ingest
+ingest.py:15: in <module>
+    from chunker import chunk_blocks
+chunker.py:10: in <module>
+    from parsers import ParsedBlock
+parsers.py:15: in <module>
+    from pypdf import PdfReader
+E   ModuleNotFoundError: No module named 'pypdf'
+___________ ERROR collecting tests/test_session_document_service.py ___________
+ImportError while importing test module 'C:\Users\18296\Documents\Codex\2026-10-03\nas-openclaw-v1-https-github-com\work\vector-search-engine\tests\test_session_document_service.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+tests\test_session_document_service.py:12: in <module>
+    from session_document_service import SessionDocumentHandler
+session_document_service.py:18: in <module>
+    from session_documents import (
+session_documents.py:21: in <module>
+    import sqlite_vec
+E   ModuleNotFoundError: No module named 'sqlite_vec'
+______________ ERROR collecting tests/test_session_documents.py _______________
+ImportError while importing test module 'C:\Users\18296\Documents\Codex\2026-10-03\nas-openclaw-v1-https-github-com\work\vector-search-engine\tests\test_session_documents.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+tests\test_session_documents.py:12: in <module>
+    from parsers import ParseError, ParsedBlock
+parsers.py:15: in <module>
+    from pypdf import PdfReader
+E   ModuleNotFoundError: No module named 'pypdf'
+=========================== short test summary info ===========================
+ERROR tests/test_knowledge_importer.py
+ERROR tests/test_scope_lock.py
+ERROR tests/test_session_document_service.py
+ERROR tests/test_session_documents.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 4 errors during collection !!!!!!!!!!!!!!!!!!!
+4 errors in 1.51s

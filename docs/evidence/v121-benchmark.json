@@ -1,0 +1,676 @@
+{
+  "platform": "Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.36",
+  "processor": "",
+  "python": "3.12.10",
+  "note": "Real engines in separate CPU workers on this development machine. Not NAS or Gateway E2E.",
+  "memory_cap_applied": true,
+  "limits": {
+    "max_receive_bytes": 4294967296,
+    "max_process_bytes": 4294967296,
+    "max_control_bytes": 524288,
+    "max_response_bytes": 2097152,
+    "max_pages": 10000,
+    "max_audio_seconds": 21600,
+    "audio_chunk_seconds": 600,
+    "audio_overlap_seconds": 2,
+    "max_image_pixels": 24000000,
+    "max_docx_expanded_bytes": 134217728,
+    "max_text_bytes": 16777216,
+    "max_output_chars": 2000000,
+    "max_asset_bytes": 33554432,
+    "max_read_chars": 12000,
+    "max_segments": 20000,
+    "max_manifest_bytes": 67108864,
+    "max_engine_log_bytes": 2097152,
+    "preview_pages": 3,
+    "large_pages": 20,
+    "large_audio_seconds": 600,
+    "ttl_seconds": 259200,
+    "cleanup_interval_seconds": 3600,
+    "timeout_seconds": 3600,
+    "audio_wall_factor": 8,
+    "max_job_seconds": 259200,
+    "stall_seconds": 1800,
+    "upload_timeout_seconds": 3600,
+    "script_timeout_seconds": 60,
+    "script_output_bytes": 268435456,
+    "concurrency": 1,
+    "engine_threads": 2,
+    "worker_memory_mb": 4096,
+    "inspection_timeout_seconds": 15,
+    "max_jobs_per_scope": 32,
+    "max_references_per_session": 32,
+    "snapshot_quota_bytes": 107374182400,
+    "saved_quota_bytes": 53687091200,
+    "cache_quota_bytes": 21474836480,
+    "disk_reserve_bytes": 1073741824,
+    "quota_warning_percent": 80,
+    "enabled_agents": [
+      "chen"
+    ],
+    "whisper_model": "/models/models--Systran--faster-whisper-small/snapshots/536b0662742c02347bc0e980a01041f333bce120",
+    "model_cache": "/var/cache/nas-filetools",
+    "script_python": "",
+    "script_isolation": "landlock",
+    "offline": true,
+    "workspace_mode": false,
+    "gateway_workspace": "",
+    "source_roots": {}
+  },
+  "cases": [
+    {
+      "filename": "text.pdf",
+      "bytes": 1279,
+      "kind": "pdf",
+      "units": 2,
+      "duration": null,
+      "inspection_seconds": 0.647,
+      "registration_seconds": 0.105,
+      "worker_wall_seconds": 0.922,
+      "result": {
+        "status": "SUCCEEDED",
+        "job_id": "7a62b5e188424fc2b2b7ce9e4ab34048",
+        "attachment_id": "86486b427220472a88dc6108b3fae6fa",
+        "progress": 1.0,
+        "expires_at": "2026-10-07T10:23:54.918150+00:00",
+        "cancel_requested": false,
+        "coverage": {
+          "kind": "pdf",
+          "requested": [
+            1,
+            2
+          ],
+          "mode": "full",
+          "total_units": 2,
+          "total_duration": null,
+          "full_document": true,
+          "processed_count": 2,
+          "processed_sample": [
+            {
+              "page": 1
+            },
+            {
+              "page": 2
+            }
+          ]
+        },
+        "failures": [],
+        "failure_count": 0,
+        "warnings": [
+          "Preview is bounded; text presence does not prove complete extraction.",
+          "PDF reading order is geometric/engine order; columns, formulas and complex tables need review."
+        ],
+        "warning_count": 2,
+        "artifacts": [
+          {
+            "artifact_id": "42ffb0751ae3447a94f3b5955f21a700",
+            "file": "published/content.md",
+            "kind": "content",
+            "sha256": "3be26ddd9bab028aaf2174f989fc5aa571950ea30e70a4b6325a9244591a6857",
+            "bytes": 221,
+            "file_id": "abade6e4c0f347aeaede24154f81f7ba",
+            "format": "markdown",
+            "workspace_relative_path": "filetools/cache/7a62b5e188424fc2b2b7ce9e4ab34048/published/content.md",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/7a62b5e188424fc2b2b7ce9e4ab34048/published/content.md",
+            "availability": "AVAILABLE"
+          },
+          {
+            "artifact_id": "e1a0c9e656414ceaa1b2df73668d0490",
+            "file": "sources.json",
+            "kind": "sources",
+            "format": "json",
+            "bytes": 3296,
+            "sha256": "abf44b1db705d4297590bf0215e7cfd83ee379cd4b84ab6c988ab4829b393e35",
+            "workspace_relative_path": "filetools/cache/7a62b5e188424fc2b2b7ce9e4ab34048/sources.json",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/7a62b5e188424fc2b2b7ce9e4ab34048/sources.json",
+            "availability": "AVAILABLE"
+          }
+        ],
+        "artifact_count": 2,
+        "metadata_truncated": false,
+        "created_at": "2026-10-04T10:23:54.100151+00:00",
+        "kind": "extract"
+      }
+    },
+    {
+      "filename": "scan.pdf",
+      "bytes": 1080791,
+      "kind": "pdf",
+      "units": 1,
+      "duration": null,
+      "inspection_seconds": 0.584,
+      "registration_seconds": 0.117,
+      "worker_wall_seconds": 3.236,
+      "result": {
+        "status": "SUCCEEDED",
+        "job_id": "172dfda8ffd04b9d83d07cc259194916",
+        "attachment_id": "b34be2be66bb4aa193411d11812276c5",
+        "progress": 1.0,
+        "expires_at": "2026-10-07T10:23:58.508330+00:00",
+        "cancel_requested": false,
+        "coverage": {
+          "kind": "pdf",
+          "requested": [
+            1,
+            1
+          ],
+          "mode": "full",
+          "total_units": 1,
+          "total_duration": null,
+          "full_document": true,
+          "processed_count": 1,
+          "processed_sample": [
+            {
+              "page": 1
+            }
+          ]
+        },
+        "failures": [],
+        "failure_count": 0,
+        "warnings": [
+          "Preview is bounded; text presence does not prove complete extraction.",
+          "PDF reading order is geometric/engine order; columns, formulas and complex tables need review."
+        ],
+        "warning_count": 2,
+        "artifacts": [
+          {
+            "artifact_id": "402054456e8c4bb6ac3ddd5c32693ce7",
+            "file": "published/content.md",
+            "kind": "content",
+            "sha256": "981148f25247cb618ca11cd36887a86192c1d6cfb93efe437e553009aa536a06",
+            "bytes": 60,
+            "file_id": "a8c350632e2b492eaafbef8a1fb3d893",
+            "format": "markdown",
+            "workspace_relative_path": "filetools/cache/172dfda8ffd04b9d83d07cc259194916/published/content.md",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/172dfda8ffd04b9d83d07cc259194916/published/content.md",
+            "availability": "AVAILABLE"
+          },
+          {
+            "artifact_id": "642965c4154e4ac6b59b0435b9be60f0",
+            "file": "sources.json",
+            "kind": "sources",
+            "format": "json",
+            "bytes": 3806,
+            "sha256": "df13f9ad621605656d75335a438cb8172d54d70a2f54927bc1f418c1512123a0",
+            "workspace_relative_path": "filetools/cache/172dfda8ffd04b9d83d07cc259194916/sources.json",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/172dfda8ffd04b9d83d07cc259194916/sources.json",
+            "availability": "AVAILABLE"
+          },
+          {
+            "artifact_id": "31bbcce28a3107074f9b7dcdeac26268",
+            "file": "published/assets/31bbcce28a3107074f9b7dcdeac26268.png",
+            "source": {
+              "page": 1
+            },
+            "bytes": 35773,
+            "kind": "image",
+            "sha256": "31bbcce28a3107074f9b7dcdeac26268642ba4baa23385e845eea9c077d8198c",
+            "file_id": "9eb62bf191f543a8a82e703f2ac87407",
+            "format": "png",
+            "workspace_relative_path": "filetools/cache/172dfda8ffd04b9d83d07cc259194916/published/assets/31bbcce28a3107074f9b7dcdeac26268.png",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/172dfda8ffd04b9d83d07cc259194916/published/assets/31bbcce28a3107074f9b7dcdeac26268.png",
+            "availability": "AVAILABLE"
+          }
+        ],
+        "artifact_count": 3,
+        "metadata_truncated": false,
+        "created_at": "2026-10-04T10:23:55.708619+00:00",
+        "kind": "extract"
+      }
+    },
+    {
+      "filename": "mixed.pdf",
+      "bytes": 1081916,
+      "kind": "pdf",
+      "units": 3,
+      "duration": null,
+      "inspection_seconds": 0.607,
+      "registration_seconds": 0.106,
+      "worker_wall_seconds": 2.92,
+      "result": {
+        "status": "SUCCEEDED",
+        "job_id": "b87f2cc5fb4c4259940fd0b48161aadc",
+        "attachment_id": "68207e27bc5a4f3db6449fc6fd0b2bd1",
+        "progress": 1.0,
+        "expires_at": "2026-10-07T10:24:02.482278+00:00",
+        "cancel_requested": false,
+        "coverage": {
+          "kind": "pdf",
+          "requested": [
+            1,
+            3
+          ],
+          "mode": "full",
+          "total_units": 3,
+          "total_duration": null,
+          "full_document": true,
+          "processed_count": 3,
+          "processed_sample": [
+            {
+              "page": 1
+            },
+            {
+              "page": 2
+            },
+            {
+              "page": 3
+            }
+          ]
+        },
+        "failures": [],
+        "failure_count": 0,
+        "warnings": [
+          "Preview is bounded; text presence does not prove complete extraction.",
+          "PDF reading order is geometric/engine order; columns, formulas and complex tables need review."
+        ],
+        "warning_count": 2,
+        "artifacts": [
+          {
+            "artifact_id": "0690b7ff4cf644569ec09c7002b42ac4",
+            "file": "published/content.md",
+            "kind": "content",
+            "sha256": "7f216e70e55a90c0e265d3a75568f388d764c5957c4e800f3345ea67bb9269cb",
+            "bytes": 312,
+            "file_id": "d5b8c9819fec4df2a1a14aba8ce91b51",
+            "format": "markdown",
+            "workspace_relative_path": "filetools/cache/b87f2cc5fb4c4259940fd0b48161aadc/published/content.md",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/b87f2cc5fb4c4259940fd0b48161aadc/published/content.md",
+            "availability": "AVAILABLE"
+          },
+          {
+            "artifact_id": "6ef2e8bb0a8447c197213fe9f0a7058d",
+            "file": "sources.json",
+            "kind": "sources",
+            "format": "json",
+            "bytes": 4997,
+            "sha256": "0e0db7c4799caae611f15b6e7bd8d61f986e825bee9c98b1ceee95b45f35d9aa",
+            "workspace_relative_path": "filetools/cache/b87f2cc5fb4c4259940fd0b48161aadc/sources.json",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/b87f2cc5fb4c4259940fd0b48161aadc/sources.json",
+            "availability": "AVAILABLE"
+          },
+          {
+            "artifact_id": "31bbcce28a3107074f9b7dcdeac26268",
+            "file": "published/assets/31bbcce28a3107074f9b7dcdeac26268.png",
+            "source": {
+              "page": 2
+            },
+            "bytes": 35773,
+            "kind": "image",
+            "sha256": "31bbcce28a3107074f9b7dcdeac26268642ba4baa23385e845eea9c077d8198c",
+            "file_id": "672df93f0a204f0c88d987c9b77776d5",
+            "format": "png",
+            "workspace_relative_path": "filetools/cache/b87f2cc5fb4c4259940fd0b48161aadc/published/assets/31bbcce28a3107074f9b7dcdeac26268.png",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/b87f2cc5fb4c4259940fd0b48161aadc/published/assets/31bbcce28a3107074f9b7dcdeac26268.png",
+            "availability": "AVAILABLE"
+          },
+          {
+            "artifact_id": "bce96cec5846c26ee3a741e7e2fd0854",
+            "file": "published/assets/bce96cec5846c26ee3a741e7e2fd0854.png",
+            "source": {
+              "page": 3
+            },
+            "bytes": 47828,
+            "kind": "image",
+            "sha256": "bce96cec5846c26ee3a741e7e2fd0854665b5cfdc18d3a5eb741adf63b6ae900",
+            "file_id": "465f193bac344ca1b34f8254f94694fb",
+            "format": "png",
+            "workspace_relative_path": "filetools/cache/b87f2cc5fb4c4259940fd0b48161aadc/published/assets/bce96cec5846c26ee3a741e7e2fd0854.png",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/b87f2cc5fb4c4259940fd0b48161aadc/published/assets/bce96cec5846c26ee3a741e7e2fd0854.png",
+            "availability": "AVAILABLE"
+          }
+        ],
+        "artifact_count": 4,
+        "metadata_truncated": false,
+        "created_at": "2026-10-04T10:23:59.655090+00:00",
+        "kind": "extract"
+      }
+    },
+    {
+      "filename": "ordered.docx",
+      "bytes": 46516,
+      "kind": "docx",
+      "units": 5,
+      "duration": null,
+      "inspection_seconds": 0.653,
+      "registration_seconds": 0.07,
+      "worker_wall_seconds": 1.012,
+      "result": {
+        "status": "PARTIAL",
+        "job_id": "e198b8bb105c4ab78c81c549ba895559",
+        "attachment_id": "4dd7751870784344be5099ceec395cdd",
+        "progress": 1.0,
+        "expires_at": "2026-10-07T10:24:04.220171+00:00",
+        "cancel_requested": false,
+        "coverage": {
+          "kind": "docx",
+          "requested": [
+            1,
+            5
+          ],
+          "mode": "full",
+          "total_units": 5,
+          "total_duration": null,
+          "full_document": false,
+          "processed_count": 5,
+          "processed_sample": [
+            {
+              "paragraph": 1
+            },
+            {
+              "paragraph": 2
+            },
+            {
+              "paragraph": 3
+            },
+            {
+              "paragraph": 4
+            },
+            {
+              "paragraph": 5
+            }
+          ]
+        },
+        "failures": [
+          {
+            "source": {
+              "paragraph": 4
+            },
+            "code": "IMAGE_TEXT_NOT_EXTRACTED",
+            "error_type": "Fault"
+          }
+        ],
+        "failure_count": 1,
+        "warnings": [
+          "Body blocks only; headers, footers, text boxes and layout are not reconstructed.",
+          "Embedded images are preserved, not OCRed; image-only content requires a separate OCR task.",
+          "Block 2: table cells retained; merged/nested geometry may be approximate."
+        ],
+        "warning_count": 3,
+        "artifacts": [
+          {
+            "artifact_id": "b24c43b790ee4d45a171c14c77f58ce1",
+            "file": "published/content.md",
+            "kind": "content",
+            "sha256": "e227cafcc5fe0abdbccca99912a79614b36de23585b0893588b4d4e749119c9a",
+            "bytes": 334,
+            "file_id": "eaf83e1ee1ba4c7eac94949dc63695ab",
+            "format": "markdown",
+            "workspace_relative_path": "filetools/cache/e198b8bb105c4ab78c81c549ba895559/published/content.md",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/e198b8bb105c4ab78c81c549ba895559/published/content.md",
+            "availability": "AVAILABLE"
+          },
+          {
+            "artifact_id": "64920aab14804ee2be28847dec3f3960",
+            "file": "sources.json",
+            "kind": "sources",
+            "format": "json",
+            "bytes": 4424,
+            "sha256": "6acec4106b93b3bd06ac355a80fa0dd20bb3728acb257d662a82feaa97dbc083",
+            "workspace_relative_path": "filetools/cache/e198b8bb105c4ab78c81c549ba895559/sources.json",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/e198b8bb105c4ab78c81c549ba895559/sources.json",
+            "availability": "AVAILABLE"
+          },
+          {
+            "artifact_id": "1e1a6f365e34b699ec96d72902b97a0a",
+            "file": "published/assets/1e1a6f365e34b699ec96d72902b97a0a.png",
+            "source": {
+              "paragraph": 4
+            },
+            "bytes": 11732,
+            "kind": "image",
+            "sha256": "1e1a6f365e34b699ec96d72902b97a0a950b38db38225c4490e20c35c8a50df5",
+            "file_id": "f08c17d86d964a49bd7111710154d803",
+            "format": "png",
+            "workspace_relative_path": "filetools/cache/e198b8bb105c4ab78c81c549ba895559/published/assets/1e1a6f365e34b699ec96d72902b97a0a.png",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/e198b8bb105c4ab78c81c549ba895559/published/assets/1e1a6f365e34b699ec96d72902b97a0a.png",
+            "availability": "AVAILABLE"
+          }
+        ],
+        "artifact_count": 3,
+        "metadata_truncated": false,
+        "created_at": "2026-10-04T10:24:03.299435+00:00",
+        "kind": "extract"
+      }
+    },
+    {
+      "filename": "printed.png",
+      "bytes": 11732,
+      "kind": "image",
+      "units": 1,
+      "duration": null,
+      "inspection_seconds": 0.604,
+      "registration_seconds": 0.071,
+      "worker_wall_seconds": 2.258,
+      "result": {
+        "status": "SUCCEEDED",
+        "job_id": "842b4e864cb9407c9950ad1c12d56d74",
+        "attachment_id": "220291bb4ade40a2a6208de2cec1425d",
+        "progress": 1.0,
+        "expires_at": "2026-10-07T10:24:07.154958+00:00",
+        "cancel_requested": false,
+        "coverage": {
+          "kind": "image",
+          "requested": [
+            1,
+            1
+          ],
+          "mode": "full",
+          "total_units": 1,
+          "total_duration": null,
+          "full_document": true,
+          "processed_count": 1,
+          "processed_sample": [
+            {
+              "page": 1
+            }
+          ]
+        },
+        "failures": [],
+        "failure_count": 0,
+        "warnings": [
+          "Printed text OCR only; no scene understanding, handwriting or formula guarantee."
+        ],
+        "warning_count": 1,
+        "artifacts": [
+          {
+            "artifact_id": "f09887a556f144af930b19f2d4199a39",
+            "file": "published/content.md",
+            "kind": "content",
+            "sha256": "981148f25247cb618ca11cd36887a86192c1d6cfb93efe437e553009aa536a06",
+            "bytes": 60,
+            "file_id": "cd0f88aa08f6484d9203344fe9417679",
+            "format": "markdown",
+            "workspace_relative_path": "filetools/cache/842b4e864cb9407c9950ad1c12d56d74/published/content.md",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/842b4e864cb9407c9950ad1c12d56d74/published/content.md",
+            "availability": "AVAILABLE"
+          },
+          {
+            "artifact_id": "2ea511e67d53401a9af1096cb52bc192",
+            "file": "sources.json",
+            "kind": "sources",
+            "format": "json",
+            "bytes": 3121,
+            "sha256": "3cb75792ee3128fc08945221d2275109f57e7fc923fccb393c2db23b430169ea",
+            "workspace_relative_path": "filetools/cache/842b4e864cb9407c9950ad1c12d56d74/sources.json",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/842b4e864cb9407c9950ad1c12d56d74/sources.json",
+            "availability": "AVAILABLE"
+          }
+        ],
+        "artifact_count": 2,
+        "metadata_truncated": false,
+        "created_at": "2026-10-04T10:24:04.986481+00:00",
+        "kind": "extract"
+      }
+    },
+    {
+      "filename": "notes.md",
+      "bytes": 86,
+      "kind": "text",
+      "units": 3,
+      "duration": null,
+      "inspection_seconds": 0.589,
+      "registration_seconds": 0.064,
+      "worker_wall_seconds": 0.971,
+      "result": {
+        "status": "SUCCEEDED",
+        "job_id": "941637b072da40d187b67a1c9d3cadf3",
+        "attachment_id": "acc41296ad9b460092cd5c42954fb96c",
+        "progress": 1.0,
+        "expires_at": "2026-10-07T10:24:08.772174+00:00",
+        "cancel_requested": false,
+        "coverage": {
+          "kind": "text",
+          "requested": [
+            1,
+            3
+          ],
+          "mode": "full",
+          "total_units": 3,
+          "total_duration": null,
+          "full_document": true,
+          "processed_count": 3,
+          "processed_sample": [
+            {
+              "paragraph": 1
+            },
+            {
+              "paragraph": 2
+            },
+            {
+              "paragraph": 3
+            }
+          ]
+        },
+        "failures": [],
+        "failure_count": 0,
+        "warnings": [],
+        "warning_count": 0,
+        "artifacts": [
+          {
+            "artifact_id": "15c5172b1a06489399ade6386dd6f79f",
+            "file": "published/content.md",
+            "kind": "content",
+            "sha256": "ac3e99a7e7310935de0c0a3b834fe8d725d6f57d91c5ffee2162912b0ed62345",
+            "bytes": 195,
+            "file_id": "a2666020852b4b41a15d59cbbef7f583",
+            "format": "markdown",
+            "workspace_relative_path": "filetools/cache/941637b072da40d187b67a1c9d3cadf3/published/content.md",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/941637b072da40d187b67a1c9d3cadf3/published/content.md",
+            "availability": "AVAILABLE"
+          },
+          {
+            "artifact_id": "70af3caa27144c7ebf1f7de6b6884b98",
+            "file": "sources.json",
+            "kind": "sources",
+            "format": "json",
+            "bytes": 3160,
+            "sha256": "f2e4324641bfa8ef57e17ed72bce5a8cb048d16c7db1906f3306a57bea79be77",
+            "workspace_relative_path": "filetools/cache/941637b072da40d187b67a1c9d3cadf3/sources.json",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/941637b072da40d187b67a1c9d3cadf3/sources.json",
+            "availability": "AVAILABLE"
+          }
+        ],
+        "artifact_count": 2,
+        "metadata_truncated": false,
+        "created_at": "2026-10-04T10:24:07.898556+00:00",
+        "kind": "extract"
+      }
+    },
+    {
+      "filename": "jfk.flac",
+      "bytes": 1152693,
+      "kind": "audio",
+      "units": 1,
+      "duration": 11.0,
+      "inspection_seconds": 1.375,
+      "registration_seconds": 0.072,
+      "worker_wall_seconds": 7.973,
+      "result": {
+        "status": "SUCCEEDED",
+        "job_id": "7391b30c415046cc951253bda1b9607d",
+        "attachment_id": "e24174a93e3f43899c4079832a41ffa3",
+        "progress": 1.0,
+        "expires_at": "2026-10-07T10:24:17.986205+00:00",
+        "cancel_requested": false,
+        "coverage": {
+          "kind": "audio",
+          "requested": [
+            0,
+            11.0
+          ],
+          "mode": "full",
+          "total_units": 1,
+          "total_duration": 11.0,
+          "full_document": true,
+          "processed_count": 2,
+          "processed_sample": [
+            {
+              "start": 0,
+              "end": 7.44
+            },
+            {
+              "start": 8.02,
+              "end": 10.34
+            }
+          ]
+        },
+        "failures": [],
+        "failure_count": 0,
+        "warnings": [
+          "Transcript is not a verified record; no speaker identification.",
+          "Chunk overlap uses word midpoint ownership; boundary recognition can still differ. Review timestamps.",
+          "No minutes generated. Any later minutes must be stored separately from transcript.md."
+        ],
+        "warning_count": 3,
+        "artifacts": [
+          {
+            "artifact_id": "8c8c7e7f91fc47338b20114093b93f08",
+            "file": "published/content.md",
+            "kind": "content",
+            "sha256": "76fa92f5b71e1462b1eaeafba1f5eb28cb93e6f6637ec6d0aed80bad6ddbbb23",
+            "bytes": 186,
+            "file_id": "dad2e24e6a8144cba8d0410195462ccc",
+            "format": "markdown",
+            "workspace_relative_path": "filetools/cache/7391b30c415046cc951253bda1b9607d/published/content.md",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/7391b30c415046cc951253bda1b9607d/published/content.md",
+            "availability": "AVAILABLE"
+          },
+          {
+            "artifact_id": "d5861ef7a0fb46478b6a0e913ffc6c45",
+            "file": "sources.json",
+            "kind": "sources",
+            "format": "json",
+            "bytes": 3911,
+            "sha256": "f64b5d129d35367b1bfb5f352c77743c7cc99e7fca9d275583a74db745b728f0",
+            "workspace_relative_path": "filetools/cache/7391b30c415046cc951253bda1b9607d/sources.json",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/7391b30c415046cc951253bda1b9607d/sources.json",
+            "availability": "AVAILABLE"
+          },
+          {
+            "artifact_id": "4a15d2399b8546549bcb846eac6427cc",
+            "file": "published/transcript.md",
+            "kind": "transcript",
+            "sha256": "76fa92f5b71e1462b1eaeafba1f5eb28cb93e6f6637ec6d0aed80bad6ddbbb23",
+            "bytes": 186,
+            "file_id": "edd2eab982ec4d50b42ed504a7b760d2",
+            "format": "markdown",
+            "workspace_relative_path": "filetools/cache/7391b30c415046cc951253bda1b9607d/published/transcript.md",
+            "gateway_path": "/tmp/benchmark/workspace/filetools/cache/7391b30c415046cc951253bda1b9607d/published/transcript.md",
+            "availability": "AVAILABLE"
+          }
+        ],
+        "artifact_count": 3,
+        "metadata_truncated": false,
+        "created_at": "2026-10-04T10:24:10.316660+00:00",
+        "kind": "extract",
+        "processed_time_ranges": [
+          [
+            0,
+            11.0
+          ]
+        ]
+      }
+    }
+  ],
+  "shared_workspace": true
+}
