@@ -42,10 +42,10 @@ def resolve_source(store, source_path, root_id="workspace", trusted_media=False)
         raise Fault("SOURCE_PATH_ESCAPE")
     if not candidate.is_file():
         raise Fault("SOURCE_NOT_FOUND")
-    if candidate.name.lower().endswith((".part", ".tmp", ".crdownload", ".download")):
+    if candidate.name.lower().endswith((".part", ".tmp", ".crdownload", ".download")) or any(p.casefold() == "uploading" for p in relative.parts):
         raise Fault("SOURCE_INCOMPLETE", "Publish the final filename only after upload closes.")
     if spec.get("kind") == "workspace" and (candidate.name.casefold() in SYSTEM_NAMES or
-            any(p.casefold() in {"skills", "memory", ".git", ".openclaw", ".secrets"} for p in relative.parts)):
+            any(p.startswith(".") or p.casefold() in {"skills", "memory", "node_modules", "__pycache__", "venv"} for p in relative.parts)):
         raise Fault("SYSTEM_FILE_EXCLUDED")
     if not 0 < candidate.stat().st_size <= store.limits.max_receive_bytes:
         raise Fault("RECEIVE_SIZE_LIMIT")
@@ -89,7 +89,7 @@ def reference_path(store, record):
     return path
 
 
-def associate(store, identity, record, filename, identifier=None, source=None):
+def associate(store, identity, record, filename, identifier=None, source=None, selected=True):
     if record["state"] != "LIVE":
         raise Fault("FILE_UNAVAILABLE")
     if record["mode"] == "reference":
@@ -102,6 +102,15 @@ def associate(store, identity, record, filename, identifier=None, source=None):
     elif not (store.root/record["path"]).is_file():
         raise Fault("FILE_UNAVAILABLE")
     scope = owner(identity)
+    if not selected:
+        if identifier:
+            with store.db() as db:
+                db.execute("INSERT INTO attachments VALUES(?,?,?,?,?,?,?,?,?,?,0)", (identifier, scope, filename,
+                    record["sha"], record["size"], record["info"], time.time(), record["id"], store.agent(identity),
+                    json.dumps({"filename": filename, "origin": "catalog-registration", **(source or {})})))
+        return {"status": "REGISTERED", "file_id": record["id"], "filename": filename,
+                "mode": record["mode"], "bytes": record["size"], "sha256": record["sha"], "category": record["category"],
+                "kind": json.loads(record["info"])["kind"], "selected": False, "reused": True}
     with store.db() as db:
         existing = db.execute("SELECT id FROM attachments WHERE owner=? AND file_id=? AND active=1", (scope, record["id"])).fetchone()
         if existing and identifier is None:
@@ -116,7 +125,10 @@ def associate(store, identity, record, filename, identifier=None, source=None):
 
 
 def register_source(store, identity, params, trusted_media=False):
-    strict(params, ("source_path", "source_root", "file_id", "mode", "request_id", "source", "filename"))
+    strict(params, ("source_path", "source_root", "file_id", "mode", "request_id", "source", "filename", "select"))
+    selected = params.get("select", True)
+    if not isinstance(selected, bool):
+        raise Fault("INVALID_PARAMETERS")
     if not store.limits.workspace_mode:
         raise Fault("WORKSPACE_MAPPING_REQUIRED")
     if bool(params.get("file_id")) == bool(params.get("source_path")):
@@ -133,7 +145,7 @@ def register_source(store, identity, params, trusted_media=False):
                 if not row:
                     raise Fault("NOT_FOUND")
                 name = db.execute("SELECT filename FROM attachments WHERE file_id=? LIMIT 1", (row["id"],)).fetchone()
-            return associate(store, identity, dict(row), name[0] if name else Path(row["path"]).name)
+            return associate(store, identity, dict(row), name[0] if name else Path(row["path"]).name, selected=selected)
         path, root_id, relative = resolve_source(store, params["source_path"], params.get("source_root", "workspace"), trusted_media)
         filename = params.get("filename", path.name)
         if not isinstance(filename, str) or Path(filename).name != filename or any(c in filename for c in "\\/\0\r\n") or not 1 <= len(filename) <= 200:
@@ -148,13 +160,16 @@ def register_source(store, identity, params, trusted_media=False):
                 row = db.execute("SELECT * FROM files WHERE agent=? AND path=? AND state='LIVE'", (agent, managed_relative)).fetchone()
             if not row:
                 raise Fault("UNPUBLISHED_MANAGED_FILE", "Use a published artifact or registered file ID.")
-            return associate(store, identity, dict(row), filename)
+            return associate(store, identity, dict(row), filename, selected=selected)
         before = stable_stat(path)
         sha = digest_file(path)
         if stable_stat(path) != before:
             raise Fault("SOURCE_CHANGED")
         mode = params.get("mode", "snapshot")
-        fingerprint = hashlib.sha256(json.dumps([root_id, relative, sha, mode, filename, params.get("source", {})], sort_keys=True).encode()).hexdigest()
+        fingerprint_fields = [root_id, relative, sha, mode, filename, params.get("source", {})]
+        if not selected:
+            fingerprint_fields.append("catalog-only")
+        fingerprint = hashlib.sha256(json.dumps(fingerprint_fields, sort_keys=True).encode()).hexdigest()
         request_id = valid_id(params.get("request_id", fingerprint[:32]))
         with store.db() as db:
             previous = db.execute("SELECT * FROM registration_requests WHERE scope=? AND request_id=?", (scope, request_id)).fetchone()
@@ -162,12 +177,17 @@ def register_source(store, identity, params, trusted_media=False):
                 if previous["fingerprint"] != fingerprint:
                     raise Fault("REQUEST_CONFLICT")
                 result = json.loads(previous["result"])
-                store.attachment(identity, result["attachment_id"])
+                if selected:
+                    store.attachment(identity, result["attachment_id"])
+                else:
+                    row = db.execute("SELECT * FROM files WHERE id=? AND agent=?", (result["file_id"], agent)).fetchone()
+                    if not row or row["state"] != "LIVE":
+                        raise Fault("FILE_UNAVAILABLE")
                 return {**result, "reused": True}
         if mode == "snapshot":
             result = store.register(identity, request_id, filename, path, {"origin": "canonical-attachment" if trusted_media else "local-registration",
                 "source_message_id": params.get("source", {}).get("message_id") if trusted_media else None,
-                "source_description": params.get("source", {}), "source_root": root_id, "source_relative_path": relative})
+                "source_description": params.get("source", {}), "source_root": root_id, "source_relative_path": relative}, selected=selected)
         else:
             detected = identify(path, filename)
             details = {**detected, "units": 0, "preview": [], "deferred_inspection": True,
@@ -179,7 +199,7 @@ def register_source(store, identity, params, trusted_media=False):
                     category_v12(detected["category"]), "", json.dumps(details), timestamp(), "LIVE", "reference"))
                 row = dict(db.execute("SELECT * FROM files WHERE id=?", (file_id,)).fetchone())
             try:
-                result = associate(store, identity, row, filename, request_id)
+                result = associate(store, identity, row, filename, request_id, selected=selected)
             except Exception:
                 with store.db() as db:
                     db.execute("DELETE FROM files WHERE id=?", (file_id,))
@@ -189,10 +209,11 @@ def register_source(store, identity, params, trusted_media=False):
             with store.db() as db:
                 db.execute("UPDATE attachments SET active=0 WHERE owner=? AND id=?", (scope, request_id))
             raise Fault("SOURCE_CHANGED")
-        result.update(status="REGISTERED", mode=mode, source_root=root_id, source_relative_path=relative,
+        result.update(status="REGISTERED", mode=mode, selected=selected, source_root=root_id, source_relative_path=relative,
                       content_trust="untrusted", source_description_trust="untrusted")
         with store.db() as db:
-            registered = db.execute("SELECT path FROM files WHERE id=?", (result["file_id"],)).fetchone()
+            registered = db.execute("SELECT path,sha,category,info FROM files WHERE id=?", (result["file_id"],)).fetchone()
+        result.update(sha256=registered["sha"], category=registered["category"], kind=json.loads(registered["info"])["kind"])
         result.update(file_reference=({"gateway_path": str(path), "external": True} if mode == "reference" else
             public_reference(store, store.root/registered["path"])))
         with store.db() as db:

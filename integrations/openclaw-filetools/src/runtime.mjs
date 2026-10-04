@@ -32,7 +32,7 @@ export function trustedIdentity(config, context) {
 }
 
 export class Registry {
-  constructor(now = Date.now, arrivalClient = null) { this.now = now; this.arrivalClient = arrivalClient; this.sessions = new Map(); this.pending = new Map(); this.firstSessions = new Map(); }
+  constructor(now = Date.now, arrivalClient = null, waitMs = 5000) { this.now = now; this.arrivalClient = arrivalClient; this.waitMs = waitMs; this.sessions = new Map(); this.pending = new Map(); this.pendingEpochs = new Map(); this.firstSessions = new Map(); }
   lifecycle(event, context, ended = false) {
     if (!context.agentId || !context.sessionKey || event.sessionId !== context.sessionId ||
         (event.sessionKey && event.sessionKey !== context.sessionKey)) return;
@@ -122,7 +122,8 @@ export class Registry {
       if (items.length) this.sessions.set(key, items);
     });
     this.pending.set(key, next);
-    void next.finally(() => { if (this.pending.get(key) === next) this.pending.delete(key); });
+    this.pendingEpochs.set(key, epochRecord);
+    void next.finally(() => { if (this.pending.get(key) === next) { this.pending.delete(key); this.pendingEpochs.delete(key); } }).catch(() => {});
     if (epochRecord.sessionId && !epochRecord.invalid && this.arrivalClient) {
       void next.then(() => this.archive(config, { ...epochRecord.toolContext, sessionId: epochRecord.sessionId }, this.arrivalClient)).catch(() => {});
     }
@@ -131,24 +132,45 @@ export class Registry {
   async archive(config, context, client) {
     let timer;
     try { return await Promise.race([this.flush(config, context, client), new Promise(resolve => {
-      timer = setTimeout(() => resolve([{ status: "REGISTRATION_PENDING" }]), 5000);
+      timer = setTimeout(() => resolve([{ status: "REGISTRATION_PENDING" }]), this.waitMs);
     })]); }
     catch { return [{ status: "ERROR", code: "REGISTRATION_PENDING" }]; }
     finally { clearTimeout(timer); }
   }
   receipts(config, context) {
+    return this.receiptPage(config, context, { consume: true }).receipts;
+  }
+  receiptPage(config, context, { offset = 0, consume = false } = {}) {
     const identity = trustedIdentity(config, context);
-    if (!identity) return [];
-    const items = this.sessions.get(this.key(identity.user_id, identity.agent_id, context.sessionKey)) ?? [];
+    if (!identity) return { status: "ERROR", code: "FORBIDDEN", receipts: [] };
+    const key = this.key(identity.user_id, identity.agent_id, context.sessionKey);
+    const items = (this.sessions.get(key) ?? []).filter(i => !i.epochRecord.invalid &&
+      i.epochRecord.sessionId === context.sessionId);
     const receipts = [];
-    for (const item of items) {
-      if (item.epochRecord.sessionId !== context.sessionId || item.receipted) continue;
-      if (item.receipt || item.error) {
-        item.receipted = true;
-        receipts.push(item.receipt ?? { status: "ERROR", code: item.error, filename: item.filename });
+    let cursor = offset, chars = 0;
+    for (; cursor < items.length; cursor++) {
+      const item = items[cursor];
+      const raw = item.sending ? { status: "REGISTRATION_PENDING" } : item.receipt ??
+        (item.error ? { status: "ERROR", code: item.error } : { status: "REGISTRATION_PENDING" });
+      const receipt = { status: raw.status, request_id: item.id, filename: item.filename?.slice(0, 200) };
+      for (const key of ["attachment_id", "file_id", "bytes", "reused", "mode"]) if (raw[key] !== undefined) receipt[key] = raw[key];
+      if (raw.code) {
+        receipt.code = /^[A-Z][A-Z0-9_]{0,79}$/.test(raw.code) ? raw.code : "SERVICE_UNAVAILABLE";
+        receipt.recovery = ["SERVICE_UNAVAILABLE", "MANAGEMENT_UNAVAILABLE", "MANAGEMENT_INVALID_RESPONSE", "REGISTRY_BUSY", "REGISTRATION_INTERRUPTED"].includes(receipt.code) ? "Check management/worker service, then inspect again to retry the same request ID. Do not re-upload." :
+          "Check source version, size limit and trusted session; changed originals need a new registration.";
       }
+      const signature = JSON.stringify(receipt);
+      if (consume && item.reported === signature) continue;
+      if (receipts.length >= 16 || chars + signature.length > 6500) break;
+      receipts.push(receipt); chars += signature.length;
+      // Pending is an observation, never a consumed terminal receipt.
+      if (consume && receipt.status !== "REGISTRATION_PENDING") item.reported = signature;
     }
-    return receipts;
+    const pendingEpoch = this.pendingEpochs.get(key);
+    if (!items.length && this.pending.has(key) && pendingEpoch?.sessionId === context.sessionId && !pendingEpoch.invalid) receipts.push({ status: "REGISTRATION_PENDING" });
+    return { status: "REGISTRATION_RECEIPTS", receipts, total: items.length, offset,
+      next_offset: cursor < items.length ? cursor : null, truncated: cursor < items.length,
+      continuation: "filetools_inspect({registration_only:true,receipt_offset:next_offset}); completion appears on next Agent run or inspect, without proactive push" };
   }
   async flush(config, context, client, signal) {
     client = configuredClient(config, client);
@@ -202,7 +224,11 @@ export class Registry {
           item.receipt = result;
           if (result.status === "INSPECTED") item.uploaded = true;
           return result;
-        } catch (error) { return { status: "ERROR", code: /^(ATTACHMENT_CHANGED|REGISTRATION_PENDING)$/.test(error.message) ? error.message : "SERVICE_UNAVAILABLE" }; }
+        } catch (error) {
+          item.receipt = { status: "ERROR", code: /^(ATTACHMENT_CHANGED|REGISTRATION_PENDING)$/.test(error.message) ? error.message : "SERVICE_UNAVAILABLE" };
+          if (error.message === "ATTACHMENT_CHANGED") item.error = error.message;
+          return item.receipt;
+        }
         finally { await handle?.close(); }
       })();
       try { results.push(await item.sending); } finally { item.sending = null; }
@@ -223,8 +249,11 @@ export function createTool(name, operation, schema, config, context, registry, c
       let result;
       try {
         if (operation === "inspect") {
-          const registrations = await registry.flush(config, context, client, signal);
-          result = await client.call(identity, operation, params, signal);
+          // Poll receipts without restarting a failed attempt; ordinary inspect retries idempotently.
+          const registrations = params.registration_only ? [] : await registry.archive(config, context, client);
+          const page = registry.receiptPage(config, context, { offset: params.receipt_offset ?? 0 });
+          result = params.registration_only ? page : { ...await client.call(identity, operation,
+            params.attachment_id ? { attachment_id: params.attachment_id } : {}, signal), registration: page };
           const errors = registrations.filter(r => r.status === "ERROR");
           if (errors.length) result = { ...result, registration_errors: errors };
         } else result = await client.call(identity, operation, params, signal);

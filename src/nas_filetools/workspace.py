@@ -156,12 +156,12 @@ class WorkspaceStore:
         if capacity["disk_free_bytes"] - additional < self.limits.disk_reserve_bytes:
             raise Fault("DISK_RESERVE")
 
-    def register(self, identity, identifier, filename, incoming, info=None):
+    def register(self, identity, identifier, filename, incoming, info=None, selected=True):
         # Cross-request copies are serialized; SQLite unique index remains the final dedup guard.
         with self.lock:
-            return self._register(identity, identifier, filename, incoming, info)
+            return self._register(identity, identifier, filename, incoming, info, selected)
 
-    def _register(self, identity, identifier, filename, incoming, info=None):
+    def _register(self, identity, identifier, filename, incoming, info=None, selected=True):
         agent, scope = self.agent(identity), owner(identity)
         valid_id(identifier)
         if (not isinstance(filename, str) or not 1 <= len(filename) <= 200 or Path(filename).name != filename or
@@ -178,11 +178,12 @@ class WorkspaceStore:
         with self.db() as db:
             previous = db.execute("SELECT * FROM attachments WHERE owner=? AND id=?", (scope, identifier)).fetchone()
             if previous:
-                if previous["sha"] != sha or previous["filename"] != filename or not previous["active"]:
+                if previous["sha"] != sha or previous["filename"] != filename or bool(previous["active"]) != selected:
                     raise Fault("ATTACHMENT_CHANGED")
-                return {**self.inspect(identity, identifier, lightweight=True), "reused": True}
+                return {**(self.inspect(identity, identifier, lightweight=True) if selected else
+                          {"file_id": previous["file_id"], "selected": False}), "reused": True}
             count = db.execute("SELECT COUNT(*) FROM attachments WHERE owner=? AND active=1", (scope,)).fetchone()[0]
-            if count >= self.limits.max_references_per_session:
+            if selected and count >= self.limits.max_references_per_session:
                 raise Fault("SESSION_REFERENCE_LIMIT")
             record = db.execute("SELECT * FROM files WHERE agent=? AND sha=? AND state='LIVE' AND mode='snapshot'", (agent, sha)).fetchone()
             reused = record is not None
@@ -222,10 +223,12 @@ class WorkspaceStore:
                 if digest_file(self.root/record["path"]) != record["sha"]:
                     raise Fault("SNAPSHOT_CHANGED")
             source = {"message_id": (info or {}).get("source_message_id"), "filename": filename,
-                      "received_at": timestamp(), "origin": (info or {}).get("origin", "attachment")}
-            db.execute("INSERT INTO attachments VALUES(?,?,?,?,?,?,?,?,?,?,1)", (identifier, scope, filename, sha,
-                record["size"], record["info"], time.time(), record["id"], agent, json.dumps(source)))
-        result = self.inspect(identity, identifier, lightweight=True)
+                      "received_at": timestamp(), "origin": (info or {}).get("origin", "attachment"),
+                      "source_root": (info or {}).get("source_root"), "source_relative_path": (info or {}).get("source_relative_path")}
+            db.execute("INSERT INTO attachments VALUES(?,?,?,?,?,?,?,?,?,?,?)", (identifier, scope, filename, sha,
+                record["size"], record["info"], time.time(), record["id"], agent, json.dumps(source), int(selected)))
+        result = self.inspect(identity, identifier, lightweight=True) if selected else {
+            "file_id": record["id"], "filename": filename, "bytes": record["size"], "selected": False}
         return {**result, "reused": reused, "receipt": {"status": "RECEIVED", "filename": filename,
                                                       "bytes": before.st_size, "file_id": record["id"]}}
 
@@ -394,7 +397,7 @@ class WorkspaceStore:
                                       "ORDER BY created DESC LIMIT 101 OFFSET ?", (agent, offset)).fetchall()
                     items = []
                     for r in rows:
-                        names = db.execute("SELECT filename,source,active FROM attachments WHERE file_id=? LIMIT 20", (r["id"],)).fetchall()
+                        names = db.execute("SELECT filename,source,active FROM attachments WHERE file_id=? LIMIT 21", (r["id"],)).fetchall()
                         details = json.loads(r["info"])
                         availability = r["state"]
                         if r["mode"] == "reference":
@@ -414,9 +417,18 @@ class WorkspaceStore:
                             "availability": availability, "cache_expires": timestamp(cached[0]) if cached else None,
                             "input_file_id": details.get("input_file_id"), "job_id": details.get("job_id"),
                             "first_received_at": r["created"], "uploads": [{"filename": a["filename"], **json.loads(a["source"]),
-                                                                         "active": bool(a["active"])} for a in names]})
-            return {"status": "FILES", "area": area, "items": items[:100], "truncated": len(items)>100,
-                    "next_offset": offset+100 if len(items)>100 else None}
+                                                                         "active": bool(a["active"])} for a in names[:20]],
+                            "uploads_truncated": len(names)>20})
+            page, size = [], 0
+            for item in items[:100]:
+                additional = len(json.dumps(item, ensure_ascii=False).encode("utf-8"))
+                if page and size+additional > self.limits.max_response_bytes//2:
+                    break
+                page.append(item)
+                size += additional
+            more = len(items)>len(page)
+            return {"status": "FILES", "area": area, "items": page, "truncated": more,
+                    "next_offset": offset+len(page) if more else None}
         if action == "select":
             file_id = valid_id(params.get("file_id"))
             with self.db() as db:
@@ -515,6 +527,8 @@ class WorkspaceStore:
                     register_products(self, identity, saved_manifest, live=True, folder=destination, mode="saved")
                     atomic_json(destination/"saved.json", {"saved_id": saved_id, "saved_at": timestamp(), "source": saved_manifest,
                         "selected_artifacts": [a["artifact_id"] for a in selected], "original_state": "LIVE"})
+                from .saved_permissions import publish_saved_permissions
+                publish_saved_permissions(self.initialize(job["agent"])/"saved", destination)
             except Exception:
                 # Preserve original cache on any error. An unregistered published bundle is retained for diagnosis.
                 if temporary.exists():

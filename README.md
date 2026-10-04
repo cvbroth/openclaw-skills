@@ -1,5 +1,17 @@
 # OpenClaw Skills
 
+## 文件工具 V1.2.1 修订（本地交付，生产待验收）
+
+修复附件登记 pending/失败回执、root 诊断标记权限及只读 NAS 输入映射；新增兼容的目录登记 `select:false` 和回执分页。可选管理员入口提供 saved-only Samba 结果共享的计划、应用、诊断和数据保留回滚，沿用已有账号和单 Worker，不自动修改个人/Family 共享、知识库或生产服务器。
+
+- [修订接口与架构取舍](docs/V121_INTERFACE.md)
+- [安装、个人 Incoming 与 Samba 结果共享、迁移回滚](docs/V121_INSTALL.md)
+- [普通用户说明](docs/V121_USER_GUIDE.md)
+- [真实／模拟测试与生产待验收](docs/V121_TESTING.md)
+- [开发交付报告](docs/V121_REPORT.md)
+
+旧 `shared-v1.2` 配置兼容，核心安装入口不变。Samba 为可选：`python3 scripts/filetools_admin.py samba-results --config <配置>` 默认只读计划，系统应用／回滚需显式 `--action apply|rollback --apply`。以下V1.2/V1.1文档作为历史记录保留。
+
 ## 统一文件工作区 V1.2（本地开发交付，生产待验收）
 
 在实际 Agent workspace 下管理快照、引用、共享缓存和独立保存版本，Gateway 固定管理 CLI 与单个 CPU worker 共用核心，控制请求只传ID。10个真实工具和通用 file-workspace Skill 支持自主选择读取/提取/Python，正文来源和交付路径明确，不自动向量入库。一人一Agent，main与chen不合并。

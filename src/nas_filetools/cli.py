@@ -54,6 +54,10 @@ def main():
     rollback = sub.add_parser("rollback")
     rollback.add_argument("--record", type=Path, required=True)
     rollback.add_argument("--apply", action="store_true")
+    results = sub.add_parser("samba-results", help="Optional saved-only Samba sharing; no account/credential management")
+    results.add_argument("--config", type=Path, required=True)
+    results.add_argument("--action", choices=("plan", "apply", "diagnose", "rollback"), default="plan")
+    results.add_argument("--apply", action="store_true", help="Required for system changes and rollback")
     migration = sub.add_parser("migrate")
     migration.add_argument("--old-root", required=True)
     migration.add_argument("--new-root", required=True)
@@ -67,7 +71,10 @@ def main():
     shared_migration.add_argument("--apply", action="store_true")
     args = parser.parse_args()
     try:
-        if args.command in ("install", "diagnose"):
+        if args.command == "samba-results":
+            from .samba_results import results
+            result = results(args.config, args.action, args.apply)
+        elif args.command in ("install", "diagnose"):
             from . import operations
             result = operations.install(args.config, args.apply, args.local_only) if args.command == "install" else operations.diagnose(args.config, args.local_only)
         elif args.command == "rollback":

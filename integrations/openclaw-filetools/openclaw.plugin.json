@@ -2,7 +2,7 @@
   "id": "nas-filetools",
   "name": "NAS FileTools",
   "description": "Temporary file evidence tools",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "configSchema": {
     "type": "object",
     "required": [

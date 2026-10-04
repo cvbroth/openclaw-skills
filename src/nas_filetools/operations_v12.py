@@ -15,7 +15,7 @@ from .operations import command, gateway, own_tree, REPOSITORY, TOOLS
 from .shared_workspace import mapped_store
 
 LAYOUT = "shared-v1.2"
-VERSION = "1.2.0"
+VERSION = "1.2.1"
 
 
 def configuration(path):
@@ -42,12 +42,15 @@ def configuration(path):
     return raw, limits
 
 
-def host_path(path, mounts):
-    candidates = [m for m in mounts if m["Type"] == "bind" and PurePosixPath(path).is_relative_to(PurePosixPath(m["Destination"]))]
+def host_path(path, mounts, require_writable=True):
+    path = PurePosixPath(path)
+    if not path.is_absolute() or ".." in path.parts:
+        raise Fault("INVALID_MAPPED_PATH")
+    candidates = [m for m in mounts if m["Type"] == "bind" and path.is_relative_to(PurePosixPath(m["Destination"]))]
     if not candidates:
         raise Fault("PERSISTENT_WORKSPACE_BIND_REQUIRED")
-    mount = max(candidates, key=lambda m: len(m["Destination"]))
-    if not mount["RW"]:
+    mount = max(candidates, key=lambda m: len(PurePosixPath(m["Destination"]).parts))
+    if require_writable and not mount["RW"]:
         raise Fault("WORKSPACE_BIND_READONLY")
     return str(PurePosixPath(mount["Source"])/PurePosixPath(path).relative_to(PurePosixPath(mount["Destination"])))
 
@@ -92,7 +95,7 @@ def profiles(raw, target=None, document=None):
                     path_type(profile["workspace"]).is_relative_to(path_type(source["path"]))):
                 raise Fault("BROAD_REFERENCE_MOUNT_DENIED")
             if target and not source.get("host_path"):
-                source["host_path"] = host_path(source["path"], target["mounts"])
+                source["host_path"] = host_path(source["path"], target["mounts"], require_writable=False)
             if source["kind"] == "nas":
                 processing[root_id] = {"path": f"/references/{agent}/{root_id}" if target else source["path"], "kind": "nas"}
         profile["processing_roots"] = processing
@@ -319,6 +322,14 @@ def plugin_inventory(target):
     return [{k: row.get(k) for k in ("id", "status", "enabled", "toolNames")} for row in (raw.get("plugins", []) if isinstance(raw, dict) else raw)]
 
 
+def diagnostic_marker(marker, token, uid, gid):
+    """Change only our new marker, independent of the host operator's umask."""
+    with marker.open("x", encoding="utf-8") as output:
+        output.write(token)
+    os.chown(marker, uid, gid)
+    os.chmod(marker, 0o660)
+
+
 def diagnose(config, local_only=False):
     raw, limits = configuration(config)
     issues, checks = [], {}
@@ -336,10 +347,10 @@ def diagnose(config, local_only=False):
                 # Probe ONLY the dedicated subtree, then verify the exact bytes in each container.
                 token = os.urandom(16).hex()
                 marker = store.root/(".diagnostic-"+token)
-                marker.write_text(token)
                 try:
+                    diagnostic_marker(marker, token, target["uid"], target["gid"])
                     read = "from pathlib import Path;import sys;assert Path(sys.argv[1]).read_text()==sys.argv[2]"
-                    command(["docker", "exec", target["container"], raw.get("management_python", "/usr/bin/python3"), "-I", "-c", read,
+                    command(["docker", "exec", "--user", f"{target['uid']}:{target['gid']}", target["container"], raw.get("management_python", "/usr/bin/python3"), "-I", "-c", read,
                              profile["workspace"]+"/filetools/"+marker.name, token])
                     worker_name = command(["docker", "ps", "--filter", "label=com.docker.compose.project="+target["project"],
                         "--filter", "label=com.docker.compose.service=nas-filetools", "--format", "{{.ID}}"] ).strip()
@@ -347,13 +358,17 @@ def diagnose(config, local_only=False):
                         raise Fault("AMBIGUOUS_WORKER_CONTAINER")
                     if not worker_name:
                         raise Fault("WORKER_CONTAINER_NOT_FOUND")
+                    worker_uid = int(command(["docker", "exec", worker_name, "id", "-u"]).strip())
+                    worker_gid = int(command(["docker", "exec", worker_name, "id", "-g"]).strip())
+                    if (worker_uid, worker_gid) != (target["uid"], target["gid"]):
+                        raise Fault("WORKER_IDENTITY_MISMATCH")
                     write = "from pathlib import Path;import sys;Path(sys.argv[1]).write_text(sys.argv[2])"
-                    command(["docker", "exec", target["container"], raw.get("management_python", "/usr/bin/python3"), "-I", "-c", write,
+                    command(["docker", "exec", "--user", f"{target['uid']}:{target['gid']}", target["container"], raw.get("management_python", "/usr/bin/python3"), "-I", "-c", write,
                              profile["workspace"]+"/filetools/"+marker.name, token+"gateway"])
                     command(["docker", "exec", worker_name, "/opt/nas-filetools/.venv/bin/python", "-I", "-c", read,
                              profile["service_root"]+"/"+marker.name, token+"gateway"])
                     command(["docker", "exec", worker_name, "/opt/nas-filetools/.venv/bin/python", "-I", "-c", write, profile["service_root"]+"/"+marker.name, token+"worker"])
-                    command(["docker", "exec", target["container"], raw.get("management_python", "/usr/bin/python3"), "-I", "-c", read,
+                    command(["docker", "exec", "--user", f"{target['uid']}:{target['gid']}", target["container"], raw.get("management_python", "/usr/bin/python3"), "-I", "-c", read,
                              profile["workspace"]+"/filetools/"+marker.name, token+"worker"])
                     checks["agents"][agent]["two_container_visibility"] = True
                 finally:

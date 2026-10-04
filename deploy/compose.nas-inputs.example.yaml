@@ -1,0 +1,8 @@
+# Optional ADDITIVE override for the existing service; review actual service name.
+# Each directory must already exist. No whole /srv/storage or default Family mount.
+services:
+  openclaw-gateway:
+    volumes:
+      - /srv/storage/users/chen/Incoming:/nas/filetools/chen/Incoming:ro
+      - /srv/storage/users/liang/Incoming:/nas/filetools/liang/Incoming:ro
+      - /srv/storage/users/azl/Incoming:/nas/filetools/azl/Incoming:ro

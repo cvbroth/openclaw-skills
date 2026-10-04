@@ -1,4 +1,5 @@
-FROM nas-filetools:1.2.0
+ARG FILETOOLS_IMAGE=nas-filetools:1.2.1
+FROM ${FILETOOLS_IMAGE}
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/* \

@@ -1,0 +1,11 @@
+{
+  "state_dir": "/var/lib/nas-filetools-samba-v121",
+  "results_root": "/srv/storage/results",
+  "smb_conf": "/etc/samba/smb.conf",
+  "unit_dir": "/etc/systemd/system",
+  "shares": [
+    {"agent": "chen", "samba_user": "chen", "name": "Chen-Results", "saved": "/root/.openclaw/workspace-chen/filetools/saved"},
+    {"agent": "liang", "samba_user": "liang", "name": "Liang-Results", "saved": "/root/.openclaw/workspace-liang/filetools/saved"},
+    {"agent": "ziling", "samba_user": "azl", "name": "AZL-Results", "saved": "/root/.openclaw/workspace-ziling/filetools/saved"}
+  ]
+}
