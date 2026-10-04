@@ -1,8 +1,10 @@
-# NAS FileTools OpenClaw 插件 V1.1
+# NAS FileTools OpenClaw 插件 V1.2
 
-目标 OpenClaw **2026.9.4**、Node **24.16+**，实际注册 9 个 `filetools_*` 工具；Skill 在 `skills/filetools-session/SKILL.md`。Python 核心/服务在仓库 `src/nas_filetools`，独立环境通过固定 Unix socket 服务。
+目标 OpenClaw **2026.9.4**、Node **24.16+**，公开SDK defineToolPlugin实际注册10个工具；通用Skill在 `skills/file-workspace/SKILL.md`。Python共享核心在仓库src/nas_filetools；Gateway固定标准库管理入口负责登记/保存，单个独立worker经Unix socket后台处理。实际Agent filetools子目录共享，正常控制请求只传ID，不上传原件字节。
 
-本插件不安装 OCR/ASR 进 Gateway，不接受模型路径或身份，不修改永久知识库。只支持经过可信身份映射的 direct session，群聊 V1 拒绝。附件按 canonical message_received 到达立即后台归档，再用 session-store-runtime / session_start 运行/会话事实关联；缺少可信字段明确不可用。
+管理员配置bindings、workspaces、management（python/entry/config），模型不能指定身份或注册表。已落盘文件只能登记明确允许根内路径；media根只供可信到达适配。canonical media绝对路径或相对path+可信workspaceDir支持，正文附件文字不授权。批准direct会话，群聊拒绝；到达先登记/回执一次，无任务不处理。
+
+before_tool_call/after_tool_call为普通read/read_file建立短租约，成功续期；外部OS/任意Python读取不可观测，需要协作touch。产物Gateway路径可由现有message入口使用，经QQBot sendMedia→sendFile；真实QQ回执/客户端下载待验收。不向Gateway装OCR/ASR，不自动入永久知识库。
 
 ```bash
 npm ci --ignore-scripts
@@ -11,6 +13,6 @@ npm run plugin:build
 npm run plugin:validate
 ```
 
-`FILETOOLS_TEST_PYTHON` 指向开发 Python 时，tests/core-integration.test.mjs 运行真实 Python 核心流转；Gateway 上下文/传输仍由测试适配器提供，不是 QQ/Gateway E2E。`FILETOOLS_TEST_TMP` 可指定允许写入的测试临时目录。
+`FILETOOLS_TEST_PYTHON` 指向独立Python时，两个集成测试实际运行核心/后台worker；workspace-integration验证共享路径、管理CLI、MD/XLSX与保存/清理。Gateway sender/session与控制传输仍由测试注入，发送回执明确模拟，不是QQ/Gateway模型端到端。`FILETOOLS_TEST_TMP`可指定测试临时目录。
 
-工具参数/返回见 [INTERFACE](../../docs/V11_INTERFACE.md)，部署/回滚见 [INSTALL](../../docs/V11_INSTALL.md)，取舍和信任边界见 [ARCHITECTURE](../../docs/V11_ARCHITECTURE.md)，生产执行清单见 [ACCEPTANCE](../../docs/V11_ACCEPTANCE.md)。
+工具/产物见 [INTERFACE](../../docs/V12_INTERFACE.md)，安装/迁移/回滚见 [INSTALL](../../docs/V12_INSTALL.md)，边界见 [ARCHITECTURE](../../docs/V12_ARCHITECTURE.md)，生产清单见 [ACCEPTANCE](../../docs/V12_ACCEPTANCE.md)。缺management的V1.1兼容代码仅供历史迁移；V1.2部署必须选shared-v1.2。

@@ -2,7 +2,7 @@
   "id": "nas-filetools",
   "name": "NAS FileTools",
   "description": "Temporary file evidence tools",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "configSchema": {
     "type": "object",
     "required": [
@@ -42,6 +42,77 @@
           "additionalProperties": false
         },
         "maxItems": 16
+      },
+      "management": {
+        "type": "object",
+        "required": [
+          "python",
+          "entry",
+          "config"
+        ],
+        "properties": {
+          "python": {
+            "type": "string"
+          },
+          "entry": {
+            "type": "string"
+          },
+          "config": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "workspaces": {
+        "type": "object",
+        "patternProperties": {
+          "^.*$": {
+            "type": "object",
+            "required": [
+              "workspace"
+            ],
+            "properties": {
+              "workspace": {
+                "type": "string"
+              },
+              "source_roots": {
+                "type": "object",
+                "patternProperties": {
+                  "^.*$": {
+                    "type": "object",
+                    "required": [
+                      "path",
+                      "kind"
+                    ],
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "kind": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "const": "workspace"
+                          },
+                          {
+                            "type": "string",
+                            "const": "nas"
+                          },
+                          {
+                            "type": "string",
+                            "const": "media"
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        }
       }
     },
     "additionalProperties": false
@@ -54,6 +125,7 @@
   ],
   "contracts": {
     "tools": [
+      "filetools_register",
       "filetools_inspect",
       "filetools_extract",
       "filetools_status",

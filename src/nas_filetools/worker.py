@@ -44,6 +44,8 @@ def isolate_child(parent):
         os.setsid()
         # Linux NAS: abort children and ffmpeg when the supervisor unexpectedly dies.
         def shutdown(*_):
+            from .process_tree import terminate_descendants
+            terminate_descendants(os.getpid())
             os.killpg(os.getpgrp(), signal.SIGKILL)
         signal.signal(signal.SIGTERM, shutdown)
         try:
@@ -77,8 +79,13 @@ def inspect_child(path, settings, result_file, parent):
 
 
 def terminate(process):
+    from .process_tree import enable_subreaper, reap_known_descendants
+    enable_subreaper()
+    known = {}
     if process.is_alive():
         if os.name != "nt":
+            from .process_tree import terminate_descendants
+            known = terminate_descendants(process.pid)
             try:
                 os.killpg(process.pid, signal.SIGKILL)
             except ProcessLookupError:
@@ -89,6 +96,7 @@ def terminate(process):
         if process.is_alive():
             process.kill()
             process.join(3)
+    reap_known_descendants(known)
 
 
 def bounded_probe(path, limits, workspace):
@@ -130,22 +138,24 @@ def run_job(root, settings, row, parent):
             if digest_file(original) != attachment["sha"]:
                 raise Fault("SNAPSHOT_CHANGED")
             config = json.loads(row["config"])
+            processing = out/".private" if limits.workspace_mode else out
+            processing.mkdir(mode=0o700, exist_ok=True)
             def progress(done, total):
                 with store.db() as db:
                     db.execute("UPDATE jobs SET progress=?,updated=? WHERE id=? AND status='RUNNING'",
                                (min(0.99, done / max(total, 1)), time.time(), row["id"]))
             if row.get("kind") == "script":
                 from .scripts import execute_script
-                result = execute_script(original, json.loads(row["payload"]), out, limits, row)
+                result = execute_script(original, json.loads(row["payload"]), processing, limits, row)
             else:
                 config["_checkpoint_fingerprint"] = row["fingerprint"]
-                result = Processor(limits).process(original, json.loads(attachment["info"]), config, out, progress)
+                result = Processor(limits).process(original, json.loads(attachment["info"]), config, processing, progress)
                 result["config"].pop("_checkpoint_fingerprint", None)
             result.update(schema_version="1.1", job_id=row["id"], attachment_id=row["attachment"], file_id=attachment["file_id"],
                           original={"filename": attachment["filename"], "sha256": attachment["sha"],
                                     "bytes": attachment["size"],
                                     "message_id": json.loads(attachment["source"]).get("message_id")},
-                          limits={k: v for k, v in settings.items() if k not in ("model_cache", "whisper_model")},
+                          limits={k: v for k, v in settings.items() if k not in ("model_cache", "whisper_model", "source_roots", "gateway_workspace")},
                           model={"reference": Path(limits.whisper_model).name, "offline": limits.offline},
                           created_at=timestamp(row["created"]), expires_at=timestamp(row["expires"]), content_trust="untrusted")
             content_id, source_id = uuid.uuid4().hex, uuid.uuid4().hex
@@ -159,13 +169,20 @@ def run_job(root, settings, row, parent):
                     f"{source['start']:.3f}–{source['end']:.3f}s" if "start" in source else
                     f"Body block {source.get('paragraph', 1)}")
                 content.append(f"<!-- segment:{segment['segment']} -->\n## {label}\n\n{segment['text']}\n")
-            (out / "content.md").write_text("\n".join(content), encoding="utf-8")
+            (processing / "content.md").write_text("\n".join(content), encoding="utf-8")
             if result["coverage"]["kind"] == "audio":
-                (out / "transcript.md").write_text("\n".join(content), encoding="utf-8")
+                (processing / "transcript.md").write_text("\n".join(content), encoding="utf-8")
                 result["artifacts"].append({"artifact_id": uuid.uuid4().hex, "file": "transcript.md", "kind": "transcript"})
                 result["warnings"].append("No minutes generated. Any later minutes must be stored separately from transcript.md.")
             if len(json.dumps(result).encode()) > limits.max_manifest_bytes:
                 raise Fault("MANIFEST_LIMIT")
+            if limits.workspace_mode and result["status"] in ("SUCCEEDED", "PARTIAL"):
+                from .publication import publish
+                from .management import register_products
+                result["artifacts"] = publish(processing, out, result["artifacts"])
+                identity = {"agent_id": row["agent"], "user_id": AGENT_USERS.get(row["agent"], row["agent"]),
+                            "session_hash": "0"*64}
+                register_products(store, identity, result)
             write_json(out / "sources.json", result)
             write_json(out / "result.json", {"status": result["status"]})
         except Exception as error:
@@ -175,6 +192,8 @@ def run_job(root, settings, row, parent):
 
 class Supervisor:
     def __init__(self, store):
+        from .process_tree import enable_subreaper
+        enable_subreaper()
         self.store = store
         self.processes = {}
         self.last_cleanup = 0
@@ -206,8 +225,12 @@ class Supervisor:
         with self.store.db() as db:
             db.execute("UPDATE jobs SET status=?,progress=?,updated=?,expires=? WHERE id=? AND status='RUNNING'",
                        (status, 1 if status in ("SUCCEEDED", "PARTIAL") else 0, time.time(), time.time()+self.store.limits.ttl_seconds, identifier))
+            if self.store.limits.workspace_mode:
+                for product in db.execute("SELECT id,info FROM files WHERE mode='artifact' AND state='PUBLISHED'").fetchall():
+                    if json.loads(product["info"]).get("job_id") == identifier:
+                        db.execute("UPDATE files SET state=? WHERE id=?", ("LIVE" if status in ("SUCCEEDED", "PARTIAL") else "REJECTED", product["id"]))
 
-    def tick(self):
+    def tick(self, can_start=True):
         with self.store.lock:
             for identifier, (process, started) in list(self.processes.items()):
                 with self.store.db() as db:
@@ -230,7 +253,7 @@ class Supervisor:
                     del self.processes[identifier]
             with self.store.db() as db:
                 queued = db.execute("SELECT * FROM jobs WHERE status='QUEUED' ORDER BY created LIMIT ?",
-                                    (max(0, self.store.limits.concurrency - len(self.processes)),)).fetchall()
+                                    (max(0, self.store.limits.concurrency - len(self.processes)) if can_start else 0,)).fetchall()
                 for row in queued:
                     db.execute("UPDATE jobs SET status='RUNNING',updated=? WHERE id=?", (time.time(), row["id"]))
             for row in queued:

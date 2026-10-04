@@ -48,11 +48,11 @@ function clientStub() {
   };
 }
 
-test("actual SDK registers nine factories and supported hooks", () => {
+test("actual SDK registers ten factories and supported hooks", () => {
   const factories = [], hooks = new Map();
   plugin.register({ pluginConfig: config, registerTool: (factory, metadata) => factories.push({ factory, metadata }),
     on: (name, fn) => hooks.set(name, fn) });
-  assert.equal(factories.length, 9);
+  assert.equal(factories.length, 10);
   assert.deepEqual(factories.map(f => f.metadata.name), names);
   assert.ok(hooks.has("message_received") && hooks.has("session_start") && hooks.has("session_end"));
   const ctx = context();

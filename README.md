@@ -1,5 +1,22 @@
 # OpenClaw Skills
 
+## 统一文件工作区 V1.2（本地开发交付，生产待验收）
+
+在实际 Agent workspace 下管理快照、引用、共享缓存和独立保存版本，Gateway 固定管理 CLI 与单个 CPU worker 共用核心，控制请求只传ID。10个真实工具和通用 file-workspace Skill 支持自主选择读取/提取/Python，正文来源和交付路径明确，不自动向量入库。一人一Agent，main与chen不合并。
+
+- [架构与信任边界](docs/V12_ARCHITECTURE.md)
+- [工具、产物与错误契约](docs/V12_INTERFACE.md)
+- [单配置安装、诊断、迁移回滚](docs/V12_INSTALL.md)
+- [支持范围、资源和V2路线图](docs/V12_SUPPORT.md)
+- [普通用户指南](docs/V12_USER_GUIDE.md)
+- [本地测试与复现](docs/V12_TESTING.md)
+- [生产验收清单](docs/V12_ACCEPTANCE.md)
+- [开发报告](docs/V12_REPORT.md)
+
+使用 `deploy/install.v12.example.json` 和 `python3 scripts/filetools_admin.py install|diagnose --config <配置>`。安装默认只生成计划，`--apply`才改运行环境；本轮没有部署生产。独立Python3.12环境，固定依赖在pyproject/requirements.lock，插件目标OpenClaw2026.9.4。完整复现及真实/模拟边界见开发报告。
+
+下方V1.1说明及docs/V11_*保留为历史交付记录；V1.2新部署必须使用shared-v1.2配置。
+
 ## 统一文件处理 V1.1（开发交付，生产待验收）
 
 新增独立 CPU 文件处理核心、SQLite 后台任务、OpenClaw 2026.9.4 插件和 Skill：支持 PDF/DOCX/UTF-8 MD/TXT、图片印刷文字 OCR、音频转写，一人一 Agent 持久快照/保存区与会话任务隔离、默认 72 小时闲置缓存，不自动进入永久知识库。模型使用真正注册的 filetools_* 工具，不传服务器路径或身份。群聊保守拒绝，具体限制见文档。

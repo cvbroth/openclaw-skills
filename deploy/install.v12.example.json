@@ -1,0 +1,18 @@
+{
+  "workspace_layout": "shared-v1.2",
+  "data_root": "/var/lib/nas-filetools-v12",
+  "agents": ["chen"],
+  "bindings": [{"agent_id": "chen", "channel_id": "qqbot", "account_id": "default", "sender_id": "REPLACE_WITH_TRUSTED_EXISTING_OPENID"}],
+  "gateway_container": "openclaw-openclaw-gateway-1",
+  "management_python": "/usr/bin/python3",
+  "limits": {"concurrency": 1, "engine_threads": 2, "worker_memory_mb": 4096, "script_timeout_seconds": 60, "timeout_seconds": 3600, "ttl_seconds": 259200},
+  "workspaces": {
+    "chen": {
+      "workspace": "/home/node/.openclaw/workspace-chen",
+      "host_workspace": "/root/.openclaw/workspace-chen",
+      "source_roots": {
+        "qq_downloads": {"path": "/home/node/.openclaw/media/qqbot/downloads", "kind": "media"}
+      }
+    }
+  }
+}

@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import sqlite3
+import time
 import uuid
 from contextlib import contextmanager
 from pathlib import Path
@@ -26,7 +27,7 @@ class EvidenceStore:
     @contextmanager
     def db(self):
         with self.lock:
-            connection = sqlite3.connect(self.root / "jobs.sqlite3", timeout=15)
+            connection = sqlite3.connect(self.root / ("registry.sqlite" if self.limits.workspace_mode else "jobs.sqlite3"), timeout=15)
             connection.row_factory = sqlite3.Row
             try:
                 with connection:
@@ -49,6 +50,13 @@ class EvidenceStore:
                   "cancel_requested": bool(row["cancel"])}
         if row["status"] in ("SUCCEEDED", "PARTIAL", "FAILED"):
             manifest = self.manifest(row)
+            if self.limits.workspace_mode:
+                from .management import public_reference
+                from .catalog import digest_file
+                for artifact in manifest["artifacts"]:
+                    if artifact["kind"] == "sources":
+                        path = self.task(identifier)/artifact["file"]
+                        artifact.update(format="json", bytes=path.stat().st_size, sha256=digest_file(path), **public_reference(self, path))
             result.update(self.public_manifest(manifest))
         return result
 
@@ -88,10 +96,14 @@ class EvidenceStore:
         maximum = integer(raw.get("max_chars", self.limits.max_read_chars), 1, self.limits.max_read_chars)
         offset = integer(raw.get("offset", 0), 0, self.limits.max_output_chars)
         if selected["kind"] not in ("content", "transcript"):
-            if selected["kind"] not in ("sources", "minutes", "script", "log") or find or set(raw) & {"pages", "time_range", "paragraphs"}:
+            if selected["kind"] not in ("sources", "minutes", "script", "log", "output") or find or set(raw) & {"pages", "time_range", "paragraphs"}:
                 raise Fault("UNREADABLE_ARTIFACT")
             file = self.task(identifier) / selected["file"]
-            text = file.read_text(encoding="utf-8", errors="replace" if selected["kind"] == "log" else "strict")
+            if selected["kind"] == "output":
+                from .management import readable_text
+                text = readable_text(file, self.limits)
+            else:
+                text = file.read_text(encoding="utf-8", errors="replace" if selected["kind"] == "log" else "strict")
             chunk = text[offset:offset + maximum]
             return {"status": "READ", "job_id": identifier, "artifact_id": artifact,
                     "artifact_kind": selected["kind"], "text": chunk, "content_trust": "untrusted",
@@ -153,6 +165,8 @@ class EvidenceStore:
 
     def save_minutes(self, identity, identifier, text, source_segments):
         row = self.job(identity, identifier)
+        if self.limits.workspace_mode and row["expires"] <= time.time():
+            raise Fault("CACHE_EXPIRED", "Select the snapshot and reprocess, or use a saved transcript.")
         manifest = self.manifest(row)
         if (row["status"] not in ("SUCCEEDED", "PARTIAL") or not isinstance(text, str) or
                 not 1 <= len(text) <= self.limits.max_read_chars or not isinstance(source_segments, list) or
@@ -167,10 +181,16 @@ class EvidenceStore:
             return {"status": "SAVED", "job_id": identifier, "artifact_id": previous["artifact_id"], "reused": True}
         artifact = uuid.uuid4().hex
         filename = f"minutes-{artifact}.md"
+        if self.limits.workspace_mode:
+            filename = "published/"+filename
         (self.task(identifier) / filename).write_text(text, encoding="utf-8")
         manifest["artifacts"].append({"artifact_id": artifact, "file": filename, "kind": "minutes",
             "derived_sha256": digest, "source_segments": source_segments, "content_trust": "untrusted",
             "author": "agent-derived-unverified"})
+        if self.limits.workspace_mode:
+            from .management import register_products
+            os.chmod(self.task(identifier)/filename, 0o440)
+            register_products(self, identity, manifest, live=True)
         write_json(self.task(identifier) / "sources.json", manifest)
         return {"status": "SAVED", "job_id": identifier, "artifact_id": artifact, "reused": False}
 

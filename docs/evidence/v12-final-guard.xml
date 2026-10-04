@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="2" time="4.995" timestamp="2026-10-04T16:09:49.689594+08:00" hostname="local-development"><testcase classname="tests.test_v12" name="test_status_does_not_advertise_expired_or_removed_products" time="3.015" /><testcase classname="tests.test_v12" name="test_published_output_read_save_after_cleanup_touch_and_no_copy" time="1.901" /></testsuite></testsuites>

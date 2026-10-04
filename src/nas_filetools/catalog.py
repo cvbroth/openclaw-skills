@@ -22,6 +22,8 @@ EXTENSIONS = {
     **{e: ("tables", e[1:]) for e in (".xlsx", ".xls", ".csv", ".tsv", ".ods")},
     **{e: ("datasets", e[1:]) for e in (".jsonl", ".parquet", ".arrow", ".feather")},
     **{e: ("structured", e[1:]) for e in (".json", ".yaml", ".yml", ".xml")},
+    **{e: ("video", e[1:]) for e in (".mp4", ".mov", ".mkv", ".webm")},
+    **{e: ("archives", e[1:]) for e in (".zip", ".tar", ".gz", ".7z")},
 }
 
 
@@ -116,6 +118,16 @@ def identify(path, filename):
         extension = ".mp3"
     elif header[4:8] == b"ftyp" and header[8:12] in (b"M4A ", b"M4B "):
         extension = ".m4a"
+    elif header[4:8] == b"ftyp":
+        extension = ".mov" if header[8:12] == b"qt  " else ".mp4"
+    elif header.startswith(b"\x1aE\xdf\xa3"):
+        extension = ".webm" if declared == ".webm" else ".mkv"
+    elif header.startswith(b"\x1f\x8b"):
+        extension = ".gz"
+    elif header.startswith(b"7z\xbc\xaf\x27\x1c"):
+        extension = ".7z"
+    elif header[257:262] == b"ustar":
+        extension = ".tar"
     elif header.startswith(b"PAR1"):
         extension = ".parquet"
     elif header.startswith(b"ARROW1"):
@@ -141,8 +153,8 @@ def identify(path, filename):
                 if len(archive.filelist) > 10000:
                     raise Fault("EXPANDED_SIZE_LIMIT")
                 names = set(archive.namelist())
-                extension = ".docx" if "word/document.xml" in names else ".xlsx" if "xl/workbook.xml" in names else ""
-                if not extension and "mimetype" in names and archive.getinfo("mimetype").file_size < 100:
+                extension = ".docx" if "word/document.xml" in names else ".xlsx" if "xl/workbook.xml" in names else ".zip"
+                if extension == ".zip" and "mimetype" in names and archive.getinfo("mimetype").file_size < 100:
                     if archive.read("mimetype") == b"application/vnd.oasis.opendocument.spreadsheet":
                         extension = ".ods"
         except (zipfile.BadZipFile, Fault):

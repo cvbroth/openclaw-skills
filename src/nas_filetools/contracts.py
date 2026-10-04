@@ -2,7 +2,7 @@
 
 import hashlib
 import re
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 
 
 class Fault(Exception):
@@ -60,9 +60,13 @@ class Limits:
     script_python: str = ""
     script_isolation: str = "landlock"
     offline: bool = True
+    workspace_mode: bool = False
+    gateway_workspace: str = ""
+    source_roots: dict = field(default_factory=dict)
 
     def __post_init__(self):
-        excluded = ("enabled_agents", "whisper_model", "model_cache", "script_python", "script_isolation", "offline")
+        excluded = ("enabled_agents", "whisper_model", "model_cache", "script_python", "script_isolation", "offline",
+                    "workspace_mode", "gateway_workspace", "source_roots")
         if any(type(value) is not int or value < 1 for name, value in asdict(self).items() if name not in excluded):
             raise Fault("INVALID_CONFIG")
         if (self.concurrency != 1 or self.engine_threads > 8 or self.worker_memory_mb < 256 or
@@ -80,6 +84,9 @@ class Limits:
             raise Fault("INVALID_CONFIG")
         if self.script_isolation not in ("landlock", "development"):
             raise Fault("INVALID_CONFIG")
+        if (type(self.workspace_mode) is not bool or not isinstance(self.gateway_workspace, str) or
+                not isinstance(self.source_roots, dict) or self.workspace_mode and len(self.enabled_agents) != 1):
+            raise Fault("INVALID_WORKSPACE_CONFIG")
 
     @property
     def max_bytes(self):  # Read compatibility for V1 adapters, not a second configurable limit.

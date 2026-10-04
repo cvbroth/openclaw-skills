@@ -1,0 +1,24 @@
+✔ registered attachment bytes flow through real core, background worker and evidence reader (3104.0017ms)
+✔ actual SDK registers ten factories and supported hooks (2.1654ms)
+✔ canonical trusted attachment -> registered ID -> read evidence; repeated inspect does not upload twice (580.4051ms)
+✔ new session UUID refuses even an unprocessed old attachment (6.7461ms)
+✔ sender/account/agent/group sessions cannot select another user's attachments (0.36ms)
+✔ model cannot supply path, owner or session, and malformed ranges are rejected (1.6976ms)
+✔ staging/URL/text paths/mismatched runtime facts never become registered attachments (5.1434ms)
+✔ changed inode/content is refused without uploading (6.37ms)
+✔ concurrent inspect uploads once and failed transport never masquerades as no content (8.4217ms)
+✔ ordinary 2026.9.4 event without runId binds the trusted stored epoch (5.3486ms)
+✔ first session creation resolves pending media; reset and failed store never adopt old media (5.1557ms)
+﹣ public SDK session storage and actual registered inbound hook work without runId (0.1105ms) # SDK lifecycle locks require a real writable Linux runtime
+✔ arrival archives without inspect; receipt once and same-event task can extract (5.9149ms)
+✔ old epoch references do not consume new UUID quota; excess is explicit (14.73ms)
+✔ one Agent binding does not require a second user_id identity system (0.5858ms)
+✔ shared canonical relative attachment registers without byte upload; text/XLSX outputs can be fetched (7349.345ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 12120.76

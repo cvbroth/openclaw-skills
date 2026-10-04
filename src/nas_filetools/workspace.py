@@ -12,6 +12,12 @@ from pathlib import Path
 from .catalog import CATEGORIES, atomic_json, copy_stream, digest_file, identify, timestamp, sync_directory
 from .contracts import Fault, options, owner, valid_id, integer
 
+V12_CATEGORIES = ("pdf", "word", "text", "images", "audio", "video", "spreadsheets", "datasets", "archives", "other")
+
+
+def category_v12(category):
+    return {"markdown": "text", "tables": "spreadsheets", "structured": "text"}.get(category, category)
+
 
 class WorkspaceStore:
     def __init__(self, root, limits):
@@ -24,8 +30,11 @@ class WorkspaceStore:
             raise Fault("DATA_ROOT_OVERLAPS_READABLE_SYSTEM_LIBRARIES")
         if os.name == "nt" and not str(self.root).startswith("\\\\?\\"):
             self.root = Path("\\\\?\\" + str(self.root))
-        self.limits, self.lock = limits, threading.RLock()
-        for name in ("agents", "incoming"):
+        self.limits = limits
+        self.directory(self.root)
+        from .registry_lock import RegistryLock
+        self.lock = RegistryLock(self.root/".registry.lock") if limits.workspace_mode else threading.RLock()
+        for name in (("incoming",) if limits.workspace_mode else ("agents", "incoming")):
             self.directory(self.root / name)
         with self.db() as db:
             tables = {r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
@@ -37,7 +46,6 @@ class WorkspaceStore:
                   id TEXT PRIMARY KEY, agent TEXT NOT NULL, sha TEXT NOT NULL, size INTEGER NOT NULL,
                   category TEXT NOT NULL, path TEXT NOT NULL, info TEXT NOT NULL, created TEXT NOT NULL,
                   state TEXT NOT NULL DEFAULT 'LIVE');
-                CREATE UNIQUE INDEX IF NOT EXISTS files_dedup ON files(agent,sha) WHERE state='LIVE';
                 CREATE TABLE IF NOT EXISTS attachments(
                   id TEXT NOT NULL, owner TEXT NOT NULL, filename TEXT NOT NULL, sha TEXT NOT NULL,
                   size INTEGER NOT NULL, info TEXT NOT NULL, created REAL NOT NULL,
@@ -54,6 +62,17 @@ class WorkspaceStore:
                   id TEXT PRIMARY KEY, agent TEXT NOT NULL, file_id TEXT NOT NULL, job_id TEXT NOT NULL,
                   path TEXT NOT NULL, created TEXT NOT NULL, info TEXT NOT NULL);
             """)
+        with self.db() as db:
+            columns = {row[1] for row in db.execute("PRAGMA table_info(files)")}
+            if "mode" not in columns:
+                db.execute("ALTER TABLE files ADD COLUMN mode TEXT NOT NULL DEFAULT 'snapshot'")
+            if limits.workspace_mode:
+                db.execute("DROP INDEX IF EXISTS files_dedup")
+                db.execute("CREATE UNIQUE INDEX IF NOT EXISTS files_snapshot_dedup ON files(agent,sha) WHERE state='LIVE' AND mode='snapshot'")
+                db.execute("CREATE TABLE IF NOT EXISTS registration_requests(scope TEXT,request_id TEXT,fingerprint TEXT,result TEXT,PRIMARY KEY(scope,request_id))")
+                db.execute("CREATE TABLE IF NOT EXISTS access_leases(job_id TEXT,token TEXT,expires REAL,PRIMARY KEY(job_id,token))")
+            else:
+                db.execute("CREATE UNIQUE INDEX IF NOT EXISTS files_dedup ON files(agent,sha) WHERE state='LIVE'")
         for agent in limits.enabled_agents:
             self.initialize(agent)
         with self.db() as db:
@@ -63,7 +82,7 @@ class WorkspaceStore:
             self.finish_delete(row)
         with self.db() as db:
             # Never advertise missing snapshots after a crash/operator filesystem change.
-            for row in db.execute("SELECT id,path FROM files WHERE state='LIVE'").fetchall():
+            for row in db.execute("SELECT id,path FROM files WHERE state='LIVE' AND mode!='reference'").fetchall():
                 if not (self.root/row["path"]).is_file() or (self.root/row["path"]).is_symlink():
                     db.execute("UPDATE files SET state='MISSING' WHERE id=?", (row["id"],))
                     db.execute("UPDATE attachments SET active=0 WHERE file_id=?", (row["id"],))
@@ -84,12 +103,12 @@ class WorkspaceStore:
     def initialize(self, agent):
         if agent not in self.limits.enabled_agents:
             raise Fault("FORBIDDEN")
-        home = self.root / "agents" / agent
+        home = self.root if self.limits.workspace_mode else self.root / "agents" / agent
         self.directory(home)
-        for area in ("inbox", "cache", "snapshots", "saved"):
+        for area in (("cache", "snapshots", "saved") if self.limits.workspace_mode else ("inbox", "cache", "snapshots", "saved")):
             self.directory(home / area)
         for area in ("snapshots", "saved"):
-            for category in CATEGORIES:
+            for category in (V12_CATEGORIES if self.limits.workspace_mode else CATEGORIES):
                 self.directory(home / area / category)
         return home
 
@@ -98,20 +117,23 @@ class WorkspaceStore:
             row = db.execute("SELECT agent FROM jobs WHERE id=?", (valid_id(identifier),)).fetchone()
         if not row:
             raise Fault("NOT_FOUND")
-        return self.root / "agents" / row[0] / "cache" / identifier
+        return self.initialize(row[0]) / "cache" / identifier
 
     def original(self, scope, identifier, filename):
         with self.db() as db:
-            row = db.execute("SELECT f.path FROM files f JOIN attachments a ON a.file_id=f.id "
+            row = db.execute("SELECT f.* FROM files f JOIN attachments a ON a.file_id=f.id "
                              "WHERE a.owner=? AND a.id=? AND f.state='LIVE'", (scope, identifier)).fetchone()
         if not row:
             raise Fault("NOT_FOUND")
-        return self.root / row[0]
+        if row["mode"] == "reference":
+            from .management import reference_path
+            return reference_path(self, dict(row))
+        return self.root / row["path"]
 
     def capacity(self, identity):
         agent = self.agent(identity)
         with self.db() as db:
-            snapshots = db.execute("SELECT COALESCE(SUM(size),0) FROM files WHERE agent=? AND state='LIVE'",
+            snapshots = db.execute("SELECT COALESCE(SUM(size),0) FROM files WHERE agent=? AND state='LIVE' AND mode='snapshot'",
                                    (agent,)).fetchone()[0]
         home = self.initialize(agent)
         sizes = {}
@@ -162,16 +184,23 @@ class WorkspaceStore:
             count = db.execute("SELECT COUNT(*) FROM attachments WHERE owner=? AND active=1", (scope,)).fetchone()[0]
             if count >= self.limits.max_references_per_session:
                 raise Fault("SESSION_REFERENCE_LIMIT")
-            record = db.execute("SELECT * FROM files WHERE agent=? AND sha=? AND state='LIVE'", (agent, sha)).fetchone()
+            record = db.execute("SELECT * FROM files WHERE agent=? AND sha=? AND state='LIVE' AND mode='snapshot'", (agent, sha)).fetchone()
             reused = record is not None
             if record is None:
                 self.room(identity, "snapshots", before.st_size)
                 file_id = uuid.uuid4().hex
+                detected["category"] = category_v12(detected["category"]) if self.limits.workspace_mode else detected["category"]
+                if not self.limits.workspace_mode and detected["category"] not in CATEGORIES:
+                    detected["category"] = "other"
                 target = self.initialize(agent) / "snapshots" / detected["category"] / (file_id+detected["extension"])
                 temporary = target.with_name(target.name+".receiving-"+uuid.uuid4().hex)
                 try:
-                    with incoming.open("rb") as source:
-                        copy_stream(source, temporary, self.limits.max_receive_bytes, before.st_size, sha)
+                    if self.limits.workspace_mode:
+                        from .management import snapshot_copy
+                        snapshot_copy(incoming, temporary, self.limits.max_receive_bytes, before.st_size, sha)
+                    else:
+                        with incoming.open("rb") as source:
+                            copy_stream(source, temporary, self.limits.max_receive_bytes, before.st_size, sha)
                     after = incoming.stat()
                     if (before.st_ino, before.st_size, before.st_mtime_ns) != (after.st_ino, after.st_size, after.st_mtime_ns):
                         raise Fault("ATTACHMENT_CHANGED")
@@ -182,7 +211,7 @@ class WorkspaceStore:
                     details.setdefault("units", 0)
                     details.setdefault("preview", [])
                     details["deferred_inspection"] = (info or {}).get("deferred_inspection", "units" not in (info or {}))
-                    db.execute("INSERT INTO files VALUES(?,?,?,?,?,?,?,?,'LIVE')", (file_id, agent, sha, before.st_size,
+                    db.execute("INSERT INTO files(id,agent,sha,size,category,path,info,created,state) VALUES(?,?,?,?,?,?,?,?,'LIVE')", (file_id, agent, sha, before.st_size,
                         detected["category"], str(target.relative_to(self.root)), json.dumps(details), timestamp()))
                 finally:
                     temporary.unlink(missing_ok=True)
@@ -203,10 +232,13 @@ class WorkspaceStore:
     def attachment(self, identity, identifier):
         self.agent(identity)
         with self.db() as db:
-            row = db.execute("SELECT a.*,f.state FROM attachments a JOIN files f ON f.id=a.file_id "
+            row = db.execute("SELECT a.*,f.state,f.mode FROM attachments a JOIN files f ON f.id=a.file_id "
                              "WHERE a.owner=? AND a.id=? AND a.active=1", (owner(identity), valid_id(identifier))).fetchone()
         if not row or row["state"] != "LIVE":
             raise Fault("NOT_FOUND")
+        if row["mode"] == "reference":
+            from .management import reference_path
+            reference_path(self, row)
         return dict(row)
 
     def inspect(self, identity, identifier=None, lightweight=False):
@@ -249,7 +281,7 @@ class WorkspaceStore:
         from .engines import version
         engines = {k: version(k) for k in ("PyMuPDF", "python-docx", "rapidocr-onnxruntime", "faster-whisper", "openpyxl")}
         fingerprint = hashlib.sha256(json.dumps([attachment["sha"], config, kind, payload, self.limits.dict(),
-                                                engines, "1.1.0"], sort_keys=True).encode()).hexdigest()
+                                                engines, "1.2.0"], sort_keys=True).encode()).hexdigest()
         with self.db() as db:
             cached = db.execute("SELECT id FROM jobs WHERE owner=? AND fingerprint=? AND expires>? AND status IN "
                                 "('QUEUED','RUNNING','SUCCEEDED','PARTIAL') ORDER BY created DESC LIMIT 1",
@@ -291,10 +323,24 @@ class WorkspaceStore:
             db.execute("UPDATE jobs SET expires=? WHERE id=?", (now+self.limits.ttl_seconds, identifier))
 
     def status(self, identity, identifier):
-        result = super().status(identity, identifier)
         row = self.job(identity, identifier)
+        if self.limits.workspace_mode and row["expires"] <= time.time() and row["status"] not in ("QUEUED", "RUNNING"):
+            return {"status": row["status"], "job_id": identifier, "attachment_id": row["attachment"],
+                "availability": "CACHE_EXPIRED", "artifacts": [], "expires_at": timestamp(row["expires"]),
+                "created_at": timestamp(row["created"]), "kind": row["kind"], "cancel_requested": bool(row["cancel"]),
+                "recovery": "Select the persistent snapshot and extract again, or read a saved version."}
+        result = super().status(identity, identifier)
+        if self.limits.workspace_mode:
+            for artifact in result.get("artifacts", []):
+                path = self.task(identifier)/artifact["file"]
+                artifact["availability"] = "AVAILABLE" if path.is_file() and not path.is_symlink() else "ARTIFACT_UNAVAILABLE"
+                if artifact["availability"] != "AVAILABLE":
+                    artifact.pop("gateway_path", None)
+                    artifact.pop("workspace_relative_path", None)
         result.update(expires_at=timestamp(row["expires"]), created_at=timestamp(row["created"]), kind=row["kind"])
         checkpoint = self.task(identifier)/"checkpoint.json"
+        if self.limits.workspace_mode:
+            checkpoint = self.task(identifier)/".private"/"checkpoint.json"
         if checkpoint.exists() and checkpoint.stat().st_size <= self.limits.max_manifest_bytes:
             saved = json.loads(checkpoint.read_text(encoding="utf-8"))
             result["processed_time_ranges"] = [[c["start"], c["end"]] for c in saved.get("chunks", []) if c["status"]=="DONE"]
@@ -318,6 +364,8 @@ class WorkspaceStore:
 
     def files(self, identity, action, **params):
         agent, scope = self.agent(identity), owner(identity)
+        if self.limits.workspace_mode and (action == "inbox_register" or params.get("area") == "inbox"):
+            raise Fault("LEGACY_INBOX_DISABLED", "Register the final NAS filename using an approved source root; no .ready JSON required.")
         if action == "offer_save":
             job = self.job(identity, params.get("job_id"))
             if job["status"] not in ("SUCCEEDED", "PARTIAL"):
@@ -327,6 +375,9 @@ class WorkspaceStore:
             return {"status": "SAVE_OFFER", "ask_once": bool(changed), "job_id": job["id"]}
         if action == "capacity":
             return self.capacity(identity)
+        if action in ("touch", "artifact_path"):
+            from .management import artifact_access
+            return artifact_access(self, identity, action, params)
         if action == "list":
             offset = integer(params.get("offset", 0), 0, 10000000)
             area = params.get("area", "snapshots")
@@ -339,12 +390,29 @@ class WorkspaceStore:
                     rows = db.execute("SELECT id,created,info FROM saved WHERE agent=? ORDER BY created DESC LIMIT 101 OFFSET ?", (agent, offset)).fetchall()
                     items = [{"saved_id": r["id"], "created_at": r["created"], **json.loads(r["info"])} for r in rows]
                 else:
-                    rows = db.execute("SELECT id,sha,size,category,created FROM files WHERE agent=? AND state='LIVE' "
+                    rows = db.execute("SELECT id,sha,size,category,created,mode,info,state FROM files WHERE agent=? AND state!='DELETED' "
                                       "ORDER BY created DESC LIMIT 101 OFFSET ?", (agent, offset)).fetchall()
                     items = []
                     for r in rows:
                         names = db.execute("SELECT filename,source,active FROM attachments WHERE file_id=? LIMIT 20", (r["id"],)).fetchall()
+                        details = json.loads(r["info"])
+                        availability = r["state"]
+                        if r["mode"] == "reference":
+                            from .management import resolve_source, stable_stat
+                            try:
+                                ref = details["external_reference"]
+                                path, _, _ = resolve_source(self, ref["relative_path"], ref["root_id"])
+                                if details.get("source_version") != list(stable_stat(path)):
+                                    availability = "REFERENCE_CHANGED_POSSIBLE"
+                            except Fault as error:
+                                availability = error.code
+                        cached = db.execute("SELECT expires FROM jobs WHERE id=?", (details.get("job_id"),)).fetchone() if r["mode"] == "artifact" else None
+                        if r["mode"] == "artifact" and (not cached or cached[0] <= time.time()):
+                            availability = "CACHE_EXPIRED"
                         items.append({"file_id": r["id"], "sha256": r["sha"], "bytes": r["size"], "category": r["category"],
+                            "mode": r["mode"], "state": r["state"], "external_reference": details.get("external_reference"),
+                            "availability": availability, "cache_expires": timestamp(cached[0]) if cached else None,
+                            "input_file_id": details.get("input_file_id"), "job_id": details.get("job_id"),
                             "first_received_at": r["created"], "uploads": [{"filename": a["filename"], **json.loads(a["source"]),
                                                                          "active": bool(a["active"])} for a in names]})
             return {"status": "FILES", "area": area, "items": items[:100], "truncated": len(items)>100,
@@ -359,6 +427,9 @@ class WorkspaceStore:
                 if existing:
                     return self.inspect(identity, existing[0], lightweight=True)
                 original = db.execute("SELECT filename FROM attachments WHERE file_id=? ORDER BY created LIMIT 1", (file_id,)).fetchone()
+                if row["mode"] != "snapshot":
+                    from .management import associate
+                    return associate(self, identity, dict(row), original[0] if original else Path(row["path"]).name)
                 return self.register(identity, uuid.uuid4().hex, original[0], self.root / row["path"], json.loads(row["info"]))
         if action == "save":
             return self.save_result(identity, params.get("job_id"), params.get("artifact_id"))
@@ -400,6 +471,7 @@ class WorkspaceStore:
             saved_id = uuid.uuid4().hex
             source = self.task(identifier)
             category = identify(source/selected[0]["file"], selected[0]["file"])["category"]
+            category = category_v12(category) if self.limits.workspace_mode else category
             destination = self.initialize(job["agent"]) / "saved" / category / saved_id
             temporary = destination.with_name(".saving-"+saved_id)
             # All source records/images are necessary dependencies; preserve bundle, even for one selected item.
@@ -424,7 +496,8 @@ class WorkspaceStore:
                         text = file.read_text(encoding="utf-8")
                         for image in saved_manifest["artifacts"]:
                             if image["kind"] == "image":
-                                text = text.replace("artifact:"+image["artifact_id"], image["file"])
+                                text = text.replace("artifact:"+image["artifact_id"],
+                                    Path(os.path.relpath(image["file"], Path(artifact["file"]).parent)).as_posix())
                         file.write_text(text, encoding="utf-8")
                 atomic_json(temporary/"saved.json", {"saved_id": saved_id, "saved_at": timestamp(), "source": saved_manifest,
                             "selected_artifacts": [a["artifact_id"] for a in selected], "original_state": "LIVE"})
@@ -434,6 +507,14 @@ class WorkspaceStore:
                     db.execute("INSERT INTO saved VALUES(?,?,?,?,?,?,?)", (saved_id, job["agent"], attachment["file_id"],
                         identifier, str(destination.relative_to(self.root)), timestamp(), json.dumps({"category": category,
                         "selected_artifacts": [a["artifact_id"] for a in selected], "original_state": "LIVE"})))
+                if self.limits.workspace_mode:
+                    from .management import register_products
+                    for artifact in saved_manifest["artifacts"]:
+                        if artifact.get("file_id"):
+                            artifact["source_file_id"] = artifact.pop("file_id")
+                    register_products(self, identity, saved_manifest, live=True, folder=destination, mode="saved")
+                    atomic_json(destination/"saved.json", {"saved_id": saved_id, "saved_at": timestamp(), "source": saved_manifest,
+                        "selected_artifacts": [a["artifact_id"] for a in selected], "original_state": "LIVE"})
             except Exception:
                 # Preserve original cache on any error. An unregistered published bundle is retained for diagnosis.
                 if temporary.exists():
@@ -457,8 +538,17 @@ class WorkspaceStore:
         if not artifact:
             raise Fault("UNREADABLE_ARTIFACT")
         result = {"status": "SAVED_FILE", "saved_id": saved_id, "artifact": artifact, "original_state": info["original_state"]}
-        if artifact["kind"] in ("content", "transcript", "minutes", "sources"):
-            text = (folder/artifact["file"]).read_text(encoding="utf-8")
+        from .management import public_reference, readable_text
+        result.update(public_reference(self, folder/artifact["file"]))
+        result["artifact"] = {**artifact, **public_reference(self, folder/artifact["file"]),
+            "bytes": (folder/artifact["file"]).stat().st_size, "sha256": digest_file(folder/artifact["file"])}
+        if artifact["kind"] in ("content", "transcript", "minutes", "sources", "output", "script", "log"):
+            try:
+                text = readable_text(folder/artifact["file"], self.limits)
+            except Fault as error:
+                if artifact["kind"] != "output" or error.code != "BINARY_ARTIFACT":
+                    raise
+                return result
             start = integer(offset, 0, self.limits.max_manifest_bytes)
             result.update(text=text[start:start+self.limits.max_read_chars],
                           next_offset=start+self.limits.max_read_chars if start+self.limits.max_read_chars<len(text) else None)
@@ -485,7 +575,13 @@ class WorkspaceStore:
                 raise Fault("FILE_BUSY")
             # Explicit deletion of a unique file means all its references; no dangling live rows.
             path = self.root/row["path"]
-            if path.is_symlink() or not path.resolve().is_relative_to((self.root/"agents"/agent/"snapshots").resolve()):
+            if row["mode"] == "reference":
+                db.execute("UPDATE files SET state='DELETED' WHERE id=?", (file_id,))
+                db.execute("UPDATE attachments SET active=0 WHERE file_id=?", (file_id,))
+                return {"status": "REFERENCE_REMOVED", "external_original_deleted": False, "file_id": file_id}
+            if row["mode"] != "snapshot":
+                raise Fault("NOT_ORIGINAL", "Use delete_cache for cached products.")
+            if path.is_symlink() or not path.resolve().is_relative_to((self.initialize(agent)/"snapshots").resolve()):
                 raise Fault("UNSAFE_DELETE")
             db.execute("UPDATE files SET state='DELETING' WHERE id=?", (file_id,))
         self.finish_delete(dict(row))
@@ -494,7 +590,7 @@ class WorkspaceStore:
     def finish_delete(self, row):
         file_id = row["id"]
         path = self.root/row["path"]
-        expected = self.root/"agents"/row["agent"]/"snapshots"
+        expected = self.initialize(row["agent"])/"snapshots"
         if path.is_symlink() or not path.resolve().is_relative_to(expected.resolve()):
             raise Fault("UNSAFE_DELETE")
         path.unlink(missing_ok=True)
@@ -512,14 +608,35 @@ class WorkspaceStore:
                 atomic_json(file, source)
 
     def remove_cache(self, row):
+        if self.limits.workspace_mode:
+            with self.db() as db:
+                if db.execute("SELECT 1 FROM access_leases WHERE job_id=? AND expires>?", (row["id"], time.time())).fetchone():
+                    raise Fault("FILE_BUSY")
+                products = db.execute("SELECT id,info FROM files WHERE mode='artifact' AND state='LIVE'").fetchall()
+                for product in products:
+                    if json.loads(product["info"]).get("job_id") == row["id"] and db.execute(
+                            "SELECT 1 FROM jobs j JOIN attachments a ON a.id=j.attachment AND a.owner=j.owner "
+                            "WHERE a.file_id=? AND j.status IN ('RUNNING','QUEUED')", (product["id"],)).fetchone():
+                        raise Fault("FILE_BUSY")
         target = self.task(row["id"])
-        expected = self.root/"agents"/row["agent"]/"cache"
+        expected = self.initialize(row["agent"])/"cache"
         if target.is_symlink() or expected.is_symlink() or target.resolve().parent != expected.resolve():
             raise Fault("UNSAFE_CLEANUP_TARGET")
         if target.exists():
-            shutil.rmtree(target)
+            def remove_readonly(function, path, _error):
+                os.chmod(path, 0o600)
+                function(path)
+            shutil.rmtree(target, onerror=remove_readonly if os.name == "nt" else None)
         with self.db() as db:
+            if self.limits.workspace_mode:
+                products = db.execute("SELECT id,info FROM files WHERE mode='artifact' AND state='LIVE'").fetchall()
+                for product in products:
+                    if json.loads(product["info"]).get("job_id") == row["id"]:
+                        db.execute("UPDATE files SET state='EXPIRED' WHERE id=?", (product["id"],))
+                        db.execute("UPDATE attachments SET active=0 WHERE file_id=?", (product["id"],))
             db.execute("DELETE FROM jobs WHERE id=?", (row["id"],))
+            if self.limits.workspace_mode:
+                db.execute("DELETE FROM access_leases WHERE job_id=?", (row["id"],))
         return {"status": "CACHE_DELETED", "job_id": row["id"], "snapshot_preserved": True}
 
     def cleanup(self, now=None):
@@ -529,8 +646,12 @@ class WorkspaceStore:
             with self.db() as db:
                 rows = db.execute("SELECT * FROM jobs WHERE expires<=? AND status NOT IN ('QUEUED','RUNNING')", (now,)).fetchall()
             for row in rows:
-                self.remove_cache(dict(row))
-                removed.append(row["id"])
+                try:
+                    self.remove_cache(dict(row))
+                    removed.append(row["id"])
+                except Fault as error:
+                    if error.code != "FILE_BUSY":
+                        raise
         return {"status": "CLEANED", "removed_jobs": removed, "originals_deleted": 0}
 
     def inbox_list(self, identity):

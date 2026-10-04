@@ -38,6 +38,7 @@ def main():
     service.add_argument("--config", type=Path)
     clean = sub.add_parser("cleanup", help="Offline cleanup; refuses a running service")
     clean.add_argument("--root", required=True)
+    clean.add_argument("--config", type=Path)
     register = sub.add_parser("register", help="Trusted local diagnostic upload, never expose to an Agent")
     register.add_argument("file", type=Path)
     register.add_argument("--attachment-id", default=None)
@@ -59,6 +60,11 @@ def main():
     migration.add_argument("--identity-map", required=True)
     migration.add_argument("--config", type=Path)
     migration.add_argument("--apply", action="store_true")
+    shared_migration = sub.add_parser("migrate-workspaces", help="Copy V1.1 snapshots/saved versions to explicit real Agent workspaces")
+    shared_migration.add_argument("--old-root", required=True)
+    shared_migration.add_argument("--agent-map", required=True)
+    shared_migration.add_argument("--config", type=Path, required=True)
+    shared_migration.add_argument("--apply", action="store_true")
     args = parser.parse_args()
     try:
         if args.command in ("install", "diagnose"):
@@ -67,22 +73,31 @@ def main():
         elif args.command == "rollback":
             from .operations import rollback
             result = rollback(args.record, args.apply)
+        elif args.command == "migrate-workspaces":
+            from .operations_v12 import migrate
+            result = migrate(args.config, args.old_root, args.agent_map, args.apply)
         elif args.command == "migrate":
             from .operations import migrate
             limits = Limits(**json.loads(args.config.read_text())) if args.config else Limits()
             result = migrate(args.old_root, args.new_root, limits, args.identity_map, args.apply)
         elif args.command == "serve":
             settings = json.loads(args.config.read_text()) if args.config else {}
-            limits = Limits(**settings)
+            limits = Limits(**settings.get("limits", settings))
             stop = threading.Event()
             signal.signal(signal.SIGTERM, lambda *_: stop.set())
             signal.signal(signal.SIGINT, lambda *_: stop.set())
-            serve(args.root, limits, args.socket, stop)
+            serve(args.root, limits, args.socket, stop, settings.get("workspaces"))
             return
         elif args.command == "cleanup":
             lock = ServiceLock(args.root)
             try:
-                result = Store(args.root, Limits()).cleanup()
+                settings = json.loads(args.config.read_text()) if args.config else {}
+                limits = Limits(**settings.get("limits", settings))
+                if settings.get("workspaces"):
+                    from .shared_workspace import WorkspaceHub
+                    result = {"status": "CLEANED", "agents": WorkspaceHub(args.root, limits, settings["workspaces"]).cleanup()}
+                else:
+                    result = Store(args.root, limits).cleanup()
             finally:
                 lock.close()
         else:

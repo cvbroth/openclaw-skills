@@ -1,0 +1,34 @@
+{
+  "status": "PASSED",
+  "environment": "local Docker desktop-linux",
+  "gateway_role": "stdlib manager fixture, not OpenClaw daemon",
+  "real_checks": [
+    "same UID/GID shared volumes",
+    "Unix HTTP IDs-only control",
+    "Linux isolated Python MD+XLSX",
+    "Gateway ordinary read/hash/XLSX cell",
+    "independent saved after cache cleanup",
+    "cross-Agent denied",
+    "worker mounts only Agent filetools subdirectories"
+  ],
+  "worker_mount_destinations": [
+    "/control",
+    "/run/nas-filetools",
+    "/check",
+    "/test",
+    "/workspaces/chen/filetools",
+    "/workspaces/main/filetools"
+  ],
+  "retrieved_outputs": [
+    {
+      "path": "/gateway/chen/filetools/cache/aa7140bc5c3346c987142ca02b2215bc/published/execution/report.md",
+      "sha256": "84898939dccb286fe3c66751c0a7daf2d09f65db0db55418aada631e5b3bc7f7"
+    },
+    {
+      "path": "/gateway/chen/filetools/cache/aa7140bc5c3346c987142ca02b2215bc/published/execution/result.xlsx",
+      "sha256": "41755a8b0c2001c988dde7b44b62ac57de8f91935b2b24d30921c562d8f3fdc0"
+    }
+  ],
+  "qq_delivery": "NOT_RUN",
+  "production": "NOT_ACCESSED"
+}

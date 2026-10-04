@@ -1,0 +1,121 @@
+{
+  "windows_python": {
+    "passed": 75,
+    "skipped": 19,
+    "failed": 0,
+    "seconds": 116.316,
+    "timestamp": "2026-10-04T16:01:49.936373+08:00",
+    "skip_reasons": [
+      "Actual Linux config UID/GID and mode",
+      "Creating real Windows symlinks needs OS privilege; Linux CI covers this",
+      "Opt-in real engines, no mocks",
+      "Real Linux Landlock/Docker acceptance; Windows is not equivalent",
+      "Real Linux double-fork / setsid reclamation",
+      "Real Linux filesystem and seccomp boundaries",
+      "Real Unix socket/service integration requires Linux",
+      "Real unprivileged Linux permissions",
+      "Requires Linux Landlock ABI>=3 + libseccomp",
+      "Set FILETOOLS_REAL_ENGINES=1 to run real engines",
+      "Symlink creation unavailable on this Windows runner"
+    ]
+  },
+  "linux_python": {
+    "passed": 93,
+    "skipped": 1,
+    "failed": 0,
+    "seconds": 183.471,
+    "timestamp": "2026-10-04T08:02:06.747447+00:00",
+    "skip_reasons": [
+      "Windows capability boundary"
+    ]
+  },
+  "windows_real_engines": {
+    "passed": 10,
+    "skipped": 0,
+    "failed": 0,
+    "seconds": 51.032,
+    "timestamp": "2026-10-04T15:06:17.473647+08:00",
+    "skip_reasons": []
+  },
+  "final_expiry_guard": {
+    "passed": 2,
+    "skipped": 0,
+    "failed": 0,
+    "seconds": 4.995,
+    "timestamp": "2026-10-04T16:09:49.689594+08:00",
+    "skip_reasons": []
+  },
+  "plugin_windows": {
+    "passed": 15,
+    "skipped": 1,
+    "failed": 0,
+    "sdk": "2026.9.4",
+    "node": "24.16.0",
+    "python_bridges_real": 2,
+    "context_channel_injected": true
+  },
+  "sdk_linux": {
+    "passed": 14,
+    "skipped": 0,
+    "failed": 0,
+    "sdk_session_database_real": true,
+    "channel_client_injected": true
+  },
+  "two_container": {
+    "passed": true,
+    "gateway": "stdlib management fixture",
+    "worker_shared_fs_socket_real": true,
+    "qq_sent": false
+  },
+  "reference_knowledge": {
+    "passed": 49,
+    "skipped": 1,
+    "failed": 0,
+    "commit": "623aa73abcd0dc7f4854a58a8a42e8b6c4725072",
+    "tracked_changes": false
+  },
+  "large_file_actual_bytes": 210763776,
+  "four_gib": "counter only, no full throughput",
+  "long_audio": "generated 4-hour metadata; real FFmpeg 24-second chunk decode with injected ASR; not long real speech",
+  "real_audio": "MIT fixed Whisper JFK about 11 seconds; English; small CPU int8 offline",
+  "static": {
+    "ruff": "PASS",
+    "compileall": "PASS",
+    "pip_check": "PASS",
+    "skill_validator": "PASS",
+    "plugin_build": "PASS",
+    "plugin_validate": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "linux": {
+    "location": "local Docker Desktop",
+    "kernel": "6.18.40.1-microsoft-standard-WSL2",
+    "python": "3.12.10",
+    "cpus": 2,
+    "memory_mb": 4096,
+    "network": "none",
+    "source": "final read-only bind mount; engine dependencies from test image"
+  },
+  "windows": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.3"
+  },
+  "dependencies_windows": {
+    "PyMuPDF": "1.25.5",
+    "python-docx": "1.1.2",
+    "Pillow": "11.1.0",
+    "openpyxl": "3.1.5",
+    "rapidocr-onnxruntime": "1.4.4",
+    "onnxruntime": "1.20.1",
+    "faster-whisper": "1.1.1",
+    "ctranslate2": "4.8.2",
+    "av": "19.0.1",
+    "numpy": "1.26.4"
+  },
+  "production_acceptance": "PENDING",
+  "gateway_qq_e2e_executed": false,
+  "production_connected": false,
+  "production_changed": false,
+  "github_ci_executed": false,
+  "github_pushed": false
+}

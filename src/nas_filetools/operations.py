@@ -89,21 +89,27 @@ def gateway(raw):
         raise Fault("PERSISTENT_GATEWAY_CONFIG_MOUNT_REQUIRED")
     # JSON5 is deliberately rejected rather than rewriting comments incorrectly.
     document = json.loads(Path(config).read_text(encoding="utf-8"))
-    entries = document.get("agents", {}).get("list", [])
+    roster = document.get("agents", {})
+    entries = [{**entry, "id": key} for key, entry in roster.get("entries", {}).items()] if roster.get("entries") else roster.get("list", [])
     for agent in raw["agents"]:
         found = next((a for a in entries if a.get("id") == agent), None)
         if not found and agent != "main":
             raise Fault("AGENT_NOT_CONFIGURED")
         denied = set((found or {}).get("tools", {}).get("deny", [])) | set(document.get("tools", {}).get("deny", []))
-        if any(t in denied for t in TOOLS) or "nas-filetools" in denied or "group:plugins" in denied or "*" in denied:
+        required = [*TOOLS, *(["filetools_register"] if raw.get("workspace_layout") == "shared-v1.2" else [])]
+        if any(t in denied for t in required) or "nas-filetools" in denied or "group:plugins" in denied or "*" in denied:
             raise Fault("FILETOOLS_DENIED_BY_EXISTING_POLICY")
     return {"container": container, "version": actual, "uid": uid, "gid": gid, "mounts": mounts,
+            "image": info.get("Config", {}).get("Image"),
             "config": config, "config_mount": target, "compose": compose,
             "project": labels.get("com.docker.compose.project", ""),
             "service": raw.get("compose_service", labels.get("com.docker.compose.service", ""))}
 
 
 def install(config, apply=False, local_only=False):
+    if json.loads(Path(config).read_text(encoding="utf-8")).get("workspace_layout") == "shared-v1.2":
+        from .operations_v12 import install as install_shared
+        return install_shared(config, apply, local_only)
     raw, limits = settings(config)
     root = Path(raw["data_root"])
     if root.exists() and any(p.name not in {"agents", "incoming", "installation", "models", "jobs.sqlite3", "jobs.sqlite3-wal",
@@ -165,8 +171,8 @@ def install(config, apply=False, local_only=False):
     os.chmod(backup, 0o600)
     updated = json.loads(previous)
     plugins = updated.setdefault("plugins", {})
-    allowed = plugins.setdefault("allow", [])
-    if "nas-filetools" not in allowed:
+    allowed = plugins.get("allow", [])
+    if allowed and "nas-filetools" not in allowed:
         allowed.append("nas-filetools")
     paths = plugins.setdefault("load", {}).setdefault("paths", [])
     # Remove only explicitly configured older copies of this exact plugin.
@@ -289,7 +295,7 @@ def rollback(record_path, apply=False):
     plugin = Path(record["plugin_path"])
     if plugin.is_symlink() or json.loads((plugin/"openclaw.plugin.json").read_text()).get("id") != "nas-filetools":
         raise Fault("UNSAFE_PLUGIN_ROLLBACK_PATH")
-    retained = Path(record_path).parent/("retained-v11-plugin-"+str(time.time_ns()))
+    retained = Path(record_path).parent/("retained-filetools-plugin-"+str(time.time_ns()))
     shutil.move(str(plugin), retained)
     if record["plugin_backup"]:
         shutil.copytree(record["plugin_backup"], plugin)
@@ -305,6 +311,9 @@ def rollback(record_path, apply=False):
 
 
 def diagnose(config, local_only=False):
+    if json.loads(Path(config).read_text(encoding="utf-8")).get("workspace_layout") == "shared-v1.2":
+        from .operations_v12 import diagnose as diagnose_shared
+        return diagnose_shared(config, local_only)
     raw, limits = settings(config)
     issues, checks = [], {}
     try:

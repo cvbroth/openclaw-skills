@@ -1,0 +1,14 @@
+FROM nas-filetools:1.2.0
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/* \
+    && /opt/nas-filetools/.venv/bin/python -m pip install --no-cache-dir -c /opt/nas-filetools/requirements.lock.txt pytest==8.3.5 ruff==0.11.2
+WORKDIR /opt/nas-filetools-check
+COPY src ./src
+COPY tests ./tests
+COPY scripts ./scripts
+COPY pyproject.toml ./
+ENV PYTHONPATH=/opt/nas-filetools-check/src
+USER 10001:10001
+ENTRYPOINT ["/opt/nas-filetools/.venv/bin/python"]
+CMD ["-m", "pytest", "-q", "--basetemp=/tmp/filetools-tests", "-p", "no:cacheprovider"]

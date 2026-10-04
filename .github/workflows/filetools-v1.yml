@@ -1,4 +1,4 @@
-name: FileTools V1.1
+name: FileTools V1.2
 on: [push, pull_request]
 jobs:
   core:
@@ -16,7 +16,7 @@ jobs:
         run: |
           python scripts/fetch_test_audio.py --output "$RUNNER_TEMP/filetools-samples"
           python scripts/prepare_models.py --model small --cache "$RUNNER_TEMP/filetools-models" --revision 536b0662742c02347bc0e980a01041f333bce120
-          FILETOOLS_REAL_ENGINES=1 FILETOOLS_AUDIO_SAMPLE="$RUNNER_TEMP/filetools-samples/jfk.flac" FILETOOLS_WHISPER_MODEL="$RUNNER_TEMP/filetools-models/models--Systran--faster-whisper-small/snapshots/536b0662742c02347bc0e980a01041f333bce120" FILETOOLS_AUDIO_EXPECT=country python -m pytest tests/test_engines.py -q
+          FILETOOLS_REAL_ENGINES=1 FILETOOLS_AUDIO_SAMPLE="$RUNNER_TEMP/filetools-samples/jfk.flac" FILETOOLS_WHISPER_MODEL="$RUNNER_TEMP/filetools-models/models--Systran--faster-whisper-small/snapshots/536b0662742c02347bc0e980a01041f333bce120" FILETOOLS_AUDIO_EXPECT=country python -m pytest -m engines -q
       - uses: actions/setup-node@v4
         with:
           node-version: '24.16.0'

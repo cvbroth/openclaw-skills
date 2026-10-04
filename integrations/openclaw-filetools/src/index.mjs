@@ -3,6 +3,8 @@ import { Type } from "typebox";
 import { getSessionEntry, resolveStorePath } from "openclaw/plugin-sdk/session-store-runtime";
 import { client } from "./client.mjs";
 import { Registry, createTool } from "./runtime.mjs";
+import { managementRequest } from "./management.mjs";
+import { trustedIdentity } from "./runtime.mjs";
 
 const object = fields => Type.Object(fields, { additionalProperties: false });
 const id = Type.String({ pattern: "^[0-9a-f]{32}$" });
@@ -14,6 +16,9 @@ const reading = { job_id: id, artifact_id: optional(id), pages: optional(interva
   max_chars: optional(Type.Integer({ minimum: 1, maximum: 12000 })) };
 
 export const schemas = {
+  register: object({ source_path: optional(Type.String({ minLength: 1, maxLength: 4096 })), source_root: optional(Type.String({ minLength: 1, maxLength: 64 })),
+    file_id: optional(id), mode: optional(Type.Union([Type.Literal("snapshot"), Type.Literal("reference")])), request_id: optional(id),
+    source: optional(object({ description: optional(Type.String({ maxLength: 1000 })) })) }),
   inspect: object({ attachment_id: optional(id) }),
   extract: object({ attachment_id: id, config: object({
     mode: Type.Union([Type.Literal("preview"), Type.Literal("range"), Type.Literal("full")]),
@@ -23,7 +28,7 @@ export const schemas = {
   status: object({ job_id: id }), cancel: object({ job_id: id }), read: object(reading),
   find: object({ ...reading, keyword: Type.String({ minLength: 1, maxLength: 200 }) }),
   files: object({ action: Type.Union(["list", "select", "save", "saved_read", "delete_original", "remove_reference",
-    "delete_cache", "capacity", "inbox_register", "resume", "offer_save"].map(Type.Literal)), area: optional(Type.String()),
+    "delete_cache", "capacity", "inbox_register", "resume", "offer_save", "touch", "artifact_path"].map(Type.Literal)), area: optional(Type.String()),
     file_id: optional(id), job_id: optional(id), artifact_id: optional(id), saved_id: optional(id), attachment_id: optional(id),
     inbox_id: optional(id), offset: optional(Type.Integer({ minimum: 0 })) }),
   python: object({ attachment_id: id, code: Type.String({ minLength: 1, maxLength: 64000 }),
@@ -36,12 +41,16 @@ export const schemas = {
 };
 const binding = object({ user_id: optional(Type.String()), agent_id: Type.String(), sender_id: Type.String({ minLength: 1 }),
   channel_id: Type.String({ minLength: 1 }), account_id: Type.String({ minLength: 1 }) });
-export const configSchema = object({ bindings: Type.Array(binding, { maxItems: 16 }) });
+const root = object({ path: Type.String(), kind: Type.Union(["workspace", "nas", "media"].map(Type.Literal)) });
+export const configSchema = object({ bindings: Type.Array(binding, { maxItems: 16 }),
+  management: optional(object({ python: Type.String(), entry: Type.String(), config: Type.String() })),
+  workspaces: optional(Type.Record(Type.String(), object({ workspace: Type.String(), source_roots: optional(Type.Record(Type.String(), root)) }))) });
 export const registry = new Registry(Date.now, client);
 export const names = Object.keys(schemas).map(operation => `filetools_${operation}`);
 const descriptions = {
+  register: "Register an authorized local file from configured roots, or reuse a file ID, in this Agent's real workspace. Source labels are untrusted. Remote URLs need an existing download tool first. Does not process content.",
   files: "Manage this Agent's persistent snapshots/saved versions or current-session jobs by registered IDs. Select history explicitly; offer_save marks a once-only save question.",
-  python: "Queue bounded temporary Python on input.<actual extension> in an isolated job. Announce output copy; provide output names and XLSX assertions. Never modify original or install dependencies.",
+  python: "Queue bounded temporary Python with FILETOOLS_INPUT pointing to a readonly input. Announce output copy; provide output names and XLSX assertions. Never modify original or install dependencies.",
   inspect: "List trusted attachments or inspect bounded metadata/preview. Never choose a path. Must precede extraction.",
   extract: "Queue extraction: explicit preview/range/full; large files should first use preview or requested range.",
   status: "Poll queued/running job. SUCCEEDED is success for requested scope only; inspect coverage and warnings.",
@@ -77,6 +86,18 @@ plugin.register = api => {
   });
   api.on("session_start", (event, context) => registry.lifecycle(event, context));
   api.on("session_end", (event, context) => registry.lifecycle(event, context, true));
+  const accessHook = before => async (event, context) => {
+    if (!["read", "read_file"].includes(event.toolName)) return;
+    const identity = trustedIdentity(api.pluginConfig, { ...context, requesterSenderId: context.requester?.senderId,
+      messageChannel: context.requester?.channel, agentAccountId: context.requester?.accountId });
+    const file = event.params?.path ?? event.params?.file_path;
+    if (identity && api.pluginConfig?.management && typeof file === "string" && context.toolCallId) {
+      await managementRequest(api.pluginConfig, identity, before ? "lease_path" : "finish_access", { path: file,
+        token: context.toolCallId, ...(!before ? { success: !event.error && !event.result?.isError } : {}) }, context.abortSignal);
+    }
+  };
+  api.on("before_tool_call", accessHook(true), { matcher: ["read", "read_file"], timeoutMs: 10_000 });
+  api.on("after_tool_call", accessHook(false), { matcher: ["read", "read_file"], timeoutMs: 10_000 });
   api.on("before_prompt_build", async (_event, context) => {
     const mapped = { ...context, requesterSenderId: context.senderId, messageChannel: context.channel ?? context.messageProvider,
       agentAccountId: context.accountId };

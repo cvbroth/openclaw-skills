@@ -3,7 +3,6 @@ import json
 import os
 import re
 import shutil
-import subprocess
 import sys
 import time
 import uuid
@@ -55,7 +54,9 @@ def execute_script(original, payload, out, limits, row):
     if Path(original).stat().st_size > limits.max_process_bytes:
         raise Fault("PROCESS_SIZE_LIMIT")
     # Stable name provided to the script; immutable snapshot is never mounted writable by Landlock.
-    incoming = out/("input"+Path(original).suffix.lower())
+    input_folder = publication/"inputs" if limits.workspace_mode else out
+    input_folder.mkdir(mode=0o700, exist_ok=True)
+    incoming = input_folder/("input"+Path(original).suffix.lower())
     shutil.copyfile(original, incoming)
     before = digest_file(original)
     if incoming.suffix.lower() in (".xlsx", ".docx", ".ods"):
@@ -73,26 +74,30 @@ def execute_script(original, payload, out, limits, row):
     launcher = Path(__file__).with_name("script_launcher.py")
     environment = {k: os.environ[k] for k in ("SYSTEMROOT", "WINDIR", "PATH") if k in os.environ}
     environment.update(TMPDIR=str(out), TMP=str(out), TEMP=str(out), OMP_NUM_THREADS=str(limits.engine_threads),
-                       OPENBLAS_NUM_THREADS=str(limits.engine_threads), PYTHONNOUSERSITE="1")
+                       OPENBLAS_NUM_THREADS=str(limits.engine_threads), PYTHONNOUSERSITE="1", FILETOOLS_INPUT=str(incoming))
     started = time.monotonic()
+    input_allowance = 0 if limits.workspace_mode else incoming.stat().st_size
     with (out/"stdout.log").open("wb") as stdout, (out/"stderr.log").open("wb") as stderr:
-        child = subprocess.Popen([limits.script_python or sys.executable, "-I", str(launcher), str(out),
+        from .process_tree import ManagedChild
+        tree = ManagedChild([limits.script_python or sys.executable, "-I", str(launcher), str(out),
             limits.script_isolation, str(limits.worker_memory_mb*1024**2), str(limits.script_timeout_seconds),
-            str(limits.script_output_bytes)], cwd=out, env=environment, stdout=stdout, stderr=stderr)
+            str(limits.script_output_bytes), str(incoming)] if limits.workspace_mode else [
+            limits.script_python or sys.executable, "-I", str(launcher), str(out), limits.script_isolation,
+            str(limits.worker_memory_mb*1024**2), str(limits.script_timeout_seconds), str(limits.script_output_bytes)],
+            cwd=out, env=environment, stdout=stdout, stderr=stderr)
+        child = tree.process
         try:
             while child.poll() is None:
                 if time.monotonic()-started > limits.script_timeout_seconds:
                     raise Fault("SCRIPT_TIMEOUT")
                 size = sum(p.stat().st_size for p in out.rglob("*") if p.is_file() and not p.is_symlink())
-                if size > incoming.stat().st_size+limits.script_output_bytes+2*1024**2:
+                if size > input_allowance+limits.script_output_bytes+2*1024**2:
                     raise Fault("SCRIPT_OUTPUT_LIMIT")
                 if any((out/n).stat().st_size > 1024**2 for n in ("stdout.log", "stderr.log")):
                     raise Fault("SCRIPT_LOG_LIMIT")
                 time.sleep(0.05)
         finally:
-            if child.poll() is None:
-                child.kill()
-            child.wait()
+            tree.close()  # Always, including a normally exited leader with living descendants.
     if digest_file(original) != before:
         raise Fault("ORIGINAL_CHANGED")
     if digest_file(script) != code_hash:
@@ -109,7 +114,7 @@ def execute_script(original, payload, out, limits, row):
             raise Fault("SCRIPT_TIMEOUT")
     if child.returncode:
         raise Fault("SCRIPT_FAILED")
-    if sum(p.stat().st_size for p in out.rglob("*") if p.is_file() and not p.is_symlink()) > incoming.stat().st_size+limits.script_output_bytes+2*1024**2:
+    if sum(p.stat().st_size for p in out.rglob("*") if p.is_file() and not p.is_symlink()) > input_allowance+limits.script_output_bytes+2*1024**2:
         raise Fault("SCRIPT_OUTPUT_LIMIT")
     assets, evidence = [], []
     for name in payload["outputs"]:

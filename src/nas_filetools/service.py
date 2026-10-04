@@ -18,12 +18,21 @@ SOCKET = "/run/nas-filetools/service.sock"
 
 def dispatch(store, identity, operation, params):
     owner(identity)
+    if hasattr(store, "for_identity"):
+        if operation == "diagnostics":
+            with store.heavy_gate:
+                for selected in store.stores.values():
+                    with selected.db() as db:
+                        if db.execute("SELECT 1 FROM jobs WHERE status IN ('QUEUED','RUNNING')").fetchone():
+                            return {"status": "DIAGNOSTICS_DEFERRED", "issues": ["SERVICE_NOT_IDLE"]}
+                return dispatch(store.for_identity(identity), identity, operation, params)
+        store = store.for_identity(identity)
     with store.lock:
         store.agent(identity)
         if operation == "capabilities":
             strict(params, ())
-            return {"status": "CAPABILITIES", "version": "1.1.0", "limits": {
-                k: v for k, v in store.limits.dict().items() if k not in ("whisper_model", "model_cache", "script_python")}}
+            return {"status": "CAPABILITIES", "version": "1.2.0", "shared_workspace": store.limits.workspace_mode, "limits": {
+                k: v for k, v in store.limits.dict().items() if k not in ("whisper_model", "model_cache", "script_python", "source_roots", "gateway_workspace")}}
         if operation == "diagnostics":
             strict(params, ())
             from .diagnostics import runtime_check
@@ -77,13 +86,18 @@ class LocalServer(ThreadingMixIn, HTTPServer):
             self.slots.release()
 
 
-def serve(root, limits, socket_path=SOCKET, stop_event=None):
+def serve(root, limits, socket_path=SOCKET, stop_event=None, workspaces=None):
     if os.name != "posix":
         raise Fault("LINUX_SERVICE_REQUIRED", "NAS service requires Linux; core/worker tests run on Windows.")
     os.umask(0o077)
     service_lock = ServiceLock(root)
-    store = Store(root, limits)
-    supervisor = Supervisor(store)
+    if workspaces is not None:
+        from .shared_workspace import WorkspaceHub, WorkspaceSupervisor
+        store = WorkspaceHub(root, limits, workspaces)
+        supervisor = WorkspaceSupervisor(store)
+    else:
+        store = Store(root, limits)
+        supervisor = Supervisor(store)
     stop = stop_event or threading.Event()
     state = {"error": None, "last_tick": time.time()}
     upload_lock = threading.Lock()
@@ -101,6 +115,8 @@ def serve(root, limits, socket_path=SOCKET, stop_event=None):
                     raise Fault("INVALID_LENGTH")
                 length = int(self.headers["Content-Length"])
                 if self.path == "/v1/attachment":
+                    if workspaces is not None:
+                        raise Fault("SHARED_REGISTRATION_REQUIRED", "Register local paths in Gateway management; send IDs only.")
                     if not 0 < length <= limits.max_bytes:
                         raise Fault("SIZE_LIMIT")
                     identity = json.loads(self.headers.get("X-Filetools-Identity", "{}"))
@@ -165,7 +181,7 @@ def serve(root, limits, socket_path=SOCKET, stop_event=None):
                 else:
                     raise Fault("UNKNOWN_ROUTE")
             except Fault as error:
-                result = {"status": "ERROR", "code": error.code}
+                result = {"status": "ERROR", "code": error.code, "recovery": error.message}
             except (ValueError, TypeError, KeyError):
                 result = {"status": "ERROR", "code": "INVALID_REQUEST"}
             except Exception:

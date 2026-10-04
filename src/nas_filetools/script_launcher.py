@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 
-def restrict(folder):
+def restrict(folder, input_file=None):
     if sys.platform != "linux" or os.uname().machine not in ("x86_64", "aarch64"):
         raise RuntimeError("SCRIPT_ISOLATION_UNAVAILABLE")
     libc = ctypes.CDLL(None, use_errno=True)
@@ -36,6 +36,8 @@ def restrict(folder):
     for path in {"/usr", "/lib", "/lib64", sys.prefix, sys.base_prefix}:
         allow(path, (1 << 0) | (1 << 2) | (1 << 3))  # execute/read_file/read_dir
     allow(str(folder), handled)
+    if input_file:
+        allow(str(input_file), 1 << 2)  # Read the sole input, with no write/truncate/unlink rights.
     allow("/dev/null", (1 << 1) | (1 << 2))
     if libc.prctl(38, 1, 0, 0, 0) != 0 or libc.syscall(446, fd, 0) != 0:
         raise RuntimeError("LANDLOCK_RESTRICT_FAILED")
@@ -51,7 +53,7 @@ def restrict(folder):
         raise RuntimeError("SECCOMP_INIT_FAILED")
     try:
         for name in ("socket", "connect", "bind", "listen", "accept", "accept4", "ptrace", "mount", "umount2",
-                     "unshare", "setns", "bpf", "process_vm_readv", "process_vm_writev", "kill", "tgkill", "tkill"):
+                     "unshare", "setns", "bpf", "process_vm_readv", "process_vm_writev", "kill", "tgkill", "tkill", "setsid", "setpgid"):
             number = sec.seccomp_syscall_resolve_name(name.encode())
             if number >= 0 and sec.seccomp_rule_add(ctx, 0x00050000 | errno.EPERM, number, 0) != 0:
                 raise RuntimeError("SECCOMP_RULE_FAILED")
@@ -65,7 +67,7 @@ if __name__ == "__main__":
     folder = Path(sys.argv[1]).resolve()
     os.chdir(folder)
     if sys.argv[2] == "landlock":
-        restrict(folder)
+        restrict(folder, Path(sys.argv[6]).resolve() if len(sys.argv)>6 else None)
     if os.name == "posix":
         import resource
         memory, seconds, output = map(int, sys.argv[3:6])
