@@ -11,6 +11,7 @@
 | 核心修订 | 171922bbe15d644610a438e997154c50f7bd962c：登记反馈/权限/只读映射、目录模式和可选Samba |
 | Samba继承权限修复 | 91d53b3669e9ea528c215e0ef8504a256a21f478：结果共享不继承全局write-list/admin/force身份 |
 | 回执额度边界修复 | f9f0043ac328205fcb2f975ba2b61dda9bdceee1：满额度的重复事件去重，溢出明确未登记数量 |
+| 回滚续作修复 | 最终交付提交另包含卸载busy后的安全重试及配置片段漂移拒绝；确切哈希见交付清单 |
 | 最终文档交付提交 | 本报告与证据归档后生成；确切最终HEAD记录在交付目录delivery.json和FINAL_COMMIT.txt及对话最终回复，避免提交内自引用哈希 |
 | 参考检索项目 | 623aa73abcd0dc7f4854a58a8a42e8b6c4725072，tracked源码和配置未改 |
 
@@ -33,6 +34,7 @@
 - Windows真实SDK/核心桥接19通过/1跳过，Linux实际SDK会话钩子和回执18通过。上下文/渠道为测试注入，**不是完整Gateway/QQ端到端**。
 - 真正root管理容器 + 双UID10001角色容器权限/只读NAS来源验证通过，含umask022/077。不是实际NAS宿主/生产Gateway。
 - 真正Samba daemon/客户端、三个临时真实账号、旧/新ACL和核心保存立即下载、写/跨用户拒绝、真实bind及幂等回滚：2通过。systemctl调用替身、故障注入单独标为模拟；真实开机和服务reload仍待验收。
+- 回滚卸载busy采用明确失败注入，随后实际umount和ACL/目录续作通过；未在生产制造busy，不以强制卸载掩盖访问。
 - 7类实际CPU样本测时已记录；扫描PDF3.236秒、混合PDF2.920秒、11秒英语录音7.973秒，均为开发机Docker限2CPU/4GiB，不是NAS速度。DOCX带图片样本按实际PARTIAL报告，未伪称完整还原。
 - 参考知识插件49通过/1跳过、TypeScript noEmit通过；参考Python全量因开发环境缺pypdf/sqlite_vec产生4个collection错误，**未完成验证**。该环境缺口未通过改生产/检索依赖规避。
 

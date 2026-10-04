@@ -286,8 +286,11 @@ def undo(record, record_path):
     if record.get("rolled_back"):
         return {"status": "RESULTS_ALREADY_ROLLED_BACK", "saved_data_preserved": True}
     conf = Path(record["conf"])
-    if digest(conf) != record["installed_conf_sha"] or digest(record["backup"]) != record["before_conf_sha"]:
+    if digest(conf) not in (record["installed_conf_sha"], record["before_conf_sha"]) or digest(record["backup"]) != record["before_conf_sha"]:
         raise Fault("SAMBA_CONFIG_CHANGED_AFTER_APPLY", "Preserve later administrator edits; remove only our include manually after review.")
+    fragment_path = Path(record_path).parent/"results.conf"
+    if fragment_path.exists() and record.get("fragment_sha") and digest(fragment_path) != record["fragment_sha"]:
+        raise Fault("RESULTS_FRAGMENT_CHANGED")
     for unit in record["created_units"]:
         path = Path(unit["path"])
         if path.exists() and digest(path) != unit["sha"]:
@@ -303,8 +306,9 @@ def undo(record, record_path):
         if mounted(share["entry"]):
             command(["umount", share["entry"]], 30)
     for unit in record["created_units"]:
-        command(["systemctl", "disable", Path(unit["path"]).name], 30)
-        Path(unit["path"]).unlink(missing_ok=True)
+        if Path(unit["path"]).exists():
+            command(["systemctl", "disable", Path(unit["path"]).name], 30)
+            Path(unit["path"]).unlink()
     if record["created_units"]:
         command(["systemctl", "daemon-reload"], 30)
     previous = {r["path"]: r for r in record["permissions"]}
@@ -320,7 +324,8 @@ def undo(record, record_path):
                         os.removexattr(path, name, follow_symlinks=False)
                 os.chmod(path, path.stat().st_mode & 0o700)
     for entry in record["created_entries"]:
-        Path(entry).rmdir()  # Empty unmounted entrances only, never saved data.
+        if Path(entry).exists():
+            Path(entry).rmdir()  # Empty unmounted entrances only, never saved data.
     root = Path(record["settings"]["results_root"])
     if record["root_created"] and root.exists() and not any(root.iterdir()):
         root.rmdir()

@@ -23,10 +23,14 @@ pytestmark = pytest.mark.skipif(sys.platform != "linux" or os.getenv("FILETOOLS_
 def test_actual_accounts_new_old_saved_bind_idempotence_rollback(tmp_path, monkeypatch):
     import nas_filetools.samba_results as module
     original_command, systemd_calls = module.command, []
+    fail_unmount = {"remaining": 0}
     def run(args, timeout=60):
         if args[0] == "systemctl":
             systemd_calls.append(args)
             return ""  # Explicit simulation of systemd service-manager calls only.
+        if args[0] == "umount" and fail_unmount["remaining"]:
+            fail_unmount["remaining"] -= 1
+            raise Fault("TEST_BUSY_MOUNT")
         return original_command(args, timeout)
     monkeypatch.setattr(module, "command", run)
     os.chmod(tmp_path, 0o755)
@@ -163,6 +167,18 @@ finally:worker.close()
         with pytest.raises(Fault, match="SAMBA_CONFIG_CHANGED_AFTER_APPLY"):
             results(cfg, "rollback", True)
         conf.write_bytes(previous + ("\n[global]\n"+module.MARKER+"\ninclude = "+str(tmp_path/"admin"/"results.conf")+"\n").encode())
+        fragment = tmp_path/"admin"/"results.conf"
+        fragment_before = fragment.read_bytes()
+        fragment.write_bytes(fragment_before+b"\n# Later fragment edit\n")
+        with pytest.raises(Fault, match="RESULTS_FRAGMENT_CHANGED"):
+            results(cfg, "rollback", True)
+        fragment.write_bytes(fragment_before)
+        fail_unmount["remaining"] = 1
+        with pytest.raises(Fault, match="TEST_BUSY_MOUNT"):
+            results(cfg, "rollback", True)
+        assert conf.read_bytes() == previous
+        assert all(binding_matches(s) for s in planned["shares"])
+        # Our own partial config restoration is distinguishable from unrelated edits.
         assert results(cfg, "rollback", True)["saved_data_preserved"]
         assert conf.read_bytes() == previous
         assert results(cfg, "rollback", True)["status"] == "RESULTS_ALREADY_ROLLED_BACK"

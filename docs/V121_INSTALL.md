@@ -81,4 +81,6 @@ python3 scripts/filetools_admin.py rollback --record /DATA/installation/1.2.1/ro
 
 Samba rollback 核对配置/自己的单位/挂载来源，恢复原smb.conf、旧saved ACL和模式，移除新结果的本功能 ACL，仅卸载自己的入口/单位、空目录。不删除任何 saved、原件、registry、缓存、账号或隧道；保存回滚审计记录。后续改过smb.conf则拒绝自动覆盖，需审查后只移除本功能include。再次部署使用新 state_dir 保存新回滚记录。
 
+若卸载返回busy或systemctl暂时失败，关闭客户端对本结果共享的打开文件，按同一record/config重试rollback。已恢复到准确原配置/已撤销的单位和入口可续作，非本功能配置/片段修改仍拒绝覆盖；不用lazy/force卸载隐藏活动访问。若卸载失败，尚存ACL/挂载应按diagnose检查，不能先删除源saved。
+
 FileTools rollback 恢复上次插件/OpenClaw/Compose，保留全部业务数据。V1.2→V1.2.1 无数据迁移，catalog-only 复用已有 attachments.active=0，不修改 Schema；这些目录文件回到旧插件后仍能 list/select（旧工具无法继续新增select:false）。V1.1 迁移仍用旧文档的明确 Agent 映射，不能合并 main/chen。回滚自己的 NAS 输入 override 时只撤销新增个人 Incoming bind，再核对旧 Compose 和知识库插件仍工作。

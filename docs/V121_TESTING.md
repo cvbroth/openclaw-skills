@@ -13,7 +13,7 @@
 | Windows插件+真实核心桥接 | 19通过、1跳过 | 真实SDK工厂、管理CLI、后台核心及MD/XLSX；会话/渠道客户端测试注入，Linux SDK存储项跳过 |
 | Linux SDK钩子/回执 | 18通过、无跳过 | 真实OpenClaw2026.9.4 SDK与原生会话存储；含before_prompt_build pending→success；不是Gateway daemon/QQ端到端 |
 | root manager + 双非root容器 | PASSED | umask022/077，真实UID10001双角色读写、标记清理、真正RO NAS挂载快照/引用、版本变更拒绝、只解除引用、原saved入口可写。角色容器不是OpenClaw daemon |
-| 实际Samba集成 | 2通过，5.26秒 | smbd/smbclient、3真实临时Unix/Samba账号、旧0440/新0600原子JSON、新核心提取→save→立即下载、写/跨用户拒绝、绑定挂载、幂等与回滚数据保留；全局写/强制身份参数不泄入本共享 |
+| 实际Samba集成 | 2通过 | smbd/smbclient、3真实临时Unix/Samba账号、旧0440/新0600原子JSON、新核心提取→save→立即下载、写/跨用户拒绝、绑定挂载、幂等与回滚数据保留；全局写/强制身份参数不泄入本共享，配置/片段漂移拒绝，busy故障后回滚续作 |
 | 独立1.2.1运行/测试镜像 | 构建通过 | CLI/依赖准备证据，不代替真实处理；镜像不是交付二进制，部署从提交重建 |
 | 现有知识库插件 | 49通过、1跳过，TypeScript noEmit通过 | 参考仓库623aa73未改，私有/Family导入同意门、scope/query等测试；Windows symlink项跳过 |
 | 参考检索Python全量 | **未验证完成** | 收集4项失败：独立文件工具开发环境缺pypdf/sqlite_vec，未给既有检索/Gateway环境安装依赖；不是检索算法失败，也不算通过 |
