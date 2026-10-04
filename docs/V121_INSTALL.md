@@ -61,7 +61,7 @@ apply 只做以下修改：
 - 给 explicit saved 树安装“服务所有者原权限 + 指定用户只读/遍历”的 POSIX ACL，group/other不获额外访问。旧文件须为同一个已核验写入 UID，已有自定义 named ACL/所有者不一致要求人工审查，不自动覆盖。锁住现有 `.registry.lock` 与保存操作协调；100000节点上限避免无界权限快照。
 - 以 bind 在 `/srv/storage/results/<user>` 暴露同份 saved 数据，绕开 /root 路径遍历，不放宽 /root。既有 results 根不改权限；若其上级不可遍历，diagnose 报 Unix access 失败，管理员仅审查该公共入口祖先权限。
 - 创建自己的 systemd `.mount` 单元，`RequiresMountsFor=原saved`、`Before=smbd.service`、启用 local-fs.target。首次目录不存在则拒绝，重启后挂载/失效需 diagnose；不覆盖现有入口或单位，不叠加未知 mount。
-- 私有 state_dir 保存配置片段与权限/配置备份，末尾新增自己的 `[global]` include。`valid users`、`read only=yes`、`guest ok=no`；隐藏并禁止访问未完成 `.saving-*`、`.migration-*`、`*.tmp-*`。testparm 校验前后配置，原来的个人/Family 共享不改。
+- 私有 state_dir 保存配置片段与权限/配置备份，末尾新增自己的 `[global]` include。`valid users`、`read only=yes`、`guest ok=no`；本共享显式清空继承的 write list/admin users/force user/force group，不借既有全局特权覆盖只读身份。隐藏并禁止访问未完成 `.saving-*`、`.migration-*`、`*.tmp-*`。testparm 校验前后配置，原来的个人/Family 共享不改。
 
 bind 本身不复制也不改变所有者，不把 Worker 原 saved 入口整体 remount成只读。只读来自 Samba 和账号 ACL；服务所有者仍可在原入口写入。新版发布器在生成独立版本、chmod0440/0600和最后原子 JSON 替换之后重新设置文件 read ACL/掩码，避免继承 ACL 被缩窄。运行时用 Python stdlib xattr，不需要临时安装 setfacl。匿名本地测试验证新旧文件和完整 save 流程；NAS 实际 FS、systemd 启动及账号仍待验收。
 

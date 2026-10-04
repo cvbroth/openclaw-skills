@@ -54,6 +54,7 @@ def test_actual_accounts_new_old_saved_bind_idempotence_rollback(tmp_path, monke
     conf = tmp_path/"smb.conf"
     conf.write_text(f"[global]\nworkgroup = WORKGROUP\nserver role = standalone server\n"
                     "interfaces = 127.0.0.1\nbind interfaces only = yes\nmap to guest = Never\n"
+                    "write list = chen\nadmin users = chen\nforce user = filetools\nforce group = filetools\n"
                     f"[Legacy]\npath = {legacy}\nread only = yes\nvalid users = chen\n")
     previous = conf.read_bytes()
     cfg = tmp_path/"results.json"
@@ -67,6 +68,8 @@ def test_actual_accounts_new_old_saved_bind_idempotence_rollback(tmp_path, monke
     assert results(cfg, "apply", True)["status"] == "RESULTS_ALREADY_APPLIED"
     assert all(binding_matches(s) for s in planned["shares"])
     assert results(cfg, "diagnose")["issues"] == []
+    for parameter in ("write list", "admin users", "force user", "force group"):
+        assert original_command(["testparm", "-s", str(conf), "--section-name=Chen-Results", "--parameter-name="+parameter]).strip() == ""
     assert all((units/s["unit"]).exists() for s in planned["shares"])
     assert len([c for c in systemd_calls if c[1] == "enable"]) == 3
     credentials = {}

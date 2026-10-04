@@ -82,6 +82,7 @@ def fragment(shares):
     return MARKER+"\n"+"\n".join(
         f"[{s['name']}]\n    path = {s['entry']}\n    valid users = {s['samba_user']}\n"
         "    read only = yes\n    guest ok = no\n    browseable = yes\n"
+        "    write list =\n    admin users =\n    force user =\n    force group =\n"
         "    veto files = /.saving-*/.migration-*/*.tmp-*/\n    delete veto files = no\n" for s in shares)
 
 
