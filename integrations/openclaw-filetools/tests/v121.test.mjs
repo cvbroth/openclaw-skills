@@ -77,3 +77,22 @@ test("actual registered prompt hook reports pending as parseable JSON without sw
   assert.match(success.prependContext, /REGISTERED/);
   assert.equal(await hooks.get("before_prompt_build")({}, { ...runtime, sessionId: "epoch-2" }), undefined);
 });
+
+test("quota overflow reports remaining count, and duplicate canonical event does not become a new quota failure", async t => {
+  const registry = new Registry();
+  await receive(t, registry, 32);
+  const key = registry.key("chen", "chen", ctx.sessionKey);
+  const first = registry.sessions.get(key)[0];
+  await registry.received(config, { messageId: first.message, media: [{ path: first.path }] },
+    { senderId: "qq-chen", channelId: "qqbot", accountId: "default", sessionKey: ctx.sessionKey },
+    { lookupSucceeded: true, sessionId: ctx.sessionId });
+  assert.equal(registry.sessions.get(key).length, 32);
+  const fresh = path.join(path.dirname(first.path), "overflow.txt");
+  await writeFile(fresh, "Additional data");
+  await registry.received(config, { messageId: "overflow-message", media: [{ path: fresh }, { path: fresh+"-2" }, { path: fresh+"-3" }] },
+    { senderId: "qq-chen", channelId: "qqbot", accountId: "default", sessionKey: ctx.sessionKey },
+    { lookupSucceeded: true, sessionId: ctx.sessionId });
+  const overflow = registry.receiptPage(config, ctx, { offset: 32 }).receipts[0];
+  assert.equal(overflow.code, "SESSION_REFERENCE_LIMIT");
+  assert.equal(overflow.unregistered_count, 3);
+});

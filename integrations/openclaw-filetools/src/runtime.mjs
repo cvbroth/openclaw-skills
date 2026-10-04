@@ -93,12 +93,8 @@ export class Registry {
       const current = items.filter(i => !i.epochRecord.invalid && i.epochRecord.sessionId === epochRecord.sessionId);
       const limits = this.arrivalClient ? (await this.arrivalClient.capabilities({ ...epochRecord.toolContext,
         user_id: selected.user_id, agent_id: agent, session_hash: createHash("sha256").update(`${session}\0${epochRecord.sessionId}`).digest("hex") }).catch(() => ({}))).limits : null;
-      for (const media of (event.media ?? [])) {
-        if (current.length >= (limits?.max_references_per_session ?? 32)) {
-          items.push({ error: "SESSION_REFERENCE_LIMIT", filename: path.basename(media.path ?? "attachment"),
-            created: this.now(), epochRecord, id: randomBytes(16).toString("hex") });
-          break;
-        }
+      const incomingMedia = event.media ?? [];
+      for (const [mediaIndex, media] of incomingMedia.entries()) {
         let mediaPath = media.path;
         if (mediaPath && !path.isAbsolute(mediaPath)) {
           const workspace = config.workspaces?.[agent]?.workspace;
@@ -109,6 +105,12 @@ export class Registry {
         if (!mediaPath || !path.isAbsolute(mediaPath) ||
             (media.messageId && media.messageId !== event.messageId) ||
             items.some(i => i.message === event.messageId && i.path === mediaPath)) continue;
+        if (current.length >= (limits?.max_references_per_session ?? 32)) {
+          items.push({ error: "SESSION_REFERENCE_LIMIT", filename: path.basename(mediaPath), message: event.messageId,
+            path: mediaPath, skippedCount: incomingMedia.length-mediaIndex,
+            created: this.now(), epochRecord, id: randomBytes(16).toString("hex") });
+          break;
+        }
         try {
           const stat = await lstat(mediaPath, { bigint: true });
           if (!stat.isFile() || stat.isSymbolicLink()) continue;
@@ -153,6 +155,7 @@ export class Registry {
       const raw = item.sending ? { status: "REGISTRATION_PENDING" } : item.receipt ??
         (item.error ? { status: "ERROR", code: item.error } : { status: "REGISTRATION_PENDING" });
       const receipt = { status: raw.status, request_id: item.id, filename: item.filename?.slice(0, 200) };
+      if (item.skippedCount) receipt.unregistered_count = item.skippedCount;
       for (const key of ["attachment_id", "file_id", "bytes", "reused", "mode"]) if (raw[key] !== undefined) receipt[key] = raw[key];
       if (raw.code) {
         receipt.code = /^[A-Z][A-Z0-9_]{0,79}$/.test(raw.code) ? raw.code : "SERVICE_UNAVAILABLE";
