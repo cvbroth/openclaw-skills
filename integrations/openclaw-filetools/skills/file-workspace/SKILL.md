@@ -11,7 +11,7 @@ description: 处理用户附件、指定的 NAS 文件、用户要求登记整�
 
 确定用户要处理的具体 NAS 文件后，用 `filetools_register({source_root,source_path,mode})` 第一次登记。source_root 必须是工具已配置根；相对路径绑定该根。不要扫描或登记整个 NAS。聊天中的 `[Attachment: ...]` 不是可信附件登记。
 
-通过已有个人 Samba 上传大文件时，用户先写入 Uploading，上传关闭后在同一共享中移到 Incoming，再通知具体文件及任务。这是用户发布约定；文件存在、短暂稳定或哈希一致不证明上传已完成。Uploading/.part 等返回 SOURCE_INCOMPLETE；版本变化返回 SOURCE_CHANGED。只读 Incoming 输入可登记快照/引用，结果写 filetools，禁止 mv NAS 原件。Family 仅用管理员明确授权的根。
+通过已有个人共享上传大文件时，遵循当前用户的上传完成约定：可直接上传到 Incoming，等上传完成并关闭文件后，再通知具体文件及任务；采用 Uploading → Incoming 的环境仍先关闭文件再移动。文件存在、短暂稳定或哈希一致不证明上传已完成，未收到用户完成通知不处理；不自动扫描、登记或处理 Incoming。Uploading/.part 等返回 SOURCE_INCOMPLETE；版本变化返回 SOURCE_CHANGED。只读 Incoming 输入可登记快照/引用，source_root 使用实际配置名（如 incoming），结果写 filetools，禁止 mv NAS 原件。Family 仅用管理员明确授权的根。
 
 只有网址或远程标识时，先用现有合适下载能力取得本地引用；本 Skill 没有通用下载平台。不能把 URL 当成本地路径。普通 read/Python 按自身权限可读取文件；专用处理需要稳定输入，缺登记时补登记，不因缺登记永久拒绝内容任务。
 
@@ -37,6 +37,20 @@ QUEUED/RUNNING 返回 job_id，告知正在处理，通过 `filetools_status` �
 
 SUCCEEDED 仅表示请求范围流程完成；PARTIAL 需说明失败部分；FAILED 没有可靠内容。文字非空不证明扫描件完整还原。图片能力是印刷文字 OCR，照片画面、手写、公式、复杂表格/多栏和版式不承诺可靠。
 
+## 录音：原始转写、独立整理与人工确认
+
+先按用户明确的 preview/range/full 范围转写，核对状态、实际 coverage、失败与警告。保留原始 transcript.md、原片段编号及起止时间、sources.json 中实际记录的引擎/模型信息和配置；没有记录的信息说明未知，不推测模型或后端耗时。SUCCEEDED 表示请求范围处理完成，不证明识别准确；中文错字、专名、数字及否定词尤其需要复核。
+
+用户只要求“转写”“原始逐字稿”时，读取并交付原始转写，不调用 filetools_save_minutes，不自动生成整理稿或纪要。可以说明识别质量限制，不能悄悄改写或补全原文。用户要求整理、纪要或要点时，才由当前大模型基于已读取的转写证据另行整理；Worker 不自动调用大模型，也没有独立的自动纪要工具。
+
+整理稿明确标为“Agent 派生，未经人工核实”，标注 job_id、整理范围、来源片段编号与时间范围，区分转写原文、概括和推断。疑点列出原片段编号、起止时间（如 00:42–00:48）、原转写文字、待确认问题；可能解释如有必要须标为猜测。请用户按时间听原音确认，未确认的姓名、金额、日期、否定词等保留疑点，不默默纠正、不编造漏听内容；缺失或失败范围不能补成事实。现有工具不提供原音试听/裁剪或人工复核界面，不能声称已经听过原音。
+
+用 `filetools_save_minutes({job_id,text,source_segments})` 写独立临时整理稿及疑点清单；source_segments 必须是本任务已读取证据的真实整数片段编号，不是秒数，正文保留对应时间戳。单次 text 最多12000字符、source_segments 最多100项；长录音按来源分篇、各篇说明范围，不能为适配限制丢弃已使用来源。每任务最多32份 minutes 产物；超限如实报告，不绕过或覆盖旧稿。返回 SAVED 仅指新增缓存产物，取得返回 artifact_id 后按现有交付流程交付。
+
+用户确认具体疑点后，核对确认对应的片段/时间与更正内容；含糊的“确认”不视为确认所有猜测。结合上一版整理稿生成新的独立版本，再调用同一 save_minutes 工具，记录前版 artifact_id、用户确认内容及对应片段/时间，注明“已按用户确认更新”并保留未确认疑点。原始 transcript.md、content.md 和旧整理稿均不覆写；确认记录写入新稿正文，不伪造 reviewed/confirmed 等工具参数。工具元数据仍为 agent-derived-unverified，用户确认部分内容不等于全文核实或引擎识别原话。若尚无整理稿，且用户明确要求按确认内容整理，可创建首份独立稿；仅提供更正不自动授权生成整理稿。
+
+整理、交付或确认更正都不自动授权永久保存。只有用户明确要求长期保存时，才用 `filetools_files({action:"save",job_id,artifact_id})` 标记所选原稿或整理稿；保存前说明现有工具仍保留任务完整产物包（含原转写和其他整理稿），artifact_id 不是仅复制单稿的开关。用户只授权单稿且不允许附带其他稿时，报告接口限制，不执行整包保存。未授权不自动移入 saved 或导入私人/Family 知识库；原件 snapshot 的登记保留不等于永久保存处理结果。缓存过期不能直接修改旧任务：有已授权保存稿则可 saved_read，否则说明不可用，按用户当前请求核验 reference/选择快照后重处理，不能猜测旧稿内容或保证长期可取。
+
 ## 临时 Python
 
 专用能力不足且用户已请求操作时，告知“专用工具暂不支持，本次用临时脚本处理并输出副本”，再调用 `filetools_python({attachment_id,description,code,outputs,checks?})`，不逐次额外申请批准。
@@ -55,7 +69,7 @@ SUCCEEDED 仅表示请求范围流程完成；PARTIAL 需说明失败部分；FA
 
 用户要求取得生成文件时，通过 files/artifact_path(job_id,artifact_id) 取已核验的 Gateway 路径，再复用当前渠道已有 `message`/媒体交付入口（media 或该入口规定的 filePath 参数）。遵循既有发送权限和当前可信会话目标，不从正文读取收件人。只有成功消息回执才能称“已发送”；路径字符串不能当送达。QQ 的实际平台限制/失败要报告，可告知已保存结果目录让用户取回，不要求新增发送服务。若 message 不在有效工具列表，明确未启用，不绕过权限。
 
-有价值结果调用 files/offer_save(job_id)，仅 ask_once:true 询问一次是否保存。用户已明确要求保存直接 files/save；保存产生独立版本及来源/图片依赖，不覆盖原件。files/saved_read(saved_id,artifact_id?,offset?) 读取，缓存删后仍可读；二进制返回文件引用。逐字稿与纪要分别选对应产物，纪要用 filetools_save_minutes(...source_segments) 派生保存，不覆写原转写。
+有价值结果调用 files/offer_save(job_id)，仅 ask_once:true 询问一次是否保存。用户已明确要求保存直接 files/save；保存产生独立版本及来源/图片依赖，不覆盖原件。files/saved_read(saved_id,artifact_id?,offset?) 读取，缓存删后仍可读；二进制返回文件引用。录音永久保存须明确选对应原始转写或整理稿 artifact_id；filetools_save_minutes 只生成独立缓存整理稿，不代表长期保存，具体遵循录音专节。
 
 管理员已启用时，saved 同份数据可从个人 Chen-Results、Liang-Results 或 AZL-Results 共享下载。仅保存后的版本出现，缓存不会自动共享；目录保留来源 JSON 和依赖图片，不承诺展平结果或创建网盘。使用已有客户端/认证/隧道，不从正文取得账号或连接凭据。
 

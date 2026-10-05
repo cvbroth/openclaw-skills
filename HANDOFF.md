@@ -1,5 +1,7 @@
 # FileTools 服务器开发交接
 
+> 服务器接手后的增量状态见第9节；下文第1–8节保留原交接时点的记录。“待验收”须结合第9节解释，不能将历史描述覆盖后续用户提供的真实验证。
+
 交接日期：2026-10-05（Asia/Shanghai）。本轮仅核对、文档和 Git 交接，不扩大开发、不连接或部署生产、不修改 Gateway/Samba/检索服务。交接完成后原 Windows 环境停止推进；服务器接手同一任务，避免两个环境并行修改。
 
 ## 1. 仓库与提交状态
@@ -149,3 +151,20 @@ cat HANDOFF.md
 已知生产信息（用户提供，非本轮探测）：OpenClaw2026.9.4构建3a9d69d，Docker容器`openclaw-openclaw-gateway-1`，镜像`stockanalyse-openclaw-managed:latest`；Ubuntu26.04 x86_64，Xeon E3-1270v5 4核8线程AVX2，内存30GiB/此前可用约23GiB、swap8GiB；共用Immich/MySQL/检索服务；Gateway UID/GID1000、chen UID1000（chen实际GID待核实），QQ主要渠道。可用内存是旧时点信息，不作为当前余量。这些标识仅用于识别并避开生产，不授权exec/restart/改配置。
 
 接续仍需：服务器隔离开发目录/测试daemon及空间、可用开发Python/Node/下载网络、需要时匿名样本。之后若要生产验收，另需明确授权、真实Samba/FS信息、审核后的安装/results路径与回滚记录、实际私聊/群聊及客户端范围。**连接Codex的服务器不等于批准部署生产。**原环境本次交接后停止修改/测试该任务；本文件不触发新的服务器任务或生产动作。
+
+## 9. 服务器接手增量（2026-10-05）
+
+本次接手在服务器 `myserver`、开发目录 `/home/chen/dev/openclaw-filetools-dev` 核对 HEAD 为 `9e853e857112816146153a423f640bc3dbbd5027`，初始工作区干净，当前命令账号 chen UID/GID 均为1000。独立分支为 `docs/filetools-recording-workflow-20261005`。
+
+以下为用户补充的**已完成真实生产验证**，本轮接手未连接生产重复核验，也未取得新的生产日志：
+
+- Chen 账号、Gateway、Worker 的 UID/GID 均为1000（更新原第8节的GID待核实项）。
+- `/srv/storage/users/chen/FileTools-Incoming` 已只读挂载到两容器的 `/nas/filetools/chen/Incoming`，来源根名为 `incoming`。
+- 用户可直接上传 Incoming，上传完成并关闭文件后再通知 Agent；没有自动扫描或自动处理。原 Uploading → Incoming 是其他环境可沿用的完成约定，不是当前 Chen 使用的必需步骤。
+- PDF reference 登记、18页全文提取和 Markdown 回传已跑通。
+- `calltoarms_03_lu.mp3` 全长661.524898秒，全文转写 SUCCEEDED，返回122段时间戳；实际附件12355字节，SHA-256与回执一致。用户未提供完整SHA，本轮不补造。
+- 中文转写错字较多；实际模型与后端处理耗时尚未核实。流程成功不代表识别准确。上述事实不扩展为所有用户/渠道/客户端、真实Samba开机挂载、4小时或4GiB验收通过。
+
+本轮用户授权仅更新现有录音 Skill 和必要文档、独立开发验证与提交。已补全“仅转写不生成整理稿；大模型另行整理；疑点携带时间戳交人工确认；明确确认后新增独立整理稿；不自动永久保存或入库”，并修正遗留 `filetools-session` 名称提示。运行时工具和引擎代码不变；当前工具支持缓存派生产物、真实片段关联和新增版本，不提供人工复核界面、原音试听或 confirmed/reviewed 状态参数。
+
+本轮环境、场景检查、真实/模拟/未验证结果见 [录音流程更新报告](docs/RECORDING_WORKFLOW_UPDATE.md)。不调整模型、不部署生产、不修改运行中的Gateway/Worker/Samba或生产配置，不覆盖生产镜像标签；服务器开发不代表授权生产变更。

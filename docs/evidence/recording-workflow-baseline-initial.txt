@@ -1,0 +1,407 @@
+....................................ssss.................s..F.........ss [ 67%]
+ssssFFFFFFF.........ssss.......F..                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_local_install_diagnosis_twice_and_v1_migration ______________
+
+tmp_path = PosixPath('/tmp/filetools-tests/test_local_install_diagnosis_t0')
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+
+    def test_local_install_diagnosis_twice_and_v1_migration(tmp_path, identity):
+        root = tmp_path/"new"
+        configuration = tmp_path/"install.json"
+        configuration.write_text(json.dumps({"data_root": str(root), "agents": ["chen"], "bindings": []}))
+>       assert install(configuration, local_only=True)["status"] == "INSTALL_PLAN"
+
+tests/test_v11.py:309:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+config = PosixPath('/tmp/filetools-tests/test_local_install_diagnosis_t0/install.json')
+apply = False, local_only = True
+
+    def install(config, apply=False, local_only=False):
+        if json.loads(Path(config).read_text(encoding="utf-8")).get("workspace_layout") == "shared-v1.2":
+            from .operations_v12 import install as install_shared
+            return install_shared(config, apply, local_only)
+        raw, limits = settings(config)
+        root = Path(raw["data_root"])
+        if root.exists() and any(p.name not in {"agents", "incoming", "installation", "models", "jobs.sqlite3", "jobs.sqlite3-wal",
+                "jobs.sqlite3-shm", "service.lock", "filetools.json"} and not p.name.startswith("v1-metadata-") for p in root.iterdir()):
+            raise Fault("DEDICATED_DATA_ROOT_REQUIRED")
+        checks = {"python": sys.version.split()[0], "free_bytes": shutil.disk_usage(root if root.exists() else root.parent).free,
+                  "dependencies": {p: version(p) for p in ("PyMuPDF", "python-docx", "openpyxl", "rapidocr-onnxruntime", "faster-whisper")}}
+        if checks["free_bytes"] < limits.disk_reserve_bytes+limits.max_receive_bytes:
+>           raise Fault("DISK_RESERVE")
+E           nas_filetools.contracts.Fault: DISK_RESERVE
+
+src/nas_filetools/operations.py:121: Fault
+____ test_real_process_tree_leader_exit_never_publishes_live_writer[normal] ____
+
+mapped = (<nas_filetools.shared_workspace.WorkspaceHub object at 0x7fa741441a30>, {'chen': {'service_root': '/tmp/filetools-tes..._real_process_tree_leader_0/main'}}, PosixPath('/tmp/filetools-tests/test_real_process_tree_leader_0/management.json'))
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+outcome = 'normal'
+
+    @pytest.mark.parametrize("outcome", ["normal", "failed", "timeout"])
+    def test_real_process_tree_leader_exit_never_publishes_live_writer(mapped, identity, outcome):
+        hub, _, _ = mapped
+        store, _, attachment = source(mapped, identity)
+        hub.stores["chen"].limits = replace(hub.stores["chen"].limits, script_timeout_seconds=1)
+        if sys.platform == "linux":
+            hub.stores["chen"].limits = replace(hub.stores["chen"].limits, script_isolation="landlock")
+        marker = Path(str(store.root).removeprefix("\\\\?\\"))/"escaped-writer.txt"
+        child = f"import time;from pathlib import Path;time.sleep(1.5);Path('late-marker.txt').write_text('escaped');Path({str(marker)!r}).write_text('escaped')"
+        code = f"import subprocess,sys,time\nfrom pathlib import Path\np=subprocess.Popen([sys.executable,'-c',{child!r}]);Path('descendant.pid').write_text(str(p.pid))\nPath('result.txt').write_text('stable')\n"
+        if outcome == "failed":
+            code += "raise RuntimeError('expected')\n"
+        elif outcome == "timeout":
+            code += "time.sleep(10)\n"
+>       job = dispatch(hub, identity, "python", {"attachment_id": attachment["attachment_id"], "code": code,
+            "description": "tree reclamation", "outputs": ["result.txt"]})
+
+tests/test_v12.py:260:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/nas_filetools/service.py:45: in dispatch
+    return request(store, identity, params)
+src/nas_filetools/scripts.py:45: in request
+    store.room(identity, "cache", attachment["size"]+store.limits.script_output_bytes)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <nas_filetools.store.Store object at 0x7fa73cbed2b0>
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+area = 'cache', additional = 268435470
+
+    def room(self, identity, area, additional):
+        capacity = self.capacity(identity)
+        if capacity["usage_bytes"][area] + additional > capacity["quota_bytes"][area]:
+            raise Fault("DISK_QUOTA")
+        if capacity["disk_free_bytes"] - additional < self.limits.disk_reserve_bytes:
+>           raise Fault("DISK_RESERVE")
+E           nas_filetools.contracts.Fault: DISK_RESERVE
+
+src/nas_filetools/workspace.py:157: Fault
+____ test_real_process_tree_leader_exit_never_publishes_live_writer[failed] ____
+
+mapped = (<nas_filetools.shared_workspace.WorkspaceHub object at 0x7fa73a58b650>, {'chen': {'service_root': '/tmp/filetools-tes..._real_process_tree_leader_1/main'}}, PosixPath('/tmp/filetools-tests/test_real_process_tree_leader_1/management.json'))
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+outcome = 'failed'
+
+    @pytest.mark.parametrize("outcome", ["normal", "failed", "timeout"])
+    def test_real_process_tree_leader_exit_never_publishes_live_writer(mapped, identity, outcome):
+        hub, _, _ = mapped
+        store, _, attachment = source(mapped, identity)
+        hub.stores["chen"].limits = replace(hub.stores["chen"].limits, script_timeout_seconds=1)
+        if sys.platform == "linux":
+            hub.stores["chen"].limits = replace(hub.stores["chen"].limits, script_isolation="landlock")
+        marker = Path(str(store.root).removeprefix("\\\\?\\"))/"escaped-writer.txt"
+        child = f"import time;from pathlib import Path;time.sleep(1.5);Path('late-marker.txt').write_text('escaped');Path({str(marker)!r}).write_text('escaped')"
+        code = f"import subprocess,sys,time\nfrom pathlib import Path\np=subprocess.Popen([sys.executable,'-c',{child!r}]);Path('descendant.pid').write_text(str(p.pid))\nPath('result.txt').write_text('stable')\n"
+        if outcome == "failed":
+            code += "raise RuntimeError('expected')\n"
+        elif outcome == "timeout":
+            code += "time.sleep(10)\n"
+>       job = dispatch(hub, identity, "python", {"attachment_id": attachment["attachment_id"], "code": code,
+            "description": "tree reclamation", "outputs": ["result.txt"]})
+
+tests/test_v12.py:260:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/nas_filetools/service.py:45: in dispatch
+    return request(store, identity, params)
+src/nas_filetools/scripts.py:45: in request
+    store.room(identity, "cache", attachment["size"]+store.limits.script_output_bytes)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <nas_filetools.store.Store object at 0x7fa73a589370>
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+area = 'cache', additional = 268435470
+
+    def room(self, identity, area, additional):
+        capacity = self.capacity(identity)
+        if capacity["usage_bytes"][area] + additional > capacity["quota_bytes"][area]:
+            raise Fault("DISK_QUOTA")
+        if capacity["disk_free_bytes"] - additional < self.limits.disk_reserve_bytes:
+>           raise Fault("DISK_RESERVE")
+E           nas_filetools.contracts.Fault: DISK_RESERVE
+
+src/nas_filetools/workspace.py:157: Fault
+___ test_real_process_tree_leader_exit_never_publishes_live_writer[timeout] ____
+
+mapped = (<nas_filetools.shared_workspace.WorkspaceHub object at 0x7fa73a58bbc0>, {'chen': {'service_root': '/tmp/filetools-tes..._real_process_tree_leader_2/main'}}, PosixPath('/tmp/filetools-tests/test_real_process_tree_leader_2/management.json'))
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+outcome = 'timeout'
+
+    @pytest.mark.parametrize("outcome", ["normal", "failed", "timeout"])
+    def test_real_process_tree_leader_exit_never_publishes_live_writer(mapped, identity, outcome):
+        hub, _, _ = mapped
+        store, _, attachment = source(mapped, identity)
+        hub.stores["chen"].limits = replace(hub.stores["chen"].limits, script_timeout_seconds=1)
+        if sys.platform == "linux":
+            hub.stores["chen"].limits = replace(hub.stores["chen"].limits, script_isolation="landlock")
+        marker = Path(str(store.root).removeprefix("\\\\?\\"))/"escaped-writer.txt"
+        child = f"import time;from pathlib import Path;time.sleep(1.5);Path('late-marker.txt').write_text('escaped');Path({str(marker)!r}).write_text('escaped')"
+        code = f"import subprocess,sys,time\nfrom pathlib import Path\np=subprocess.Popen([sys.executable,'-c',{child!r}]);Path('descendant.pid').write_text(str(p.pid))\nPath('result.txt').write_text('stable')\n"
+        if outcome == "failed":
+            code += "raise RuntimeError('expected')\n"
+        elif outcome == "timeout":
+            code += "time.sleep(10)\n"
+>       job = dispatch(hub, identity, "python", {"attachment_id": attachment["attachment_id"], "code": code,
+            "description": "tree reclamation", "outputs": ["result.txt"]})
+
+tests/test_v12.py:260:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/nas_filetools/service.py:45: in dispatch
+    return request(store, identity, params)
+src/nas_filetools/scripts.py:45: in request
+    store.room(identity, "cache", attachment["size"]+store.limits.script_output_bytes)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <nas_filetools.store.Store object at 0x7fa73a58b4a0>
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+area = 'cache', additional = 268435470
+
+    def room(self, identity, area, additional):
+        capacity = self.capacity(identity)
+        if capacity["usage_bytes"][area] + additional > capacity["quota_bytes"][area]:
+            raise Fault("DISK_QUOTA")
+        if capacity["disk_free_bytes"] - additional < self.limits.disk_reserve_bytes:
+>           raise Fault("DISK_RESERVE")
+E           nas_filetools.contracts.Fault: DISK_RESERVE
+
+src/nas_filetools/workspace.py:157: Fault
+_________ test_real_cancel_reclaims_script_descendants_and_global_slot _________
+
+mapped = (<nas_filetools.shared_workspace.WorkspaceHub object at 0x7fa73a58b020>, {'chen': {'service_root': '/tmp/filetools-tes..._real_cancel_reclaims_scri0/main'}}, PosixPath('/tmp/filetools-tests/test_real_cancel_reclaims_scri0/management.json'))
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+
+    def test_real_cancel_reclaims_script_descendants_and_global_slot(mapped, identity):
+        hub, _, _ = mapped
+        store, _, attachment = source(mapped, identity)
+        if sys.platform == "linux":
+            hub.stores["chen"].limits = replace(hub.stores["chen"].limits, script_isolation="landlock")
+        marker = Path(str(store.root).removeprefix("\\\\?\\"))/"cancel-escaped.txt"
+        child = f"import time;from pathlib import Path;time.sleep(2);Path('late-marker.txt').write_text('BAD');Path({str(marker)!r}).write_text('BAD')"
+        code = f"import subprocess,sys,time\nfrom pathlib import Path\np=subprocess.Popen([sys.executable,'-c',{child!r}]);Path('descendant.pid').write_text(str(p.pid))\nPath('started.txt').write_text('ready')\ntime.sleep(10)\n"
+>       job = dispatch(hub, identity, "python", {"attachment_id": attachment["attachment_id"], "code": code,
+            "description": "cancel process tree", "outputs": ["result.txt"]})
+
+tests/test_v12.py:286:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/nas_filetools/service.py:45: in dispatch
+    return request(store, identity, params)
+src/nas_filetools/scripts.py:45: in request
+    store.room(identity, "cache", attachment["size"]+store.limits.script_output_bytes)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <nas_filetools.store.Store object at 0x7fa73a58b350>
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+area = 'cache', additional = 268435470
+
+    def room(self, identity, area, additional):
+        capacity = self.capacity(identity)
+        if capacity["usage_bytes"][area] + additional > capacity["quota_bytes"][area]:
+            raise Fault("DISK_QUOTA")
+        if capacity["disk_free_bytes"] - additional < self.limits.disk_reserve_bytes:
+>           raise Fault("DISK_RESERVE")
+E           nas_filetools.contracts.Fault: DISK_RESERVE
+
+src/nas_filetools/workspace.py:157: Fault
+______ test_linux_script_input_is_readonly_and_escaped_process_reclaimed _______
+
+mapped = (<nas_filetools.shared_workspace.WorkspaceHub object at 0x7fa73a58e8d0>, {'chen': {'service_root': '/tmp/filetools-tes..._linux_script_input_is_rea0/main'}}, PosixPath('/tmp/filetools-tests/test_linux_script_input_is_rea0/management.json'))
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+
+    @pytest.mark.skipif(sys.platform != "linux", reason="Real Linux Landlock/Docker acceptance; Windows is not equivalent")
+    def test_linux_script_input_is_readonly_and_escaped_process_reclaimed(mapped, identity):
+        hub, _, _ = mapped
+        _, _, attachment = source(mapped, identity)
+        hub.stores["chen"].limits = replace(hub.stores["chen"].limits, script_isolation="landlock")
+        code = "import os\nfrom pathlib import Path\np=Path(os.environ['FILETOOLS_INPUT'])\ntry:\n p.write_text('BAD')\nexcept PermissionError:\n Path('proof.txt').write_text('denied')\n"
+>       result = finish(hub, identity, dispatch(hub, identity, "python", {"attachment_id": attachment["attachment_id"],
+            "code": code, "description": "readonly proof", "outputs": ["proof.txt"]}))
+
+tests/test_v12.py:321:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/nas_filetools/service.py:45: in dispatch
+    return request(store, identity, params)
+src/nas_filetools/scripts.py:45: in request
+    store.room(identity, "cache", attachment["size"]+store.limits.script_output_bytes)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <nas_filetools.store.Store object at 0x7fa73a58d9a0>
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+area = 'cache', additional = 268435470
+
+    def room(self, identity, area, additional):
+        capacity = self.capacity(identity)
+        if capacity["usage_bytes"][area] + additional > capacity["quota_bytes"][area]:
+            raise Fault("DISK_QUOTA")
+        if capacity["disk_free_bytes"] - additional < self.limits.disk_reserve_bytes:
+>           raise Fault("DISK_RESERVE")
+E           nas_filetools.contracts.Fault: DISK_RESERVE
+
+src/nas_filetools/workspace.py:157: Fault
+__ test_linux_denies_registry_saved_other_agent_published_and_process_escape ___
+
+mapped = (<nas_filetools.shared_workspace.WorkspaceHub object at 0x7fa73a592540>, {'chen': {'service_root': '/tmp/filetools-tes..._linux_denies_registry_sav0/main'}}, PosixPath('/tmp/filetools-tests/test_linux_denies_registry_sav0/management.json'))
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+
+    @pytest.mark.skipif(sys.platform != "linux", reason="Real Linux filesystem and seccomp boundaries")
+    def test_linux_denies_registry_saved_other_agent_published_and_process_escape(mapped, identity):
+        hub, profiles, _ = mapped
+        store, _, attachment = source(mapped, identity)
+        prior = dispatch(hub, identity, "extract", {"attachment_id": attachment["attachment_id"], "config": {"mode": "full"}})
+        assert finish(hub, identity, prior)["status"] == "SUCCEEDED"
+        saved = store.save_result(identity, prior["job_id"])
+        public = store.task(prior["job_id"])/"published"/"content.md"
+        other = Path(profiles["main"]["workspace"])/"secret.txt"
+        other.write_text("private")
+        paths = [str(store.root/"registry.sqlite"), str(public), str(other), store.saved_read(identity, saved["saved_id"], 0)["gateway_path"]]
+        hub.stores["chen"].limits = replace(hub.stores["chen"].limits, script_isolation="landlock")
+        code = f"""import os,socket
+    from pathlib import Path
+    for target in {paths!r}:
+     for mode in ('r', 'w'):
+      try:
+       with open(target, mode) as file:
+        file.read() if mode == 'r' else file.write('BAD')
+      except PermissionError: pass
+      else: raise AssertionError(target+' was accessible')
+    for operation in (os.setsid, lambda: os.setpgid(0,0), socket.socket):
+     try: operation()
+     except PermissionError: pass
+     else: raise AssertionError('escape/network allowed')
+    Path('proof.txt').write_text('all denied')
+    """
+>       result = finish(hub, identity, dispatch(hub, identity, "python", {"attachment_id": attachment["attachment_id"],
+            "code": code, "description": "real Linux denial checks", "outputs": ["proof.txt"]}))
+
+tests/test_v12.py:353:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/nas_filetools/service.py:45: in dispatch
+    return request(store, identity, params)
+src/nas_filetools/scripts.py:45: in request
+    store.room(identity, "cache", attachment["size"]+store.limits.script_output_bytes)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <nas_filetools.store.Store object at 0x7fa73a5902c0>
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+area = 'cache', additional = 268435470
+
+    def room(self, identity, area, additional):
+        capacity = self.capacity(identity)
+        if capacity["usage_bytes"][area] + additional > capacity["quota_bytes"][area]:
+            raise Fault("DISK_QUOTA")
+        if capacity["disk_free_bytes"] - additional < self.limits.disk_reserve_bytes:
+>           raise Fault("DISK_RESERVE")
+E           nas_filetools.contracts.Fault: DISK_RESERVE
+
+src/nas_filetools/workspace.py:157: Fault
+_______ test_linux_development_double_fork_detached_writer_is_reclaimed ________
+
+mapped = (<nas_filetools.shared_workspace.WorkspaceHub object at 0x7fa73a58dee0>, {'chen': {'service_root': '/tmp/filetools-tes..._linux_development_double_0/main'}}, PosixPath('/tmp/filetools-tests/test_linux_development_double_0/management.json'))
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+
+    @pytest.mark.skipif(sys.platform != "linux", reason="Real Linux double-fork / setsid reclamation")
+    def test_linux_development_double_fork_detached_writer_is_reclaimed(mapped, identity):
+        hub, _, _ = mapped
+        store, _, attachment = source(mapped, identity)
+        marker = store.root/"double-fork-escaped.txt"
+        code = f"""import os,time
+    from pathlib import Path
+    pid=os.fork()
+    if pid == 0:
+     os.setsid()
+     if os.fork() == 0:
+      time.sleep(1.5)
+      Path({str(marker)!r}).write_text('BAD')
+      os._exit(0)
+     os._exit(0)
+    os.waitpid(pid,0)
+    Path('result.txt').write_text('stable')
+    """
+>       result = finish(hub, identity, dispatch(hub, identity, "python", {"attachment_id": attachment["attachment_id"],
+            "code": code, "description": "detached process reclamation", "outputs": ["result.txt"]}))
+
+tests/test_v12.py:377:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/nas_filetools/service.py:45: in dispatch
+    return request(store, identity, params)
+src/nas_filetools/scripts.py:45: in request
+    store.room(identity, "cache", attachment["size"]+store.limits.script_output_bytes)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <nas_filetools.store.Store object at 0x7fa73a58e750>
+identity = {'agent_id': 'chen', 'session_hash': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'user_id': 'chen'}
+area = 'cache', additional = 268435470
+
+    def room(self, identity, area, additional):
+        capacity = self.capacity(identity)
+        if capacity["usage_bytes"][area] + additional > capacity["quota_bytes"][area]:
+            raise Fault("DISK_QUOTA")
+        if capacity["disk_free_bytes"] - additional < self.limits.disk_reserve_bytes:
+>           raise Fault("DISK_RESERVE")
+E           nas_filetools.contracts.Fault: DISK_RESERVE
+
+src/nas_filetools/workspace.py:157: Fault
+__________ test_local_shared_install_is_idempotent_and_mapping_errors __________
+
+tmp_path = PosixPath('/tmp/filetools-tests/test_local_shared_install_is_i0')
+
+    def test_local_shared_install_is_idempotent_and_mapping_errors(tmp_path):
+        raw = config(tmp_path)
+        path = tmp_path/"install.json"
+        path.write_text(json.dumps(raw))
+>       assert install(path, local_only=True)["status"] == "INSTALL_PLAN"
+
+tests/test_v12_operations.py:109:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/nas_filetools/operations.py:112: in install
+    return install_shared(config, apply, local_only)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+config = PosixPath('/tmp/filetools-tests/test_local_shared_install_is_i0/install.json')
+apply = False, local_only = True
+
+    def install(config, apply=False, local_only=False):
+        raw, limits = configuration(config)
+        root = Path(raw["data_root"])
+        if root.exists() and (root.is_symlink() or any(p.name not in {"installation", "models", "migration", "workspace-map.json", "service.lock"} for p in root.iterdir())):
+            raise Fault("DEDICATED_CONTROL_ROOT_REQUIRED")
+        parent = root
+        while not parent.exists():
+            parent = parent.parent
+        if shutil.disk_usage(parent).free < limits.disk_reserve_bytes+limits.max_receive_bytes:
+>           raise Fault("DISK_RESERVE")
+E           nas_filetools.contracts.Fault: DISK_RESERVE
+
+src/nas_filetools/operations_v12.py:171: Fault
+=============================== warnings summary ===============================
+<frozen importlib._bootstrap>:488
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type swigvarlink has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+------------------ generated xml file: /evidence/baseline.xml ------------------
+=========================== short test summary info ============================
+SKIPPED [3] tests/test_engines.py:15: Set FILETOOLS_REAL_ENGINES=1 to run real engines
+SKIPPED [1] tests/test_engines.py:26: Set FILETOOLS_REAL_ENGINES=1 to run real engines
+SKIPPED [1] tests/test_v11.py:269: Windows capability boundary
+SKIPPED [6] tests/test_v12.py:215: Opt-in real engines, no mocks
+SKIPPED [2] tests/test_v121_samba.py:23: Opt-in isolated root Docker Samba/ACL/bind integration
+SKIPPED [2] tests/test_v121_samba.py:267: Opt-in isolated root Docker Samba/ACL/bind integration
+FAILED tests/test_v11.py::test_local_install_diagnosis_twice_and_v1_migration
+FAILED tests/test_v12.py::test_real_process_tree_leader_exit_never_publishes_live_writer[normal]
+FAILED tests/test_v12.py::test_real_process_tree_leader_exit_never_publishes_live_writer[failed]
+FAILED tests/test_v12.py::test_real_process_tree_leader_exit_never_publishes_live_writer[timeout]
+FAILED tests/test_v12.py::test_real_cancel_reclaims_script_descendants_and_global_slot
+FAILED tests/test_v12.py::test_linux_script_input_is_readonly_and_escaped_process_reclaimed
+FAILED tests/test_v12.py::test_linux_denies_registry_saved_other_agent_published_and_process_escape
+FAILED tests/test_v12.py::test_linux_development_double_fork_detached_writer_is_reclaimed
+FAILED tests/test_v12_operations.py::test_local_shared_install_is_idempotent_and_mapping_errors
+9 failed, 82 passed, 15 skipped, 5 warnings in 28.15s
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

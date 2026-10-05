@@ -1,0 +1,12 @@
+{
+  "nature": "real core/filesystem; synthetic WAV, injected ASR and manually supplied draft/confirmation; no LLM, production or delivery",
+  "checks": {
+    "extract_does_not_generate_minutes": true,
+    "new_revision_preserves_transcript_and_old_draft": true,
+    "confirmation_keeps_unverified_metadata": true,
+    "derivation_does_not_permanently_save": true,
+    "invalid_sources_and_limits_rejected": true,
+    "explicit_save_marks_revision_but_preserves_full_bundle": true,
+    "expired_cache_rejected": true
+  }
+}

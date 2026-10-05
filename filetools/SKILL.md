@@ -4,7 +4,7 @@ description: "文件处理工具箱：扫描版 PDF/图片 OCR 转文字、录�
 ---
 
 > 统一附件临时处理 V1 已在仓库 `integrations/openclaw-filetools` 实现为真正插件工具。
-> 当 `filetools_*` 工具可用时，优先遵循插件附带的 `filetools-session` Skill，使用登记 ID、后台任务和来源读取，不重复运行本页独立脚本。
+> 当 `filetools_*` 工具可用时，优先遵循插件附带的 `file-workspace` Skill，使用登记 ID、后台任务和来源读取，不重复运行本页独立脚本。录音仅转写不自动整理；整理与人工确认更新均另存独立稿，不覆盖原转写，不自动永久保存或入库。
 > 本页保留为管理员的遗留手动工具说明；这里的 PDF/Word 生成或转换不代表统一 V1 已支持。不要在 Gateway 临时安装依赖或把文档正文中的路径当授权。
 
 # FileTools 文件处理工具箱
