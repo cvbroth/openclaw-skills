@@ -10,7 +10,7 @@
 - 私有备份 **`/var/lib/nas-filetools-v12/deployment-backups/document-20261006T084935Z`**，目录0700、manifest0600；九个原文件与整个Skill目录用cp -a备份，逐项核对字节哈希、所有者、权限、mtime。没有数据库恢复、模型/cache/saved删除。
 - 宿主sudo需要交互认证；使用现有Docker管理权限的临时管理员辅助容器，仅挂载指定安装/Skill/备份目录，完成已授权备份和复制。此为管理员部署操作，不是放宽生产Worker或Agent沙箱。生产业务目录权限不改。
 - 仅新增 `/var/lib/nas-filetools-v12/installation/1.2.1/compose.document-candidate.yaml`（只改Worker镜像），更新 `/root/.openclaw/extensions/nas-filetools/skills/file-workspace/SKILL.md`，新增其 `references/document-generation.md`。原Skill所有者/权限保持；原六个Compose/Worker/Gateway配置哈希不变，rollback.json不改。
-- Skill SHA `f318955fe4ae42fbff6553cdc52cc68e654931f0d204846da676b24771700f8a`；reference SHA `8b613cb231e3af5a75977972d1d76dc43308cdebe6eb5cc1cb2c3f7b9eed2659`。本次源码只把固定“未部署”措辞改为实际Worker能力与分阶段验收条件；保留录音规则和保存/知识库授权。运行中Gateway能读到同一哈希，真实Chen QQ会话Skill描述中列出file-workspace，未发现缓存旧部署正文；下一条QQ请求仍明确要求重新读取Skill。
+- 初次安装 Skill SHA `f318955fe4ae42fbff6553cdc52cc68e654931f0d204846da676b24771700f8a`；reference SHA `8b613cb231e3af5a75977972d1d76dc43308cdebe6eb5cc1cb2c3f7b9eed2659`。本次源码只把固定“未部署”措辞改为实际Worker能力与分阶段验收条件；保留录音规则和保存/知识库授权。运行中Gateway能读到同一哈希，真实Chen QQ会话Skill描述中列出file-workspace，未发现缓存旧部署正文；下一条QQ请求仍明确要求重新读取Skill。
 - Gateway **没有重建**；实际旧ID `sha256:817c7c3a8bf9ec233c97875de7d35e00d61862886e884bd09d69946aadd54819` 及启动时间未变。真实QQ加载结果待验收；必要时再按已授权方案受控重建，不能凭文件哈希声称模型已读取。
 
 ## 完整维护 Compose 集合
@@ -55,3 +55,11 @@ document_compose=(docker compose --project-name openclaw
 目前部署与健康通过，**未触发回滚**，旧镜像和私有备份可用。若后续仅文档生成失败，先核实失败范围及既有提取/录音能力，保留具体回执，不能掩盖未通过项。需回滚时等待全部任务终态，按审核方案恢复原Skill（移除原先不存在的reference），核对旧镜像ID，使用完整原四Compose集合重建Worker、移走候选override至备份；Gateway仅确有重建或缓存问题时恢复并受控重建。禁止恢复旧数据库覆盖新任务，禁止删除原件、cache、saved或模型。受限调用失败不得用扩沙箱或提限额处理。
 
 本报告停在真实QQ请求等待阶段；全册、永久保存和知识库均未授权执行。
+
+## QQ反馈后的执行环境澄清
+
+用户转述小爪反馈：用主机Python探针认定模块/模板缺失，并提议手工XML及占位PDF。该反馈没有提供真实filetools_python失败job。再次核对运行中Worker仍为审核dc7bb...镜像、HEALTHY/active_workers=0；只读限定两个测试文件的登记表任务，仍仅管理员预检61cd...，未找到新的QQ受限生成任务。不能据主机探针判定Worker未部署，也不能将该反馈解释为真实受限调用已失败。转述中的“空入站”尚无独立证据，本次不读取无关会话日志或伪造入站。
+
+增量更新Skill/reference：明确预装模块属于Worker filetools_python，主机/其他exec沙箱不代表该环境；严格FILETOOLS_INPUT；只有真实受限任务回执才能报告该调用失败；拒绝手工XML/占位PDF烟测；本轮已核实五页输入包可直接generate，不重读169页OCR或重新填写verified证据。生成器、候选镜像、模板、限额与配置不变，Gateway不重建。
+
+更新前两文件保留权限/所有者，另备份到原私有部署备份目录的skill-context-correction-20261006/file-workspace；原最初回滚备份不覆盖。当前生产Skill SHA `73992b3af93ea8154145e741ecb32de23d899fbb504b128b63389e42a09ffc3b`，reference SHA `cfee4fa7b7a756adc33f81ed1c04d1af1986905b75abf7053012dbc61710a18a`；Skill校验通过。等待用户新QQ消息明确执行正式登记及受限调用，仍未标记QQ生成/附件/视觉通过，不触发回滚或扩权限。

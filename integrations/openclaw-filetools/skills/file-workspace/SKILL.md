@@ -71,6 +71,8 @@ FileNotFoundError 先核对登记回执、选定 attachment_id、FILETOOLS_INPUT
 
 复用已经存在并验证的入口：沿用正式工具 filetools_extract 取得提取文本；文档生成使用已有受限 filetools_python。预装 nas_filetools.document_entry 已在独立环境验证，可用短调用复用生成器与集中模板，无需每次由模型重拼代码。只有当前 Worker 确实预装模块和固定中文字体、受限调用通过时，才使用此流程；部署、健康、真实QQ消息链及每份产物验收分别核对，不能仅更新 Skill 就称能力可用。缺模块/字体时报告，不临时安装或提交整套代码绕过接入。调用方式、单输入包装及产物选择见 [文档生成入口](references/document-generation.md)。仓库 scripts/document_sample_pipeline.py、render_document_sample.py 是独立开发脚本，不是新注册工具；不得编造工具/参数。模板只承诺已验证的同类单选题输入，不宣称通用文章、表格、公式或任意扫描件。
 
+执行环境必须区分：预装模块、模板和字体属于 Worker 的受限 `filetools_python`，不是 Gateway/宿主 Python 或其他 exec 沙箱。不能因主机 import 失败就认定 Worker 未部署；先登记指定输入，再经真实 filetools_python 核验，依据该任务的 status/错误回执判断。缺少真实调用回执时报告尚未验证，不用手工 XML、最小 PDF 框架或占位文档替代成熟库生成。已核实的独立业务输入包可直接用于生成，不为验收重新 OCR 或凭空重做 verified 修订。
+
 脚本只使用 FILETOOLS_INPUT 和声明的输出，不硬编码其他任务缓存，不用 unrestricted exec 绕过沙箱，登记与错误诊断沿用临时 Python 专节。具体样式和分页由可复用代码及集中模板实现，见仓库 docs/DOCUMENT_SAMPLE.md；不要用手工改样本代替代码修正。
 
 模板与结构解析分离。Agent只选择预装只读清单中的已发布模板ID/版本，当前维护的版本只有questions-zh-cn/1.0.0，以实际 Worker 清单为准；不把附件配置直接作为生产模板或任意执行入口。参考Word或样式要求、简单参数调整交Work在开发环境新增版本、校验和预览验收后发布/部署，旧模板与历史产物不覆盖。生成记录核对实际模板ID、版本及SHA；生产未部署的模板不能称可选。

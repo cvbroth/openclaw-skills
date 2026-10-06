@@ -2,6 +2,10 @@
 
 本入口是已有 `filetools_python` 的预装模块调用，不是新增工具。已在独立候选镜像验证；使用前检查当前Worker确已预装模块/字体且受限调用通过，部署与健康不代表QQ消息链或每份文件验收通过。生产缺模块或固定字体时停止并报告，不提交整套生成器代码临时补装。适用已验证的同类单选题 OCR，不能承诺文章、表格、公式或任意扫描件模板。
 
+这里的 Python 代码必须提交给真实 `filetools_python({attachment_id,code,description,outputs})`，由 Worker 执行。不要在主机 exec/Gateway Python/其他工具沙箱导入后据此推断 Worker 缺模块。环境变量名严格为 `FILETOOLS_INPUT`。可先对已登记输入提交短探针 `from nas_filetools.document_templates import load_template; from nas_filetools.document_entry import FONT_PATH`，加载发布模板并输出检查 JSON；按 status 取得真实回执。没有调用或只有主机探针时只能说 Worker 尚未经此次调用核实。不得用手工拼 XML 或占位 PDF 冒充 smoke。
+
+若已收到本轮授权、此前逐页核实并保留原OCR/修订记录的 reviewed 输入包，直接登记该包并调用下面的 generate_registered_input，无需再次 prepare_registered_ocr、读取全册OCR或重新声称核对原页。首次从OCR建立包才需要以下包装流程。
+
 先从真实提取任务回执取得 OCR Markdown 的 file_id，登记/选择得到 attachment_id。已有产物优先复用，不重新 OCR。原PDF范围与OCR实际 coverage/页码必须一致；提取产物支持 `## Page N`，旧OCR支持 `## 第 N 页`，无来源页码的文本不能猜测页码。
 
 结构整理、疑点及对照原页的修订先由 Agent 完成；未核实不补字。包装步骤只写独立业务输入，不能证明模型真的看过原页。用受限 Python 的唯一 `FILETOOLS_INPUT` 读取上述 OCR，调用：
