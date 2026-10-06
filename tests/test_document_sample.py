@@ -67,7 +67,7 @@ def test_real_docx_pdf_content_styles_and_exact_original(tmp_path):
     section = word.sections[0]
     assert abs(section.page_width.cm - 21) < 0.01 and abs(section.page_height.cm - 29.7) < 0.01
     assert all(abs(value.cm - 2) < 0.01 for value in [section.top_margin, section.left_margin, section.right_margin, section.bottom_margin])
-    assert "Heading 1" in [p.style.name for p in word.paragraphs]
+    assert "Heading 2" in [p.style.name for p in word.paragraphs]
     assert all("## 第" not in p.text for p in word.paragraphs)
     assert word.styles["Normal"].font.size.pt == 11.5
     assert word.styles["Option"].paragraph_format.left_indent.cm > 0

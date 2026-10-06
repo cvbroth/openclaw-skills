@@ -1,0 +1,24 @@
+2026-10-06 server development; baseline 112c0e72c73a814372ed5e0aab16f30c959f080d
+Branch: feat/filetools-document-sample-20261006
+Core default regression: 109 passed, 15 skipped, 5 SWIG warnings in 42.61s.
+Final focused regression in Poppler validation image: 18 passed, 5 SWIG warnings in 10.27s.
+Synthetic boundary fixtures use real python-docx / PyMuPDF / LibreOffice rendering.
+Cases: page-bottom short question and heading, multi-page stem, long options, final-option source attachment, exact content-change rejection.
+Core suite includes injected substitutes; counts are not production engine/SDK/QQ acceptance.
+ruff check --no-cache src tests scripts: All checks passed!
+Skill quick_validate.py: Skill is valid!
+Recording section byte-identical to baseline; git diff --check passed.
+Fixed generation dependencies: Python3.12.10, python-docx1.1.2, PyMuPDF1.25.5.
+Actual Word renderer: LibreOffice7.4.7.2. Independent PDF raster engine: Poppler22.12.0 (Debian22.12.0-2+deb12u3).
+Validation-only image sha256:8cd6a32e4bd0f669e3b67819bb04de40ad73452930b69b9543e554e098c4addf
+Inherited previous document-test image; only poppler-utils newly installed. No production tag overwritten.
+Network-none/read-only/cap-drop/no-new-privileges, 2 CPUs/4GiB/UID1000; existing sandbox limits unchanged.
+Actual sample: Word10 pages / PDF9 pages; ordered text, black text, A4 geometry, glyph traces, page numbers and pagination boundaries checked.
+Exact invariants: all 32 questions /128 options and order unchanged; original OCR, structured audit, issues and reviewed input unchanged.
+Source orphans after: Word0 /PDF0. No hardcoded sample question/page pagination exceptions.
+Visual review: 19 pages through full contact sheets plus enlarged pages and focus boundaries. No observed Chinese missing/clipping/blank page in independent Poppler previews.
+MuPDF raster previews sometimes omitted prefixes, even fresh per-page; underlying cause unresolved. Retained private diagnostic evidence; text/trace checks alone did not establish visual success.
+Real isolated FileTools restricted-script publication and artifact_path retrieval: byte counts and SHA-256 match receipts.
+Word fonts are not embedded; user-side font substitution and Microsoft Word layout unverified.
+Not verified: production deployment/capability, real Gateway/Worker/QQ delivery, full-book processing, CI, engine-enabled full regression.
+Private input/audit/preview evidence remains ignored runtime; only aggregate non-private evidence committed.

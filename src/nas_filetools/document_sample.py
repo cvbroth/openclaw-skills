@@ -177,138 +177,378 @@ def structure_ocr(raw, pages=(6, 10), evidence=None, reviewed_edits=None):
             "review_status": "original-page-comparison-required", "reviewed_edits": applied}
 
 
+# One configuration controls both templates; no question/page-number exceptions.
+DEFAULT_TEMPLATE = {
+    "font_family": FONT_FAMILY, "body_pt": 11.5, "line_spacing": 1.35,
+    "space_after_pt": 6, "margin_cm": 2, "width_cm": 21, "height_cm": 29.7,
+    "title_pt": 16, "part_pt": 14, "chapter_pt": 13, "subject_pt": 13,
+    "type_pt": 11.5, "source_pt": 9, "footer_pt": 9, "heading_before_pt": 3,
+    "option_indent_cm": 0.65, "option_hanging_cm": 0.35,
+    "short_question_max_fraction": 0.30, "short_option_max_lines": 3,
+    "short_stem_max_lines": 3, "minimum_start_lines": 2,
+    "footer_distance_cm": 1, "max_pages": 50,
+}
+
+
+def template_config(overrides=None):
+    result = {**DEFAULT_TEMPLATE, **(overrides or {})}
+    if set(result) != set(DEFAULT_TEMPLATE):
+        raise ValueError("UNKNOWN_TEMPLATE_PARAMETER")
+    if not 0 < result["short_question_max_fraction"] < 0.5:
+        raise ValueError("INVALID_SHORT_QUESTION_THRESHOLD")
+    if result["minimum_start_lines"] < 2:
+        raise ValueError("INVALID_MINIMUM_START_LINES")
+    return result
+
+
 def source_label(fragments):
     pages = sorted({r["page"] for r in fragments})
-    lines = [r["line"] for r in fragments]
-    return f"来源：原PDF第{'、'.join(map(str, pages))}页；OCR行{min(lines)}–{max(lines)}"
+    return f"原PDF：第{'、'.join(map(str, pages))}页"
+
+
+def heading_style(text, previous=None):
+    if re.match(r"^第.+部分", text):
+        return "Heading 1"
+    if re.match(r"^第.+[章节篇]", text) or text in ("导论", "绪论", "引言", "结语"):
+        return "Heading 2"
+    if "选择题" in text or re.match(r"^[一二三四五六七八九十]+、", text):
+        return "Heading 3"
+    return "Subject" if previous == "Heading 1" else "Heading 2"
 
 
 def paragraphs(model, title):
     result = [("Title", title)]
+    previous_heading = None
     for block in model["blocks"]:
         if block["kind"] == "chapter":
-            result.append(("Heading 1", block["text"]))
+            style = heading_style(block["text"], previous_heading)
+            result.append((style, block["text"]))
+            previous_heading = style
         elif block["kind"] == "question":
             for part in block["parts"]:
                 if part["kind"] == "stem":
-                    text = f"{block['number']}.\u00a0{part['text']}"
-                    style = "Question"
+                    text, style = f"{block['number']}.\u00a0{part['text']}", "Question"
                 elif part["kind"] == "option":
-                    text = f"{part['label']}. {part['text']}"
-                    style = "Option"
+                    text, style = f"{part['label']}. {part['text']}", "Option"
                 else:
                     text, style = part["text"], "Point"
                 result.append((style, text))
             result.append(("Source", source_label(block["fragments"])))
         else:
-            result.append(("Unresolved", "[结构待核实] " + block["text"]))
-            result.append(("Source", source_label(block["fragments"])))
+            result.extend([("Unresolved", "[结构待核实] " + block["text"]),
+                           ("Source", source_label(block["fragments"]))])
     return result
 
 
-def _font_style(style, size):
-    style.font.name = FONT_FAMILY
+def item_groups(items):
+    """Bounded question groups, separated by Source; never bind all questions."""
+    index = 0
+    while index < len(items):
+        start = index
+        if items[index][0] == "Question":
+            while index < len(items) and items[index][0] != "Source":
+                index += 1
+            if index == len(items):
+                raise ValueError("QUESTION_SOURCE_REQUIRED")
+        index += 1
+        yield start, index, items[start:index]
+
+
+class StoryLayout:
+    """Actual Story measurements and drawing; no speculative break-* CSS."""
+    def __init__(self, font_path, template=None):
+        self.template = template_config(template)
+        self.font_path = Path(font_path) if font_path else None
+        t = self.template
+        self.media = fitz.Rect(0, 0, t["width_cm"] * 72 / 2.54, t["height_cm"] * 72 / 2.54)
+        inset = t["margin_cm"] * 72 / 2.54
+        self.where = self.media + (inset, inset, -inset, -inset)
+        self.line = t["body_pt"] * t["line_spacing"]
+        self.short_limit = self.where.height * t["short_question_max_fraction"]
+        self.cache = {}
+        face = f'@font-face {{font-family: sample; src: url({self.font_path.name});}}' if self.font_path else ""
+        self.css = face + f'''
+        body {{font-family: sample; font-size:{t['body_pt']}pt; line-height:{t['line_spacing']}; margin:0; color:#000;}}
+        p {{margin:0 0 {t['space_after_pt']}pt 0;}}
+        .title {{font-size:{t['title_pt']}pt;}}
+        .heading-1 {{font-size:{t['part_pt']}pt; font-weight:bold;}}
+        .heading-2 {{font-size:{t['chapter_pt']}pt; font-weight:bold;}}
+        .heading-3 {{font-size:{t['type_pt']}pt; font-weight:bold;}}
+        .subject {{font-size:{t['subject_pt']}pt;}}
+        .option,.point,.continuation {{margin-left:{t['option_indent_cm'] * 72 / 2.54}pt;}}
+        .option,.point {{text-indent:{-t['option_hanging_cm'] * 72 / 2.54}pt;}}
+        .source {{font-size:{t['source_pt']}pt;}}
+        '''
+
+    def story(self, items):
+        content = "".join(f'<p class="{style.lower().replace(" ", "-")}">{html.escape(text)}</p>' for style, text in items)
+        return fitz.Story("<html><body>" + content + "</body></html>", user_css=self.css,
+                          archive=fitz.Archive(str(self.font_path.parent)) if self.font_path else None)
+
+    def height(self, items):
+        key = tuple(items)
+        if key not in self.cache:
+            more, filled = self.story(items).place(fitz.Rect(0, 0, self.where.width, 100000))
+            if more:
+                raise ValueError("MEASUREMENT_LIMIT")
+            self.cache[key] = fitz.Rect(filled).height
+        return self.cache[key]
+
+    def short_paragraph(self, item, lines):
+        return self.height([item]) <= lines * self.line + self.template["space_after_pt"] + 0.1
+
+    def question_short(self, group):
+        return self.height(group) <= self.short_limit
+
+    def long_option_tail(self, item):
+        """Split only presentation flow; keep at least two measured final lines.
+
+        The single semantic option/text in the model and DOCX is unchanged.
+        """
+        style, text = item
+        low, high = 1, len(text) - 1
+        target = self.template["minimum_start_lines"] * self.line + self.template["space_after_pt"] - 0.1
+        while low < high:
+            size = (low + high) // 2
+            if self.height([("Continuation", text[-size:])]) >= target:
+                high = size
+            else:
+                low = size + 1
+        cut = len(text) - low
+        # Do not insert a semantic space or cut an ASCII word if avoidable.
+        while cut > 0 and text[cut - 1].isascii() and text[cut - 1].isalnum() and text[cut].isascii() and text[cut].isalnum():
+            cut -= 1
+        if cut == 0:
+            raise ValueError("UNBREAKABLE_LONG_OPTION_TAIL")
+        return (style, text[:cut]), ("Continuation", text[cut:])
+
+
+def _font_style(style, size, template):
+    from docx.shared import RGBColor
+    t = template
+    style.font.name = t["font_family"]
     style.font.size = Pt(size)
+    style.font.color.rgb = RGBColor(0, 0, 0)
+    color = style.element.rPr.find(qn("w:color"))
+    for attribute in ("themeColor", "themeTint", "themeShade"):
+        color.attrib.pop(qn("w:" + attribute), None)
     fonts = style.element.get_or_add_rPr().get_or_add_rFonts()
     for key in ("ascii", "hAnsi", "eastAsia", "cs"):
-        fonts.set(qn("w:" + key), FONT_FAMILY)
+        fonts.set(qn("w:" + key), t["font_family"])
         fonts.attrib.pop(qn("w:" + key + "Theme"), None)
-    style.paragraph_format.line_spacing = 1.35
-    style.paragraph_format.space_after = Pt(6)
+    style.paragraph_format.line_spacing = t["line_spacing"]
+    style.paragraph_format.space_after = Pt(t["space_after_pt"])
     style.paragraph_format.space_before = Pt(0)
     style.paragraph_format.widow_control = True
+    borders = style.element.get_or_add_pPr().find(qn("w:pBdr"))
+    if borders is not None:
+        borders.getparent().remove(borders)
 
 
-def write_docx(path, items):
+def write_docx(path, items, font_path=None, template=None):
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.oxml import OxmlElement
+    layout = StoryLayout(font_path, template)
+    t = layout.template
     document = Document()
     section = document.sections[0]
-    section.page_width, section.page_height = Cm(21), Cm(29.7)
-    section.top_margin = section.bottom_margin = section.left_margin = section.right_margin = Cm(2)
-    for name, size in [("Normal", 11.5), ("Title", 16), ("Heading 1", 14), ("Question", 11.5),
-                       ("Option", 11.5), ("Point", 11.5), ("Source", 9), ("Unresolved", 11.5)]:
+    section.page_width, section.page_height = Cm(t["width_cm"]), Cm(t["height_cm"])
+    section.top_margin = section.bottom_margin = section.left_margin = section.right_margin = Cm(t["margin_cm"])
+    section.footer_distance = Cm(t["footer_distance_cm"])
+    sizes = {"Normal": t["body_pt"], "Title": t["title_pt"], "Subject": t["subject_pt"],
+             "Heading 1": t["part_pt"], "Heading 2": t["chapter_pt"], "Heading 3": t["type_pt"],
+             "Question": t["body_pt"], "Option": t["body_pt"], "Point": t["body_pt"],
+             "Source": t["source_pt"], "Unresolved": t["body_pt"], "Footer": t["footer_pt"]}
+    for name, size in sizes.items():
         style = document.styles[name] if name in document.styles else document.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
-        _font_style(style, size)
-        if name in ("Title", "Heading 1"):
-            style.paragraph_format.keep_with_next = True
-            style.paragraph_format.space_before = Pt(10)
+        _font_style(style, size, t)
+        if name.startswith("Heading"):
+            style.font.bold = True
+            style.paragraph_format.space_before = Pt(t["heading_before_pt"])
         if name in ("Option", "Point"):
-            style.paragraph_format.left_indent = Cm(0.65)
-            style.paragraph_format.first_line_indent = Cm(-0.35)
-    # Keep a long stem splittable while retaining the number and first characters.
+            style.paragraph_format.left_indent = Cm(t["option_indent_cm"])
+            style.paragraph_format.first_line_indent = Cm(-t["option_hanging_cm"])
+    added = []
     for style, text in items:
         paragraph = document.add_paragraph(text, style)
         paragraph.paragraph_format.keep_together = False
-        paragraph.paragraph_format.keep_with_next = style in ("Title", "Heading 1")
+        paragraph.paragraph_format.keep_with_next = style in ("Title", "Subject", "Heading 1", "Heading 2", "Heading 3")
+        added.append(paragraph)
+    for start, end, group in item_groups(items):
+        if group[0][0] != "Question":
+            continue
+        short = layout.question_short(group)
+        for offset, item in enumerate(group):
+            paragraph = added[start + offset]
+            is_short_option = item[0] in ("Option", "Point") and layout.short_paragraph(item, t["short_option_max_lines"])
+            paragraph.paragraph_format.keep_together = short or is_short_option
+            paragraph.paragraph_format.keep_with_next = short and offset < len(group) - 1
+        if not short:
+            if layout.short_paragraph(group[0], t["short_stem_max_lines"]):
+                added[start].paragraph_format.keep_together = True
+                added[start].paragraph_format.keep_with_next = True
+            # Bind only the final option's ending and its source, not the next question.
+            added[end - 2].paragraph_format.keep_with_next = True
+            added[end - 1].paragraph_format.keep_together = True
+    footer = section.footer.paragraphs[0]
+    footer.style = document.styles["Footer"]
+    footer.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    footer.add_run("文档第 ")
+    field = OxmlElement("w:fldSimple")
+    field.set(qn("w:instr"), "PAGE")
+    run = OxmlElement("w:r")
+    value = OxmlElement("w:t")
+    value.text = "1"
+    run.append(value)
+    field.append(run)
+    footer._p.append(field)
+    footer.add_run(" 页")
     document.core_properties.title = items[0][1]
     document.save(path)
 
 
-def write_pdf(path, items, font_path):
-    font_path = Path(font_path)
-    if not font_path.is_file():
+def write_pdf(path, items, font_path, template=None):
+    layout = StoryLayout(font_path, template)
+    t = layout.template
+    if not Path(font_path).is_file():
         raise ValueError("FONT_FILE_UNAVAILABLE")
     font = fitz.Font(fontfile=str(font_path))
-    missing = sorted({c for _, text in items for c in text if not c.isspace() and not font.has_glyph(ord(c))})
+    missing = sorted({c for _, text in items + [("Footer", "文档第 0123456789 页")] for c in text if not c.isspace() and not font.has_glyph(ord(c))})
     if missing:
         raise ValueError("FONT_MISSING_GLYPHS: " + "".join(missing))
-    css = f'''@font-face {{font-family: sample; src: url({font_path.name});}}
-    body {{font-family: sample; font-size: 11.5pt; line-height: 1.35; margin: 0;}}
-    p {{margin: 0 0 6pt 0;}} h1 {{font-size: 14pt; margin: 10pt 0 6pt 0;}}
-    .title {{font-size:16pt;}} .option,.point {{margin-left:18.4pt; text-indent:-9.9pt;}}
-    .source {{font-size:9pt; color:#666;}}'''
-    body = []
-    for style, text in items:
-        tag = "h1" if style == "Heading 1" else "p"
-        body.append(f'<{tag} class="{style.lower().replace(" ", "-")}">{html.escape(text)}</{tag}>')
-    story = fitz.Story("<html><body>" + "".join(body) + "</body></html>", user_css=css, archive=fitz.Archive(str(font_path.parent)))
-    media = fitz.paper_rect("a4")
-    inset = 2 * 72 / 2.54
-    where = media + (inset, inset, -inset, -inset)
     writer = fitz.DocumentWriter(str(path))
-    more, count = True, 0
-    try:
-        while more:
-            count += 1
-            if count > 50:
-                raise ValueError("SAMPLE_LAYOUT_PAGE_LIMIT")
-            device = writer.begin_page(media)
-            more, _ = story.place(where)
-            story.draw(device)
+    device, y, page_count = None, layout.where.y0, 0
+    decisions = []
+
+    def new_page():
+        nonlocal device, y, page_count
+        if device is not None:
             writer.end_page()
+        page_count += 1
+        if page_count > t["max_pages"]:
+            raise ValueError("SAMPLE_LAYOUT_PAGE_LIMIT")
+        device = writer.begin_page(layout.media)
+        y = layout.where.y0
+
+    def draw_unit(unit, keep=False, minimum=0):
+        nonlocal y
+        height = layout.height(unit)
+        if device is None:
+            new_page()
+        remaining = layout.where.y1 - y
+        if y > layout.where.y0 and ((keep and height > remaining - 0.1) or remaining < minimum):
+            new_page()
+        story = layout.story(unit)
+        while True:
+            more, filled = story.place(fitz.Rect(layout.where.x0, y, layout.where.x1, layout.where.y1))
+            story.draw(device)
+            y = fitz.Rect(filled).y1
+            if not more:
+                break
+            new_page()
+
+    try:
+        groups = list(item_groups(items))
+        for group_index, (start, end, group) in enumerate(groups):
+            if group[0][0] != "Question":
+                reserve = 0
+                if group[0][0] in ("Title", "Subject", "Heading 1", "Heading 2", "Heading 3"):
+                    for _, _, following in groups[group_index + 1:]:
+                        if following[0][0] != "Question":
+                            reserve += layout.height(following)
+                            continue
+                        if layout.question_short(following):
+                            reserve += layout.height(following)
+                        else:
+                            reserve += t["minimum_start_lines"] * layout.line + t["space_after_pt"]
+                        break
+                draw_unit(group, keep=True, minimum=layout.height(group) + reserve)
+                continue
+            short = layout.question_short(group)
+            decisions.append({"start_item": start, "end_item": end, "short": short, "measured_pt": layout.height(group)})
+            if short:
+                draw_unit(group, keep=True)
+                continue
+            prefix = group[:-2]
+            index = 0
+            while index < len(prefix):
+                item = prefix[index]
+                unit = [item]
+                keep = item[0] in ("Option", "Point") and layout.short_paragraph(item, t["short_option_max_lines"])
+                if index == 0 and len(prefix) > 1 and layout.short_paragraph(item, t["short_stem_max_lines"]):
+                    unit.append(prefix[1])
+                    # A short stem stays with the next semantic part only if bounded.
+                    if layout.height(unit) <= layout.short_limit:
+                        keep = True
+                        index += 1
+                    else:
+                        unit.pop()
+                minimum = t["minimum_start_lines"] * layout.line + t["space_after_pt"]
+                if index == 0 and len(prefix) > 1 and len(unit) == 1 and layout.short_paragraph(item, t["short_stem_max_lines"]):
+                    minimum += layout.height(unit)  # Reserve two lines of a long first option.
+                draw_unit(unit, keep=keep, minimum=minimum)
+                index += 1
+            last, source = group[-2:]
+            if layout.short_paragraph(last, t["short_option_max_lines"]):
+                draw_unit([last, source], keep=True)
+            else:
+                head, tail = layout.long_option_tail(last)
+                draw_unit([head], minimum=t["minimum_start_lines"] * layout.line + t["space_after_pt"])
+                draw_unit([tail, source], keep=True)
     finally:
+        if device is not None:
+            writer.end_page()
         writer.close()
+    # Mature Page text API adds the document's own page number in the footer band.
+    with fitz.open(path) as pdf:
+        for number, page in enumerate(pdf, 1):
+            label = f"文档第 {number} 页"
+            width = font.text_length(label, fontsize=t["footer_pt"])
+            page.insert_text(((page.rect.width - width) / 2, page.rect.height - t["footer_distance_cm"] * 72 / 2.54),
+                             label, fontname="sample-footer", fontfile=str(font_path), fontsize=t["footer_pt"], color=(0, 0, 0))
+        pdf.saveIncr()
+    return decisions
 
 
-def validate_pair(docx_path, pdf_path, items):
-    """Check actual extracted content and geometry, not merely file existence."""
+def canonical(text):
+    return re.sub(r"\s+", "", text)
+
+
+def page_body(page, number, template=None):
+    t = template_config(template)
+    bottom = page.rect.height - t["margin_cm"] * 72 / 2.54
+    footer = page.get_text(clip=fitz.Rect(0, bottom + 1, page.rect.width, page.rect.height), sort=True)
+    if canonical(footer) != canonical(f"文档第 {number} 页"):
+        raise ValueError("DOCUMENT_FOOTER_MISMATCH")
+    return page.get_text(clip=fitz.Rect(0, 0, page.rect.width, bottom + 1), sort=True)
+
+
+def validate_pair(docx_path, pdf_path, items, template=None):
     expected = [text for _, text in items]
     document = Document(docx_path)
     if [p.text for p in document.paragraphs] != expected:
         raise ValueError("DOCX_CONTENT_MISMATCH")
-    def canonical(text):
-        return re.sub(r"\s+", "", text)
     with fitz.open(pdf_path) as pdf:
-        actual = "".join(page.get_text(sort=True) for page in pdf)
+        actual = "".join(page_body(page, number, template) for number, page in enumerate(pdf, 1))
         if canonical(actual) != canonical("".join(expected)):
             raise ValueError("PDF_CONTENT_OR_ORDER_MISMATCH")
         geometry = []
         for number, page in enumerate(pdf, 1):
-            if not page.get_text().strip():
+            traces = page.get_texttrace()
+            if not traces or not page_body(page, number, template).strip():
                 raise ValueError("EMPTY_PDF_PAGE")
-            if any("\ufffd" in word[4] for word in page.get_text("words")):
-                raise ValueError("PDF_REPLACEMENT_GLYPH")
-            for block in page.get_text("dict")["blocks"]:
-                for line in block.get("lines", []):
-                    for span in line["spans"]:
-                        rect = fitz.Rect(span["bbox"])
-                        if not page.rect.contains(rect):
-                            raise ValueError("PDF_TEXT_CROPPED")
+            for span in traces:
+                if not page.rect.contains(fitz.Rect(span["bbox"])):
+                    raise ValueError("PDF_TEXT_CROPPED")
+                for codepoint, glyph, origin, bbox in span["chars"]:
+                    if codepoint == 0xfffd or (glyph == 0 and not chr(codepoint).isspace()):
+                        raise ValueError("PDF_MISSING_GLYPH")
             geometry.append({"page": number, "words": len(page.get_text("words"))})
     return {"content_equal": True, "pdf_pages": geometry, "docx_paragraphs": len(document.paragraphs),
-            "visual_review": "required", "word_render": "not-checked-by-this-function"}
+            "document_page_numbers": "checked", "visual_review": "required", "word_render": "not-checked-by-this-function"}
 
 
-def generate_sample(input_path, output_dir, font_path, title="合成验证样本（非用户原册）", pages=(6, 10)):
+def generate_sample(input_path, output_dir, font_path, title="合成验证样本（非用户原册）", pages=(6, 10), template=None):
     """Generate a small sample only; no automatic full-book processing or saving."""
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
@@ -324,9 +564,9 @@ def generate_sample(input_path, output_dir, font_path, title="合成验证样本
         raw = raw_bytes.decode("utf-8")
         model = structure_ocr(raw, pages)
     items = paragraphs(model, title)
-    write_docx(output / "sample.docx", items)
-    write_pdf(output / "sample.pdf", items, font_path)
-    checks = validate_pair(output / "sample.docx", output / "sample.pdf", items)
+    write_docx(output / "sample.docx", items, font_path, template)
+    decisions = write_pdf(output / "sample.pdf", items, font_path, template)
+    checks = validate_pair(output / "sample.docx", output / "sample.pdf", items, template)
     (output / "structured.json").write_text(json.dumps(model, ensure_ascii=False, indent=2), encoding="utf-8")
     (output / "original-ocr.md").write_bytes(raw_bytes)
     lines = ["# 疑点及处理记录", "", "原始OCR不改写。下列修订仅依据提供的原页核对记录；生成器不自行验证记录，未确定处不得凭常识补字。", ""]
@@ -346,7 +586,7 @@ def generate_sample(input_path, output_dir, font_path, title="合成验证样本
         r = removed["fragment"]
         lines.append(f"- 第{r['page']}页 / OCR行{r['line']}：{r['raw']}；证据：{json.dumps(removed['evidence'], ensure_ascii=False)}")
     (output / "issues.md").write_text("\n".join(lines), encoding="utf-8")
-    checks.update(source_sha256=model["source_sha256"], issues=len(model["issues"]), font=FONT_FAMILY,
+    checks.update(template=template_config(template), pdf_layout_decisions=decisions, word_font_embedding="not-embedded; desktop substitution remains unverified", source_sha256=model["source_sha256"], issues=len(model["issues"]), font=FONT_FAMILY,
                   font_sha256=hashlib.sha256(Path(font_path).read_bytes()).hexdigest(), original_pdf_review="supplied-manual-evidence" if model["reviewed_edits"] else "not-performed",
                   generator_verified_review_evidence=False)
     (output / "validation.json").write_text(json.dumps(checks, ensure_ascii=False, indent=2), encoding="utf-8")

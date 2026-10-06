@@ -51,7 +51,7 @@ def retrieve_outputs(root, hub, identity, job, status):
     return published
 
 
-def pipeline(root, stage):
+def pipeline(root, stage, report_name="DOCUMENT_SAMPLE_REPORT.md"):
     root = Path(root).resolve()
     workspace = root / "workspace"
     workspace.mkdir(exist_ok=True)
@@ -111,7 +111,9 @@ def pipeline(root, stage):
             "published_input_reuse_job": probe["job_id"], "delivery": "real isolated core artifact_path + local hash-verified copies; not QQ"}
         print(json.dumps(receipts["generation"], ensure_ascii=False))
     elif stage == "report":
-        source = Path(__file__).resolve().parents[1] / "docs/DOCUMENT_SAMPLE_REPORT.md"
+        if Path(report_name).name != report_name or not report_name.endswith(".md"):
+            raise ValueError("DEVELOPMENT_REPORT_NAME_REQUIRED")
+        source = Path(__file__).resolve().parents[1] / "docs" / report_name
         shutil.copyfile(source, workspace / "document-report.md")
         registered = register_source(store, identity, {"source_path": "document-report.md"})
         job = dispatch(hub, identity, "python", {"attachment_id": registered["attachment_id"],
@@ -129,5 +131,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", required=True, type=Path)
     parser.add_argument("--stage", required=True, choices=["extract", "generate", "report"])
+    parser.add_argument("--report-name", default="DOCUMENT_SAMPLE_REPORT.md")
     args = parser.parse_args()
-    pipeline(args.root, args.stage)
+    pipeline(args.root, args.stage, args.report_name)

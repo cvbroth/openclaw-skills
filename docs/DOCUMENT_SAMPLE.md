@@ -15,7 +15,14 @@
 
 ## 模板与独立环境
 
-复用固定 Python3.12.10、python-docx1.1.2、PyMuPDF1.25.5，未增加 Python 依赖。Word 与 PDF 共用一份有序段落模型。A4竖版、四边2厘米、正文11.5磅、1.35行距、6磅段后距；真正标题样式、题干独立段落、选项缩进。题号与题干开头用不换行空格相连，长题自然跨页，原页码仅是来源标记，没有手工分页。该模板针对本轮单选题样本；不是通用 OCR/多栏/公式重建。
+复用固定 Python3.12.10、python-docx1.1.2、PyMuPDF1.25.5，未增加依赖。`DEFAULT_TEMPLATE` 集中配置字体、字号、行距、段距、A4/2厘米边距、缩进、页脚及分页阈值；调用可覆盖已知键，未知参数拒绝。没有按题号或原页码写分页例外。Word/PDF 共用有序段落内容，分页分别实现：
+
+- Word 使用真实 keep_together/keep_with_next/widow_control 属性。短题只在本题内有限绑定，到 Source 即结束；长题干可拆，原生孤行控制保留至少两行开头。短题干跟随后继段，短选项不拆，末选项与来源绑定；长选项保留可拆属性。短题分类使用固定字体的 Story 高度作为保守估计，并非提前得到 Word 的实际高度；最终须以真实 Word 渲染核验。
+- PDF 使用 Story.place 得到的实测高度，短题（不超过可用页高30%）剩余空间不足时整体移页；长题逐语义块流动，新题起始保留至少两行所需空间。短题干与有界首段保留在一起，短选项完整放置；长末选项按实测两行尾部拆分呈现流，与 Source 作为有界尾单元，语义文本仍为同一个原选项。标题预留后续内容空间。没有声称支持 CSS break-inside/widows/orphans 等未实测参数，也没有拼原始PDF对象。
+
+部分为 Heading 1、章节/导论为 Heading 2、题型为 Heading 3，学科名使用独立 Subject 副标题；全部黑色，首部减少间距。正文来源仅为“原PDF：第…页”，OCR行号/修订依据/完整片段映射仍在原审计文件。Word 页脚为 PAGE 域，PDF 使用成熟 Page 文本接口添加“文档第 N 页”，与来源区分。没有一题一页或按原PDF机械分页。
+
+通用验证模块 `document_layout_checks.py` 将实际渲染文字映射到各段和页面，核验短题、两行开头、短选项、来源、标题、黑色文字和文档页码。`compare_document_sample.py` 精确比较上版题干/选项/顺序，仅允许标题样式、来源展示及页脚的明确变化；同时要求原OCR、structured.json、issues.md字节一致。所有用户审计和逐题位置证据仅留 runtime。
 
 PyMuPDF Story 支持 HTML/CSS、Archive 字体资源及自动分页；使用其成熟排版实现，不拼原始 PDF 对象。参见 [官方 Story 文档](https://pymupdf.readthedocs.io/en/latest/story-class.html) 和 [字体文档](https://pymupdf.readthedocs.io/en/latest/font.html)。
 
@@ -36,11 +43,14 @@ scripts/document_sample_pipeline.py --root /sample --stage extract
 scripts/document_sample_pipeline.py --root /sample --stage generate
 scripts/render_document_sample.py --delivery /sample/delivery --output /sample/rendered
 scripts/document_sample_pipeline.py --root /sample --stage report
+# 后续分页报告使用 --report-name DOCUMENT_PAGINATION_REPORT.md（开发CLI参数，不是工具参数）
 ```
 
 extract 只接受预先合法制作的5页 PDF 副本，其引擎页码仍为1–5。`source-map.json` 和单独 mapped-ocr.md 记录与原页6–10的映射；不篡改引擎 sources。重新 OCR 原稿另存，生成阶段优先读取用户提供的旧 OCR 输入包。不能因 `/root` 不可读就提升权限或扫描缓存；本轮用户自行提供工作区旧样本。
 
 ## 验证与交付边界
+
+固定PyMuPDF出现预览前缀漏显，逐页独立进程亦未完全消除；深层原因未定位。当前栅格验证使用独立Poppler pdftoppm引擎，保留MuPDF异常与交叉渲染证据，不从文字/trace完整推断视觉通过。分页改进轮只为独立开发验证镜像补充poppler-utils（实测22.12.0-2+deb12u3），生成依赖/沙箱限额不变。缺少该程序时明确失败，不伪造预览。
 
 正文恢复先逐题对照原页，再运行 DOCX/PDF 内容顺序和几何校验，最后实际渲染并人工看逐页图片。存在/退出0/非空不能证明正确。Word 导出的 PDF 在固定 PyMuPDF 下曾返回空 dict blocks；独立渲染验证使用 [get_texttrace 官方绘制轨迹接口](https://pymupdf.readthedocs.io/en/latest/functions.html#Page.get_texttrace) 并要求非空，逐字检查缺字和矩形，避免空几何检查误报通过。
 
@@ -48,4 +58,6 @@ validation.json 是生成器自动检查；rendered/render-checks.json 是独立
 
 FileTools 发布后由 status 获取 job_id/artifact_id/file_id，通过 files/artifact_path 返回真实 Gateway 开发路径、bytes/SHA，再取回核对。delivery 目录为这些真实发布产物的哈希核对副本。普通 preview 路径不冒充发布附件；本轮没有真实 OpenClaw/QQ message 成功回执，不声称送达 QQ。没有调用永久 files/save 或知识库导入。
 
-本轮结果、已核实的漏行与未验证项见 [样本验证报告](DOCUMENT_SAMPLE_REPORT.md)。全册和生产部署均等待用户另行确认。
+初版结果见 [样本验证报告](DOCUMENT_SAMPLE_REPORT.md)；后续分页、模板与 Skill 改进见 [分页改进报告](DOCUMENT_PAGINATION_REPORT.md)。后续轮次只运行 generate、render、compare、report，不重新执行 extract；继续沿用已核对输入。全册和生产部署均等待用户另行确认。
+
+分页改进轮的验证镜像从现有 `filetools-document-test:20261006-364d4d6` 派生为 `filetools-document-validation:20261006-pagination`，仅安装poppler-utils；后续重建开发Dockerfile亦包含此渲染依赖。上述旧镜像构建及OCR段落是初版记录，不代表本轮重建或重新OCR。
