@@ -30,6 +30,8 @@ from nas_filetools.document_entry import generate_registered_input
 generate_registered_input()
 ```
 
+业务输入包必须含顶层 `raw_ocr` 字符串（实际合成文本或获授权的原OCR），不能只写 document 元数据及修订/疑点列表；document 还必须含 schema/source_pages/title/template。独立修订记录不能替代原文。手动构建合成包时先按真实 validate_request 校验，不填写与原文不匹配的页边或修订证据。`artifact_count:0` 仅说明没有发布产物，不能推出脚本未执行或日志未生成；接口不给日志时报告可见证据不足，由管理员按授权查指定任务，不绕过访问私有执行目录。
+
 声明 outputs 为 `sample.docx,sample.pdf,structured.json,original-ocr.md,issues.md,validation.json,generation-metrics.json` 七个平面文件名的列表。函数只读取 FILETOOLS_INPUT，在当前执行目录生成；显式页范围和标题从业务输入包取得，字体和集中模板在 Worker 镜像中，不从聊天提供任意字体路径，不读取其他任务缓存。没有新增工具参数，也不改变60秒/4GiB限额。
 
 模板只从预装只读清单选择已发布ID/版本，当前为questions-zh-cn/1.0.0；未知模板或附件提供的inline参数拒绝，不能把参考Word/附件配置直接作为生产模板。用户提出新增模板或简单样式调整时，由Work在开发环境建立新版本，校验、真实预览并审核后发布，再另行部署；不要每份任务临时改模板。生成validation.json/metrics记录实际模板ID、版本和SHA，不覆盖旧产物。当前没有论文/图书模板。

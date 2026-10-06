@@ -37,3 +37,18 @@ def test_package_arbitrary_source_pages_retains_exact_ocr(tmp_path, monkeypatch)
     assert request["raw_ocr"] == raw
     assert incoming.read_bytes() == raw.encode("utf-8")
     assert request["document"]["source_pages"] == [73, 73]
+
+
+def test_valid_document_metadata_without_ocr_fails_before_generation(tmp_path, monkeypatch):
+    request = {"document": {"schema": "reviewed-single-choice-v1", "source_pages": [1, 1],
+                            "title": "合成烟测", "template": {"id": "questions-zh-cn", "version": "1.0.0"}},
+               "margin_evidence": [], "reviewed_edits": [], "review_notes": []}
+    incoming = tmp_path / "input.json"
+    incoming.write_text(json.dumps(request))
+    monkeypatch.setenv("FILETOOLS_INPUT", str(incoming))
+    output = tmp_path / "out"
+    output.mkdir()
+    monkeypatch.chdir(output)
+    with pytest.raises(ValueError, match="DOCUMENT_INPUT_SCHEMA_OR_EXPLICIT_SCOPE_REQUIRED"):
+        generate_registered_input()
+    assert list(output.iterdir()) == []

@@ -71,3 +71,15 @@ document_compose=(docker compose --project-name openclaw
 再次核对已准备业务输入包在Chen工作区：document-production-p6-p10-20261006.review.json，37053字节，SHA `bfcf84934a42fef6cc9eaeef355d0dd333e402cf9180fd34096e4c84417ba5ad`，与开发发布的独立输入包一致；仅原6–10页旧OCR、28条独立修订、19条页边证据和疑点记录。原OCR SHA仍9ca6e82cd2749b68ab3dffbd09735c235a7cccff5b59a1802a67eaf233a39f70，模板ID/版本仍questions-zh-cn/1.0.0。原核对记录继承，不要求此次Agent重新声明核对事实；不存在追加原文修订。此包可直接filetools_register({source_root:"workspace",source_path:确切文件名,mode:"snapshot"})，然后以返回attachment_id提交预装generate_registered_input及七项outputs。无需169页旧OCR登记、prepare_registered_ocr或重新制作包。
 
 继续等待用户真实QQ请求生成合成中文Word/PDF及同一32题小样本；样本附件交付、独立渲染、客户端下载和Word字体替换仍未验证。镜像/配置/限额不变，无重建、回滚、全册或永久保存。
+
+## 合成生成失败定位：缺少原文输入，未进入排版
+
+用户报告任务5a4d9fb2ba3f49da8c619ea85f714f8e FAILED/SCRIPT_FAILED/artifact_count=0。管理员只读核对该任务登记记录、指定目录文件及私有stderr；不扫描其他任务、不对Agent开放私有目录。实际输入为document-production-smoke-test-20261006.review.json，818字节，SHA `e7e358edcc7735344c65b26ac81fb45da723e36b2171a28965a86cfdd6cd84d9`，由QQ测试新增，**不是**此前准备的五页包。实际代码为预装generate_registered_input两行调用。
+
+私有execution/stderr.log明确记录ValueError: DOCUMENT_INPUT_SCHEMA_OR_EXPLICIT_SCOPE_REQUIRED，堆栈指向document_entry.generate_registered_input的validate_request阶段。输入包含document和证据列表，缺少必填顶层raw_ocr字符串，因此入口拒绝，尚未运行排版。stdout为空、operation.py及stderr实际存在但没有发布。artifact_count=0仅证明无正式发布产物，不能据此断言没有执行日志或函数不可用。此次故障不据Fault推断内存/限时/模块缺失。
+
+纠正范围为业务输入，不改模块、镜像、配置、模板或沙箱。新增独立合成输入document-production-smoke-valid-20261006.review.json，730字节，SHA `bd3bd18744ab923674b3997abcc5854e3696480e205d7ffa574d9d0dcbb13f94`，包含真实合成原文（1题4选项）和显式模板/范围；证据列表为空，不捏造原PDF修订。已在不挂生产目录/socket的隔离候选容器用预装入口生成全部七产物，native内容一致、1页PDF；这是独立开发入口验证，未使用真实生产Landlock/QQ调用，不能当成生产受限重试或视觉验收。合成来源Page 1是测试页，不是原册核对声明。正常Chen工作区新增该业务副本，失败原件及五页包保留。
+
+新增有效document元数据但缺raw_ocr时不生成任何产物的回归；隔离开发17项输入/模板测试通过（5条上游SWIG警告），Skill校验通过。reference增量说明原文必填及零发布的诊断边界，备份在原私有备份目录skill-input-diagnostic-20261006/file-workspace。Skill SHA保持73992b3af93ea8154145e741ecb32de23d899fbb504b128b63389e42a09ffc3b；当前reference SHA `a8bfcb485a7292590a5665c337774aeba1d169aabca7db959bff739253566608`。最初回滚备份不覆盖。
+
+失败范围已定位到此合成包的输入校验；没有新证据显示既有提取/录音失败，也没有重新运行这些重任务，不能声称本轮已实测所有旧能力。无重建、回滚或限额提升。等待用户QQ登记修正后合成包，再经真实filetools_python生成并正式交付，成功后同样登记现成五页包；仍需独立取回生产文件实际渲染和客户端下载反馈。原始OCR与修订记录未覆盖、全册未处理。
