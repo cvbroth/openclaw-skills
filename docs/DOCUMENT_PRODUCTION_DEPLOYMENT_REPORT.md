@@ -63,3 +63,11 @@ document_compose=(docker compose --project-name openclaw
 增量更新Skill/reference：明确预装模块属于Worker filetools_python，主机/其他exec沙箱不代表该环境；严格FILETOOLS_INPUT；只有真实受限任务回执才能报告该调用失败；拒绝手工XML/占位PDF烟测；本轮已核实五页输入包可直接generate，不重读169页OCR或重新填写verified证据。生成器、候选镜像、模板、限额与配置不变，Gateway不重建。
 
 更新前两文件保留权限/所有者，另备份到原私有部署备份目录的skill-context-correction-20261006/file-workspace；原最初回滚备份不覆盖。当前生产Skill SHA `73992b3af93ea8154145e741ecb32de23d899fbb504b128b63389e42a09ffc3b`，reference SHA `cfee4fa7b7a756adc33f81ed1c04d1af1986905b75abf7053012dbc61710a18a`；Skill校验通过。等待用户新QQ消息明确执行正式登记及受限调用，仍未标记QQ生成/附件/视觉通过，不触发回滚或扩权限。
+
+## 真实QQ Worker探针已核验，文档生成继续等待
+
+用户返回新任务58ae3a7169214aa7b54fd62ee43ce252，created_at=2026-10-06T12:18:51.318362+00:00。只读数据库及实际status均SUCCEEDED；通过真实管理files/artifact_path取回指定worker-probe.json，artifact_id=10c71d5c42e14b3a92f7007f8e00583a、file_id=687f5ad0c7504c63b39d2700019abc75。实际59字节、SHA `4b8ce34f331899aaf0ec6c982d964bbc2ac15a02fec9efc3436d1a148421e51a`与用户回执及正式引用一致，内容记录questions-zh-cn/1.0.0和font_present=true。这是新真实生产受限任务，用户反馈来自QQ；本次不伪造入站，管理员取回核验也不等于QQ附件下载通过。探针未生成文档，不用于声称短文/32题视觉或生成性能通过。
+
+再次核对已准备业务输入包在Chen工作区：document-production-p6-p10-20261006.review.json，37053字节，SHA `bfcf84934a42fef6cc9eaeef355d0dd333e402cf9180fd34096e4c84417ba5ad`，与开发发布的独立输入包一致；仅原6–10页旧OCR、28条独立修订、19条页边证据和疑点记录。原OCR SHA仍9ca6e82cd2749b68ab3dffbd09735c235a7cccff5b59a1802a67eaf233a39f70，模板ID/版本仍questions-zh-cn/1.0.0。原核对记录继承，不要求此次Agent重新声明核对事实；不存在追加原文修订。此包可直接filetools_register({source_root:"workspace",source_path:确切文件名,mode:"snapshot"})，然后以返回attachment_id提交预装generate_registered_input及七项outputs。无需169页旧OCR登记、prepare_registered_ocr或重新制作包。
+
+继续等待用户真实QQ请求生成合成中文Word/PDF及同一32题小样本；样本附件交付、独立渲染、客户端下载和Word字体替换仍未验证。镜像/配置/限额不变，无重建、回滚、全册或永久保存。
