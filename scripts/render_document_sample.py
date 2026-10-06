@@ -13,7 +13,7 @@ import fitz
 from docx import Document
 from PIL import Image, ImageDraw
 
-from nas_filetools.document_sample import page_body
+from nas_filetools.document_sample import document_paragraphs, page_body
 from nas_filetools.document_layout_checks import check_layout
 
 
@@ -26,10 +26,10 @@ def render(delivery, output):
     subprocess.run(["libreoffice", "-env:UserInstallation=file:///tmp/filetools-document-lo-profile",
                     "--headless", "--convert-to", "pdf", "--outdir", str(output),
                     str(delivery / "sample.docx")], check=True, timeout=120, env=render_environment)
-    expected = re.sub(r"\s+", "", "".join(p.text for p in Document(delivery / "sample.docx").paragraphs))
+    expected = re.sub(r"\s+", "", "".join(p.text for p in document_paragraphs(Document(delivery / "sample.docx"))))
     results = {}
     word_document = Document(delivery / "sample.docx")
-    items = [(p.style.name, p.text) for p in word_document.paragraphs]
+    items = [(p.style.name, p.text) for p in document_paragraphs(word_document)]
     template = json.loads((delivery / "validation.json").read_text()).get("template")
     for label, path in [("word", output / "sample.pdf"), ("pdf", delivery / "sample.pdf")]:
         layout_checks = check_layout(path, items, "/usr/share/fonts/truetype/filetools/DroidSansFallback.ttf", template)

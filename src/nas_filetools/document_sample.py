@@ -39,7 +39,29 @@ def join_scan_lines(parts):
     return result
 
 
-def structure_ocr(raw, pages=(6, 10), evidence=None, reviewed_edits=None):
+def expand_inline_options(records):
+    """Split an ordered option candidate, retaining each exact raw fragment.
+
+    A lone marker inside prose is not an anchor. This changes presentation only;
+    marker normalization is represented by the semantic option label.
+    """
+    expanded = []
+    marker = re.compile(r"(?<![A-Za-z0-9])([A-Da-dＡ-Ｄａ-ｄ])[.．、:：)），,]\s*")
+    for record in records:
+        matches = list(marker.finditer(record["text"]))
+        labels = [unicodedata.normalize("NFKC", m.group(1)).upper() for m in matches]
+        if (len(matches) < 2 or matches[0].start() != 0 or len(set(labels)) != len(labels)
+                or any(ord(b) != ord(a) + 1 for a, b in zip(labels, labels[1:]))):
+            expanded.append(record)
+            continue
+        for index, match in enumerate(matches):
+            end = matches[index + 1].start() if index + 1 < len(matches) else len(record["text"])
+            expanded.append({**record, "text": record["text"][match.start():end].strip(),
+                             "inline_part": index})
+    return expanded
+
+
+def structure_ocr(raw, pages=(6, 10), evidence=None, reviewed_edits=None, mixed=False):
     """Return independent blocks plus untouched line references and audit records.
 
     Repeated boundary headers require three distinct source pages. Position
@@ -96,8 +118,16 @@ def structure_ocr(raw, pages=(6, 10), evidence=None, reviewed_edits=None):
         if key not in source_keys:
             raise ValueError("MARGIN_SOURCE_MISMATCH")
         margin_evidence[key] = item
+    if mixed:
+        records = expand_inline_options(records)
     blocks, issues, removed = [], [], []
     current, active, chapter = None, None, None
+    question_type = "choice"
+    repeat_labels = {}
+    for record in records:
+        if re.fullmatch(r"[^\s·]{1,12}·(?:单选|多选|分析)", record["text"]):
+            repeat_labels.setdefault(record["text"], set()).add(record["page"])
+
 
     def issue(code, fragments, detail):
         issues.append({"code": code, "detail": detail, "fragments": fragments})
@@ -106,7 +136,7 @@ def structure_ocr(raw, pages=(6, 10), evidence=None, reviewed_edits=None):
         if current is None:
             return
         labels = [b["label"] for b in current["parts"] if b["kind"] == "option"]
-        if labels != list("ABCD"):
+        if current.get("question_type", "choice") != "analysis" and labels != list("ABCD"):
             issue("OPTIONS_INCOMPLETE_OR_ORDER", current["fragments"], f"Observed options: {labels}; no options supplied.")
         stem = current["parts"][0]
         if stem["text"] and (stem["text"].count("“") > stem["text"].count("”") or stem["text"].endswith("著")):
@@ -119,19 +149,33 @@ def structure_ocr(raw, pages=(6, 10), evidence=None, reviewed_edits=None):
         repeat = at_boundary and len(boundaries.get(text, set())) >= 3
         # Never classify a chapter/question/option as a repeated running header.
         repeat = repeat and not (CHAPTER.match(text) or QUESTION.match(text) or OPTION.match(text))
+        repeat = repeat or (mixed and len(repeat_labels.get(text, set())) >= 3)
         positional = margin_evidence.get((record["page"], record["line"], text))
         if repeat or positional:
-            removed.append({"fragment": record, "reason": "verified-margin-position" if positional else "same-exact-text-at-page-boundary",
-                            "evidence": positional or {"pages": sorted(boundaries[text])}})
+            removed.append({"fragment": record, "reason": "verified-margin-position" if positional else ("repeated-standalone-type-label" if mixed and len(repeat_labels.get(text, set())) >= 3 else "same-exact-text-at-page-boundary"),
+                            "evidence": positional or {"pages": sorted(boundaries.get(text, repeat_labels.get(text, set())))}})
             continue
         heading = CHAPTER.match(text)
+        if mixed and (re.fullmatch(r"第[一二三四五六七八九十百\d]+部分", text)
+                      or re.match(r"^(?:[一二三四五六七八九十]+、)?(?:单项选择题|多项选择题|材料分析题)", text)
+                      or re.match(r"^(?:导论|绪论)(?:\s|[^·])*?$", text)
+                      or (blocks and blocks[-1]["kind"] == "chapter"
+                          and re.fullmatch(r"第[一二三四五六七八九十百\d]+(?:部分|章)", blocks[-1]["text"])
+                          and not QUESTION.match(text) and "·" not in text)):
+            heading = True
         if heading:
             finish()
             chapter = re.sub(r"^#{1,3}\s*", "", text)
+            if mixed and re.match(r"^(?:[一二三四五六七八九十]+、)?材料分析题", chapter):
+                question_type = "analysis"
+            elif mixed and re.match(r"^(?:[一二三四五六七八九十]+、)?多项选择题", chapter):
+                question_type = "multiple-choice"
+            elif mixed and re.match(r"^(?:[一二三四五六七八九十]+、)?单项选择题", chapter):
+                question_type = "choice"
             blocks.append({"kind": "chapter", "text": chapter, "fragments": [record]})
             current, active = None, None
             continue
-        match = QUESTION.match(text)
+        match = re.match(r"^(\d{1,3})[.．、，,]\s*(.+)$", text) if mixed else QUESTION.match(text)
         if match and re.match(r"^\d+[.]\d{1,2}(?:\D|$)", text):
             match = None  # Unspaced decimal body numbers are not question anchors.
         if match:
@@ -139,20 +183,32 @@ def structure_ocr(raw, pages=(6, 10), evidence=None, reviewed_edits=None):
             expected = current is None or number == current["number"] + 1
             observed = [b["label"] for b in current["parts"] if b["kind"] == "option"] if current else []
             completed = bool(observed) and observed[-1] == "D"
-            if expected and (current is None or completed):
+            analysis_anchor = mixed and question_type == "analysis" and "结合材料回答问题" in match.group(2)
+            if (expected or mixed) and (current is None or completed or analysis_anchor):
                 finish()
                 active = {"kind": "stem", "text": match.group(2), "fragments": [record]}
                 current = {"kind": "question", "number": number, "chapter": chapter, "parts": [active], "fragments": [record]}
+                if mixed:
+                    current["question_type"] = question_type
+                    if not expected and number != 1:
+                        issue("QUESTION_NUMBER_GAP", [record], "Nonconsecutive numbered anchor after a complete question; verify original, no missing question supplied.")
                 blocks.append(current)
                 continue
             issue("AMBIGUOUS_NUMBERING", [record], "Numbered line is not a proven new question; preserved inside the current block.")
         match = OPTION.match(text)
+        if mixed:
+            match = re.match(r"^([A-Da-dＡ-Ｄａ-ｄ])[.．、:：)），,]\s*(.*)$", text)
         if match and current:
-            label = unicodedata.normalize("NFKC", match.group(1))
+            label = unicodedata.normalize("NFKC", match.group(1)).upper()
             previous = [b["label"] for b in current["parts"] if b["kind"] == "option"]
             if label in previous or (previous and ord(label) != ord(previous[-1]) + 1) or (not previous and label != "A"):
                 issue("OPTION_ORDER", [record], f"Unexpected option {label}; kept in source order.")
             active = {"kind": "option", "label": label, "text": match.group(2), "fragments": [record]}
+            current["parts"].append(active)
+            current["fragments"].append(record)
+            continue
+        if mixed and current and question_type == "analysis" and re.match(r"^(?:材料\s*[一二三四五六七八九十\d]+|摘自|[（(]\d+[）)])", text):
+            active = {"kind": "material", "text": text, "fragments": [record]}
             current["parts"].append(active)
             current["fragments"].append(record)
             continue
@@ -172,7 +228,7 @@ def structure_ocr(raw, pages=(6, 10), evidence=None, reviewed_edits=None):
             issue("UNRESOLVED_STRUCTURE", [record], "No established question/option context; text retained.")
     finish()
     preserved = [r for b in blocks for r in b["fragments"]] + [item["fragment"] for item in removed]
-    if Counter((r["page"], r["line"], r["raw"]) for r in preserved) != Counter((r["page"], r["line"], r["raw"]) for r in records):
+    if Counter((r["page"], r["line"], r["raw"], r.get("inline_part")) for r in preserved) != Counter((r["page"], r["line"], r["raw"], r.get("inline_part")) for r in records):
         raise ValueError("SOURCE_FRAGMENT_ACCOUNTING_FAILED")
     return {"schema_version": 1, "source_sha256": hashlib.sha256(raw.encode()).hexdigest(), "pages": list(pages),
             "blocks": blocks, "issues": issues, "removed_headers_footers": removed,
@@ -209,7 +265,7 @@ def heading_style(text, previous=None):
     return "Subject" if previous == "Heading 1" else "Heading 2"
 
 
-def paragraphs(model, title):
+def paragraphs(model, title, template=None):
     result = [("Title", title)]
     previous_heading = None
     for block in model["blocks"]:
@@ -223,6 +279,8 @@ def paragraphs(model, title):
                     text, style = f"{block['number']}.\u00a0{part['text']}", "Question"
                 elif part["kind"] == "option":
                     text, style = f"{part['label']}. {part['text']}", "Option"
+                elif part["kind"] == "material":
+                    text, style = part["text"], "Material"
                 else:
                     text, style = part["text"], "Point"
                 result.append((style, text))
@@ -230,20 +288,23 @@ def paragraphs(model, title):
         else:
             result.extend([("Unresolved", "[结构待核实] " + block["text"]),
                            ("Source", source_label(block["fragments"]))])
+    if not template_config(template)["show_source_labels"]:
+        result = [(style, text) for style, text in result if style != "Source"]
     return result
 
 
 def item_groups(items):
-    """Bounded question groups, separated by Source; never bind all questions."""
+    """Bound question groups by their semantic start and optional source end."""
     index = 0
     while index < len(items):
         start = index
-        if items[index][0] == "Question":
-            while index < len(items) and items[index][0] != "Source":
-                index += 1
-            if index == len(items):
-                raise ValueError("QUESTION_SOURCE_REQUIRED")
         index += 1
+        if items[start][0] == "Question":
+            while index < len(items) and items[index][0] in ("Option", "Point", "Material", "Continuation", "Source"):
+                style = items[index][0]
+                index += 1
+                if style == "Source":
+                    break
         yield start, index, items[start:index]
 
 
@@ -351,7 +412,7 @@ def write_docx(path, items, font_path=None, template=None):
     sizes = {"Normal": t["body_pt"], "Title": t["title_pt"], "Subject": t["subject_pt"],
              "Heading 1": t["part_pt"], "Heading 2": t["chapter_pt"], "Heading 3": t["type_pt"],
              "Question": t["body_pt"], "Option": t["body_pt"], "Point": t["body_pt"],
-             "Source": t["source_pt"], "Unresolved": t["body_pt"], "Footer": t["footer_pt"]}
+             "Source": t["source_pt"], "Unresolved": t["body_pt"], "Material": t["body_pt"], "Footer": t["footer_pt"]}
     for name, size in sizes.items():
         style = document.styles[name] if name in document.styles else document.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
         _font_style(style, size, t)
@@ -381,8 +442,9 @@ def write_docx(path, items, font_path=None, template=None):
                 added[start].paragraph_format.keep_together = True
                 added[start].paragraph_format.keep_with_next = True
             # Bind only the final option's ending and its source, not the next question.
-            added[end - 2].paragraph_format.keep_with_next = True
-            added[end - 1].paragraph_format.keep_together = True
+            if group[-1][0] == "Source":
+                added[end - 2].paragraph_format.keep_with_next = True
+                added[end - 1].paragraph_format.keep_together = True
     footer = section.footer.paragraphs[0]
     footer.style = document.styles["Footer"]
     footer.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -396,6 +458,39 @@ def write_docx(path, items, font_path=None, template=None):
     field.append(run)
     footer._p.append(field)
     footer.add_run(" 页")
+    if not t["show_source_labels"]:
+        # Word/Writer can split a keepNext chain ending on an option. A bounded
+        # one-cell row has an actual native cannot-split property. Only measured
+        # short groups use this; long questions remain ordinary flowing paragraphs.
+        for start, end, group in item_groups(items):
+            if group[0][0] != "Question" or not layout.question_short(group):
+                continue
+            table = document.add_table(rows=1, cols=1)
+            table.autofit = False
+            table.columns[0].width = Cm(t["width_cm"] - 2 * t["margin_cm"])
+            cell = table.cell(0, 0)
+            cell.width = table.columns[0].width
+            cell._tc.remove(cell.paragraphs[0]._p)
+            margins = OxmlElement("w:tcMar")
+            for side in ("top", "left", "bottom", "right"):
+                element = OxmlElement("w:" + side)
+                element.set(qn("w:w"), "0")
+                element.set(qn("w:type"), "dxa")
+                margins.append(element)
+            cell._tc.get_or_add_tcPr().append(margins)
+            table.rows[0]._tr.get_or_add_trPr().append(OxmlElement("w:cantSplit"))
+            added[start]._p.addprevious(table._tbl)
+            # A real empty paragraph separates adjacent tables so readers cannot
+            # merge them into one large layout unit. It carries no source text.
+            separator = document.add_paragraph(style="QuestionBoundary" if "QuestionBoundary" in document.styles
+                                               else document.styles.add_style("QuestionBoundary", WD_STYLE_TYPE.PARAGRAPH))
+            separator.paragraph_format.space_before = Pt(0)
+            separator.paragraph_format.space_after = Pt(0)
+            separator.paragraph_format.line_spacing = Pt(1)
+            separator.paragraph_format.keep_with_next = False
+            table._tbl.addnext(separator._p)
+            for paragraph in added[start:end]:
+                cell._tc.append(paragraph._p)
     document.core_properties.title = items[0][1]
     document.save(path)
 
@@ -462,7 +557,8 @@ def write_pdf(path, items, font_path, template=None):
             if short:
                 draw_unit(group, keep=True)
                 continue
-            prefix = group[:-2]
+            has_source = group[-1][0] == "Source"
+            prefix = group[:-2] if has_source else group
             index = 0
             while index < len(prefix):
                 item = prefix[index]
@@ -481,6 +577,8 @@ def write_pdf(path, items, font_path, template=None):
                     minimum += layout.height(unit)  # Reserve two lines of a long first option.
                 draw_unit(unit, keep=keep, minimum=minimum)
                 index += 1
+            if not has_source:
+                continue
             last, source = group[-2:]
             if layout.short_paragraph(last, t["short_option_max_lines"]):
                 draw_unit([last, source], keep=True)
@@ -527,10 +625,17 @@ def page_body(page, number, template=None):
     return page.get_text(clip=fitz.Rect(0, 0, page.rect.width, bottom + 1), sort=True)
 
 
+def document_paragraphs(document):
+    """Body order including paragraphs inside bounded question rows, no footer."""
+    from docx.text.paragraph import Paragraph
+    return [p for element in document.element.body.iter(qn("w:p"))
+            if (p := Paragraph(element, document)).style.name != "QuestionBoundary" or p.text]
+
+
 def validate_pair(docx_path, pdf_path, items, template=None):
     expected = [text for _, text in items]
     document = Document(docx_path)
-    if [p.text for p in document.paragraphs] != expected:
+    if [p.text for p in document_paragraphs(document)] != expected:
         raise ValueError("DOCX_CONTENT_MISMATCH")
     with fitz.open(pdf_path) as pdf:
         actual = "".join(page_body(page, number, template) for number, page in enumerate(pdf, 1))
@@ -548,12 +653,16 @@ def validate_pair(docx_path, pdf_path, items, template=None):
                     if codepoint == 0xfffd or (glyph == 0 and not chr(codepoint).isspace()):
                         raise ValueError("PDF_MISSING_GLYPH")
             geometry.append({"page": number, "words": len(page.get_text("words"))})
-    return {"content_equal": True, "pdf_pages": geometry, "docx_paragraphs": len(document.paragraphs),
+    return {"content_equal": True, "pdf_pages": geometry, "docx_paragraphs": len(document_paragraphs(document)),
             "document_page_numbers": "checked", "visual_review": "required", "word_render": "not-checked-by-this-function"}
 
 
 def generate_sample(input_path, output_dir, font_path, title="合成验证样本（非用户原册）", pages=(6, 10), template=None):
-    """Generate a small sample only; no automatic full-book processing or saving."""
+    """Generate an explicitly scoped development document; never save or publish.
+
+    Mixed structure is experimental and deliberately unavailable in the Worker
+    entry schema until full structural and visual acceptance has completed.
+    """
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
     input_bytes = Path(input_path).read_bytes()
@@ -561,13 +670,14 @@ def generate_sample(input_path, output_dir, font_path, title="合成验证样本
         review = json.loads(input_bytes)
         raw = review["raw_ocr"]
         raw_bytes = raw.encode("utf-8")
-        model = structure_ocr(raw, pages, review.get("margin_evidence"), review.get("reviewed_edits"))
+        model = structure_ocr(raw, pages, review.get("margin_evidence"), review.get("reviewed_edits"),
+                              mixed=review.get("document", {}).get("schema") == "reviewed-questions-v2")
         model["review_notes"] = review.get("review_notes", [])
     else:
         raw_bytes = input_bytes
         raw = raw_bytes.decode("utf-8")
         model = structure_ocr(raw, pages)
-    items = paragraphs(model, title)
+    items = paragraphs(model, title, template)
     write_docx(output / "sample.docx", items, font_path, template)
     decisions = write_pdf(output / "sample.pdf", items, font_path, template)
     checks = validate_pair(output / "sample.docx", output / "sample.pdf", items, template)

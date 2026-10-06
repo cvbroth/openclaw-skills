@@ -55,12 +55,13 @@ def check_layout(pdf_path, items, font_path, template=None):
             stem = selected[0]
             opening_lines = sum(line["page"] == stem["pages"][0] for line in stem["lines"])
             short = layout.question_short(group)
-            source_follows = selected[-2]["pages"][-1] == selected[-1]["pages"][0] and len(selected[-1]["pages"]) == 1
+            has_source = group[-1][0] == "Source"
+            source_follows = (selected[-2]["pages"][-1] == selected[-1]["pages"][0] and len(selected[-1]["pages"]) == 1) if has_source else None
             if short and len(pages) != 1:
                 failures.append({"start_item": start, "code": "SHORT_QUESTION_SPLIT"})
             if opening_lines < min(t["minimum_start_lines"], len(stem["lines"])):
                 failures.append({"start_item": start, "code": "ONE_LINE_QUESTION_START"})
-            if not source_follows:
+            if has_source and not source_follows:
                 failures.append({"start_item": start, "code": "SOURCE_ORPHANED"})
             options = []
             for offset, (style, value) in enumerate(group):
@@ -74,7 +75,7 @@ def check_layout(pdf_path, items, font_path, template=None):
                                 "lines_per_page": {page: sum(line["page"] == page for line in row["lines"]) for page in row["pages"]}})
             questions.append({"start_item": start, "number": group[0][1].split(".", 1)[0], "pages": pages,
                               "short": short, "stem_opening_lines": opening_lines, "source_follows_last_option": source_follows,
-                              "source_page": selected[-1]["pages"][0], "options": options})
+                              "source_page": selected[-1]["pages"][0] if has_source else None, "options": options})
         page_metrics = []
         for number, page in enumerate(pdf, 1):
             traces = page.get_texttrace()

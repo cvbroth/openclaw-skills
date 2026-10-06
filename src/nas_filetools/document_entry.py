@@ -6,6 +6,7 @@ No OCR, correction, publication, permanent saving, or subprocess rendering here.
 import hashlib
 import json
 import os
+import re
 import time
 from pathlib import Path
 
@@ -33,6 +34,18 @@ def validate_request(request):
             or set(choice) != {"id", "version"}):
         raise ValueError("DOCUMENT_INPUT_SCHEMA_OR_EXPLICIT_SCOPE_REQUIRED")
     load_template(choice["id"], choice["version"])
+    # Current production schema cannot interpret these types. Inspect only the
+    # explicitly requested pages; a front-matter contents page must not block a
+    # legitimate single-choice scope. Never silently feed material into A-D.
+    from .document_sample import PAGE_MARK
+    source_page = None
+    for line in request["raw_ocr"].splitlines():
+        marker = PAGE_MARK.match(line.strip())
+        if marker:
+            source_page = int(marker.group(1) or marker.group(2))
+        elif (source_page is not None and pages[0] <= source_page <= pages[1]
+              and re.match(r"^(?:#{1,3}\s*)?(?:[一二三四五六七八九十]+、)?(?:多项选择题|材料分析题)", line.strip())):
+            raise ValueError("DOCUMENT_UNSUPPORTED_QUESTION_TYPE_FOR_SINGLE_CHOICE_ENTRY")
     return pages, title
 
 

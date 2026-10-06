@@ -52,3 +52,15 @@ def test_valid_document_metadata_without_ocr_fails_before_generation(tmp_path, m
     with pytest.raises(ValueError, match="DOCUMENT_INPUT_SCHEMA_OR_EXPLICIT_SCOPE_REQUIRED"):
         generate_registered_input()
     assert list(output.iterdir()) == []
+
+
+@pytest.mark.parametrize("kind", ["多项选择题", "三、材料分析题"])
+def test_production_single_choice_cannot_silently_process_other_types(kind):
+    from nas_filetools.document_entry import validate_request
+    request = {"raw_ocr": "## Page 73\n" + kind + "\n1.原始题干。",
+               "document": {"schema": "reviewed-single-choice-v1", "source_pages": [73, 73],
+                            "title": "合成", "template": {"id": "questions-zh-cn", "version": "1.0.0"}}}
+    with pytest.raises(ValueError, match="UNSUPPORTED_QUESTION_TYPE"):
+        validate_request(request)
+    request["raw_ocr"] = "## Page 1\n" + kind + "\n## Page 73\n1.单选范围。"
+    assert validate_request(request) == ([73, 73], "合成")

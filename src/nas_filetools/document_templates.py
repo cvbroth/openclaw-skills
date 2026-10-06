@@ -12,13 +12,17 @@ SUPPORTED_CAPABILITIES = frozenset(("reviewed-single-choice-v1", "python-docx==1
 
 def validate_parameters(parameters):
     rules = json.loads((TEMPLATE_ROOT / "schema.json").read_bytes())["parameters"]
-    if not isinstance(parameters, dict) or set(parameters) != set(rules):
+    if not isinstance(parameters, dict) or set(parameters) - set(rules) or any(
+            key not in parameters and "default" not in rule for key, rule in rules.items()):
         raise ValueError("TEMPLATE_PARAMETER_KEYS_INVALID")
+    parameters = {key: parameters.get(key, rule.get("default")) for key, rule in rules.items()}
     for key, rule in rules.items():
         value = parameters[key]
         kind = rule["type"]
         if kind == "string":
             valid = isinstance(value, str) and value in rule["enum"]
+        elif kind == "boolean":
+            valid = type(value) is bool
         else:
             valid = (type(value) is int if kind == "integer" else type(value) in (int, float))
             valid = valid and math.isfinite(value) and rule["minimum"] <= value <= rule["maximum"]
