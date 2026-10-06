@@ -1,0 +1,7 @@
+# Independent visual validation only, never a production Worker image.
+ARG DOCUMENT_TEST_IMAGE=filetools-document-validation:20261006-pagination
+FROM ${DOCUMENT_TEST_IMAGE}
+USER root
+ARG PDFIUM_PACKAGE_VERSION=5.13.0
+RUN /opt/nas-filetools/.venv/bin/python -m pip install --no-cache-dir pypdfium2==${PDFIUM_PACKAGE_VERSION} fonttools==4.55.3
+USER 10001:10001

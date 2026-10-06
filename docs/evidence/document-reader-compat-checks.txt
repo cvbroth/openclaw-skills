@@ -1,0 +1,27 @@
+2026-10-06 server myserver; baseline e49ac23a077031c61aadf043a9a04b3854159387
+Branch feat/filetools-document-sample-20261006; initial worktree clean.
+Default regression: 111 passed, 15 skipped, 5 SWIG warnings in 52.55s.
+Final focused generation/pagination/readers: 20 passed, 5 SWIG warnings in 20.65s.
+Ruff src/tests/scripts: All checks passed! Skill quick_validate: Skill is valid!
+Recording section unchanged byte-for-byte. Original OCR/structured audit/issues/reviewed input unchanged.
+Both DOCX archives have byte-identical entries; only ZIP timestamps changed archive SHA.
+All 32 question boundaries unchanged in Word and PDF; 128 options/order/text unchanged.
+Actual Linux generation: python-docx1.1.2 / PyMuPDF1.25.5 (MuPDF1.25.6).
+Native font subsets + full garbage4/deflate save: no new generation dependency.
+Independent validation: pypdfium2 5.13.0 / PDFium153.0.7999.0, scale1.7; Poppler22.12.0; MuPDF1.25.6.
+Additional development versions: pypdfium2 4.30.0 /PDFium126.0.6462.0 and 5.14.0 /PDFium156.0.8076.0.
+User-reported Windows original PDF omission at same hash is retained evidence; same 153/1.7 exact chain call did NOT reproduce on Linux.
+No proven root cause; Linux success does not close Windows acceptance. No bitmap/font/OS/library blame inferred.
+New direct PDF: 158059 bytes /9 pages; original 7489871 bytes /9 pages.
+Original two identical uncompressed CJK font streams: 3556308 bytes each; new shared CJK subset stream compressed84072 bytes; math subset24696 bytes.
+True duplicate font streams: before1 /after0; font dictionaries sharing a stream are not extra font binaries.
+New PDF three-engine images: 6287 nonspace glyph ink candidates checked; no omission candidates. PDFium ordered searchable text equal.
+Manual review separate: all 27 page renders plus enlarged prefixes/sources/Chinese/page numbers. No missing glyph/crop/blank page observed in this Linux environment.
+Word exported PDF comparison: LibreOffice7.4.7.2, 10 pages/136727 bytes; three-engine actual ink checks passed. Not selected as generation dependency.
+Synthetic repeated independent Story units and prefixes/sources: actual three readers and searchable text checked; not user content.
+Simulated raster-prefix deletion with intact PDF text: correctly rejected; fault injection is NOT a real reader bug reproduction.
+Default core suite uses some injected substitutes; not production engine/SDK/QQ acceptance.
+Real independent FileTools Landlock generation/publish/artifact_path retrieval succeeded; bytes/SHA match receipts. Not QQ delivery.
+No OCR rerun, permanent save, KB import, production configuration/permissions/quotas/tag changes, or full-book processing.
+Private sample/images/source maps remain ignored runtime; aggregate evidence only in Git.
+Unverified: Windows new-file render/root cause, Word desktop font substitution (not embedded), production/QQ/CI/full book.

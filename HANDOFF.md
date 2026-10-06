@@ -182,3 +182,7 @@ cat HANDOFF.md
 沿用文档样本分支和 `112c0e72c73a814372ed5e0aab16f30c959f080d`，改进可复用生成代码、集中模板和现有Skill；不重新OCR、不改32题原文、原始OCR或独立修订记录。Word/PDF分别验证原生/实测分页、标题层级黑色、简洁来源、自身页码；补充通用合成边界和精确前后比较。录音专节原文保留。详见 [分页改进报告](docs/DOCUMENT_PAGINATION_REPORT.md)；初版报告保留其历史时点。仍仅开发交付，不处理全册或部署生产。
 
 本轮视觉复核补充：MuPDF逐页独立渲染仍偶有选项前缀漏显，未定位深层原因。独立开发验证镜像 `filetools-document-validation:20261006-pagination` 从旧文档测试镜像派生，仅补充Poppler-utils 22.12.0-2+deb12u3；验证脚本改用独立Poppler栅格引擎交叉复核。原生成依赖、生产标签、处理权限/限额不变。
+
+## 12. PDF阅读器兼容性开发增量
+
+沿用e49ac23a077031c61aadf043a9a04b3854159387和现有文档分支。用户Windows PDFium153/scale1.7实际漏显说明前轮单Poppler视觉验收不足；本轮Linux同版本同调用未复现，根因与Windows新版验证仍未闭环。可复用生成器增加全部Story/页脚后的原生字体子集、完整去重压缩保存，保留题文和分页；新增三引擎图像/字体流/搜索验证、资源复用回归及Skill跨阅读器边界。生成无新增运行依赖，开发验证单独加入PDFium/fontTools，不改生产。详见 [兼容性报告](docs/DOCUMENT_READER_COMPAT_REPORT.md)。继续停在小样本，不处理全册或部署。

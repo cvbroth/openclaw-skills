@@ -61,3 +61,11 @@ FileTools 发布后由 status 获取 job_id/artifact_id/file_id，通过 files/a
 初版结果见 [样本验证报告](DOCUMENT_SAMPLE_REPORT.md)；后续分页、模板与 Skill 改进见 [分页改进报告](DOCUMENT_PAGINATION_REPORT.md)。后续轮次只运行 generate、render、compare、report，不重新执行 extract；继续沿用已核对输入。全册和生产部署均等待用户另行确认。
 
 分页改进轮的验证镜像从现有 `filetools-document-test:20261006-364d4d6` 派生为 `filetools-document-validation:20261006-pagination`，仅安装poppler-utils；后续重建开发Dockerfile亦包含此渲染依赖。上述旧镜像构建及OCR段落是初版记录，不代表本轮重建或重新OCR。
+
+## 跨阅读器差异后的验收修订
+
+前述单Poppler检查不足以完成跨阅读器视觉验收；出现差异时保留确切哈希、系统、版本和倍率，不能以提取/trace正常归为预览异常。当前生成器在全部Story/页脚后原生subset_fonts并完整去重压缩保存，不增加生成运行依赖，分页策略不变。
+
+新增 scripts/check_pdf_readers.py：独立PDFium/Poppler/MuPDF实际逐页栅格（PDFium scale=1.7）、字体流诊断、逐字像素遗漏候选与有序搜索文字比较；缺依赖明确失败。JSON明确人工看版仍必需，像素阈值不能证明所有平台兼容。运行示例：`scripts/check_pdf_readers.py --pdf /sample/delivery/sample.pdf --output /sample/compat-after/readers-513`。用户资料的输出只能留忽略目录。
+
+独立验证构建入口 deploy/Dockerfile.document-compat，从前轮验证镜像派生，默认pypdfium2=5.13.0、fontTools=4.55.3；PDFIUM_PACKAGE_VERSION构建参数仅用于另测版本。本轮实际先建4.30.0开发标签，再分别派生5.14.0和5.13.0标签；生成仍用固定PyMuPDF1.25.5/python-docx1.1.2，不依赖PDFium、Poppler、fontTools或LibreOffice。完整开发检查报告见 [阅读器兼容性报告](DOCUMENT_READER_COMPAT_REPORT.md)。本轮Linux同PDFium版本/倍率未复现用户Windows问题；根因和Windows新版验收仍未闭环，不宣称彻底修复。

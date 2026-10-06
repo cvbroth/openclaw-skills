@@ -6,6 +6,7 @@ from pathlib import Path
 
 import fitz
 from docx import Document
+from docx.oxml.ns import qn
 
 from nas_filetools.document_layout_checks import compare_docx_content, paragraph_locations
 from nas_filetools.document_sample import item_groups
@@ -38,11 +39,15 @@ def compare(before, delivery, rendered, output):
             raise ValueError("UNCHANGED_AUDIT_OR_ORIGINAL_REQUIRED: " + name)
         hashes[name] = hashlib.sha256(new).hexdigest()
     result["unchanged_audit_and_original_hashes"] = hashes
-    old_items = [(p.style.name, p.text) for p in Document(before / "delivery/sample.docx").paragraphs]
+    old_word = Document(before / "delivery/sample.docx")
+    old_items = [(p.style.name, p.text) for p in old_word.paragraphs]
+    old_has_footer = any("PAGE" in field.get(qn("w:instr"), "")
+                         for section in old_word.sections
+                         for field in section.footer._element.iter(qn("w:fldSimple")))
     new_items = [(p.style.name, p.text) for p in Document(delivery / "sample.docx").paragraphs]
     for label, old_path, new_path in [("word", before / "rendered/sample.pdf", rendered / "sample.pdf"),
                                      ("pdf", before / "delivery/sample.pdf", delivery / "sample.pdf")]:
-        old = boundaries(old_path, old_items, False)
+        old = boundaries(old_path, old_items, old_has_footer)
         new = boundaries(new_path, new_items, True)
         if [q["number"] for q in old] != [q["number"] for q in new]:
             raise ValueError("QUESTION_ORDER_CHANGED")

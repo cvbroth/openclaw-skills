@@ -506,7 +506,18 @@ def write_pdf(path, items, font_path, template=None):
             width = font.text_length(label, fontsize=t["footer_pt"])
             page.insert_text(((page.rect.width - width) / 2, page.rect.height - t["footer_distance_cm"] * 72 / 2.54),
                              label, fontname="sample-footer", fontfile=str(font_path), fontsize=t["footer_pt"], color=(0, 0, 0))
-        pdf.saveIncr()
+        # Finalize font resources once after every Story and footer has drawn.
+        # Native MuPDF subsetting requires no fontTools runtime dependency.
+        # Full rewrite compresses streams and collects/merges duplicate objects;
+        # an incremental save would retain the full duplicate footer font.
+        pdf.subset_fonts()
+        finalized = Path(path).with_suffix(".final.pdf")
+        try:
+            pdf.save(finalized, garbage=4, deflate=True)
+        except BaseException:
+            finalized.unlink(missing_ok=True)
+            raise
+    finalized.replace(path)
     return decisions
 
 
