@@ -69,3 +69,7 @@ FileTools 发布后由 status 获取 job_id/artifact_id/file_id，通过 files/a
 新增 scripts/check_pdf_readers.py：独立PDFium/Poppler/MuPDF实际逐页栅格（PDFium scale=1.7）、字体流诊断、逐字像素遗漏候选与有序搜索文字比较；缺依赖明确失败。JSON明确人工看版仍必需，像素阈值不能证明所有平台兼容。运行示例：`scripts/check_pdf_readers.py --pdf /sample/delivery/sample.pdf --output /sample/compat-after/readers-513`。用户资料的输出只能留忽略目录。
 
 独立验证构建入口 deploy/Dockerfile.document-compat，从前轮验证镜像派生，默认pypdfium2=5.13.0、fontTools=4.55.3；PDFIUM_PACKAGE_VERSION构建参数仅用于另测版本。本轮实际先建4.30.0开发标签，再分别派生5.14.0和5.13.0标签；生成仍用固定PyMuPDF1.25.5/python-docx1.1.2，不依赖PDFium、Poppler、fontTools或LibreOffice。完整开发检查报告见 [阅读器兼容性报告](DOCUMENT_READER_COMPAT_REPORT.md)。本轮Linux同PDFium版本/倍率未复现用户Windows问题；根因和Windows新版验收仍未闭环，不宣称彻底修复。
+
+## 生产候选和版本化模板接续
+
+用户已在原Windows PDFium153/scale1.7验收新版当前样本，根因仍未确定，见兼容报告补充。只读生产依赖和候选接入边界见 [部署方案](DOCUMENT_DEPLOYMENT_PLAN.md)。当前样式默认值已迁入专用模板目录，加载/管理见 [模板说明](DOCUMENT_TEMPLATES.md)；没有新增论文/图书模板。结构解析与原文/修订不变。旧开发pipeline的generate阶段改为调用预装模块，需使用候选镜像而非历史仅预装引擎的镜像；推荐新scripts/check_document_candidate.py验证真实60秒短调用/模板记录，历史120秒结果仍按原批次解释。生产尚未部署。

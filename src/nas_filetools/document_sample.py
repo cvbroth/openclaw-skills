@@ -1,7 +1,7 @@
 """Conservative OCR question sample structuring and fixed DOCX/PDF layout.
 
-Standalone on purpose: the existing restricted Python tool can submit this source
-as code and consume its sole registered input via FILETOOLS_INPUT.
+Reusable generation library; production candidates preload it with published
+templates. The restricted Python entry consumes one FILETOOLS_INPUT.
 """
 import hashlib
 import html
@@ -16,6 +16,8 @@ from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt
+
+from nas_filetools.document_templates import load_template
 
 FONT_FAMILY = "Droid Sans Fallback"
 PAGE_MARK = re.compile(r"^##\s*(?:第\s*(\d+)\s*页|Page\s+(\d+))\s*$", re.I)
@@ -178,16 +180,7 @@ def structure_ocr(raw, pages=(6, 10), evidence=None, reviewed_edits=None):
 
 
 # One configuration controls both templates; no question/page-number exceptions.
-DEFAULT_TEMPLATE = {
-    "font_family": FONT_FAMILY, "body_pt": 11.5, "line_spacing": 1.35,
-    "space_after_pt": 6, "margin_cm": 2, "width_cm": 21, "height_cm": 29.7,
-    "title_pt": 16, "part_pt": 14, "chapter_pt": 13, "subject_pt": 13,
-    "type_pt": 11.5, "source_pt": 9, "footer_pt": 9, "heading_before_pt": 3,
-    "option_indent_cm": 0.65, "option_hanging_cm": 0.35,
-    "short_question_max_fraction": 0.30, "short_option_max_lines": 3,
-    "short_stem_max_lines": 3, "minimum_start_lines": 2,
-    "footer_distance_cm": 1, "max_pages": 50,
-}
+DEFAULT_TEMPLATE = load_template()["parameters"]
 
 
 def template_config(overrides=None):

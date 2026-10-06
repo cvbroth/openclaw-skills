@@ -1,0 +1,39 @@
+"""Explicit scope and stable preinstalled entry; synthetic inputs only."""
+import json
+from pathlib import Path
+
+import pytest
+
+from nas_filetools.document_entry import generate_registered_input, prepare_registered_ocr
+
+
+@pytest.mark.parametrize("spec", [{}, {"schema": "reviewed-single-choice-v1", "source_pages": [1, True],
+                                     "title": "边界"},
+                                  {"schema": "reviewed-single-choice-v1", "source_pages": [9, 2],
+                                   "title": "边界"}])
+def test_missing_or_invalid_scope_writes_nothing(tmp_path, monkeypatch, spec):
+    incoming = tmp_path / "input.json"
+    incoming.write_text(json.dumps({"raw_ocr": "原文", "document": spec}))
+    monkeypatch.setenv("FILETOOLS_INPUT", str(incoming))
+    output = tmp_path / "out"
+    output.mkdir()
+    monkeypatch.chdir(output)
+    with pytest.raises(ValueError, match="EXPLICIT_SCOPE_REQUIRED"):
+        generate_registered_input()
+    assert list(Path.cwd().iterdir()) == []
+
+
+def test_package_arbitrary_source_pages_retains_exact_ocr(tmp_path, monkeypatch):
+    raw = "## Page 73\n1. 合成题干？\nA. 甲\nB. 乙\nC. 丙\nD. 丁\n"
+    incoming = tmp_path / "ocr.md"
+    incoming.write_bytes(raw.encode("utf-8"))
+    monkeypatch.setenv("FILETOOLS_INPUT", str(incoming))
+    output = tmp_path / "out"
+    output.mkdir()
+    monkeypatch.chdir(output)
+    prepare_registered_ocr({"schema": "reviewed-single-choice-v1", "source_pages": [73, 73], "title": "合成",
+                            "template": {"id": "questions-zh-cn", "version": "1.0.0"}})
+    request = json.loads(Path("reviewed-input.json").read_bytes())
+    assert request["raw_ocr"] == raw
+    assert incoming.read_bytes() == raw.encode("utf-8")
+    assert request["document"]["source_pages"] == [73, 73]

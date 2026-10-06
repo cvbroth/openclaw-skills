@@ -1,0 +1,9 @@
+# Overlay only the reviewed document capability on the inspected production image.
+# No pip/apt install, model changes, manager replacement, or sandbox changes.
+ARG WORKER_BASE=filetools-document-base:20261006-17be592
+FROM ${WORKER_BASE}
+USER root
+COPY src/nas_filetools/document_sample.py src/nas_filetools/document_entry.py src/nas_filetools/document_templates.py /opt/nas-filetools/.venv/lib/python3.12/site-packages/nas_filetools/
+COPY src/nas_filetools/templates /opt/nas-filetools/.venv/lib/python3.12/site-packages/nas_filetools/templates/
+RUN /opt/nas-filetools/.venv/bin/python -B -c 'import importlib.metadata as m; assert m.version("PyMuPDF") == "1.25.5"; assert m.version("python-docx") == "1.1.2"; from pathlib import Path; import fitz,hashlib; p=Path("/usr/share/fonts/truetype/filetools/DroidSansFallback.ttf"); p.parent.mkdir(parents=True,exist_ok=True); b=fitz.Font("cjk").buffer; assert hashlib.sha256(b).hexdigest() == "ee38813ea00c3e32add4268fff7fff9e39417b4913cb13be2415164a47807cc2"; p.write_bytes(b); p.chmod(0o644)'
+USER 1000:1000

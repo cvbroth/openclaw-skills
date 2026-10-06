@@ -1,7 +1,7 @@
 """Isolated developer pipeline using existing FileTools IDs/publication, never production.
 
 --extract reads only an already made five-page development PDF excerpt.
---generate submits the reusable module as restricted Python code, consumes a
+--generate calls the preinstalled reusable module in a candidate Worker, consumes a
 published OCR file_id, and verifies copies retrieved through artifact_path.
 """
 import argparse
@@ -100,8 +100,7 @@ def pipeline(root, stage, report_name="DOCUMENT_SAMPLE_REPORT.md"):
         # The user-provided OLD OCR plus independent page-reviewed evidence is
         # one registered input; newly extracted OCR remains separate.
         registered = register_source(store, identity, {"source_path": "review-input.json"})
-        source = Path(__file__).resolve().parents[1] / "src/nas_filetools/document_sample.py"
-        code = source.read_text() + '\nimport os\ngenerate_sample(Path(os.environ["FILETOOLS_INPUT"]), Path.cwd(), "/usr/share/fonts/truetype/filetools/DroidSansFallback.ttf", title="肖1000 第6–10页开发样本（旧OCR，按原页核对）")\n'
+        code = 'import os\nfrom pathlib import Path\nfrom nas_filetools.document_sample import generate_sample\ngenerate_sample(Path(os.environ["FILETOOLS_INPUT"]), Path.cwd(), "/usr/share/fonts/truetype/filetools/DroidSansFallback.ttf", title="肖1000 第6–10页开发样本（旧OCR，按原页核对）")\n'
         job = dispatch(hub, identity, "python", {"attachment_id": registered["attachment_id"], "description": "Generate five-page source sample DOCX/PDF from sole registered OCR input",
             "code": code, "outputs": ["sample.docx", "sample.pdf", "structured.json", "original-ocr.md", "issues.md", "validation.json"]})
         status = wait(hub, identity, job)

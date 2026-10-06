@@ -1,0 +1,68 @@
+{
+  "baseline": "12e8c614db898ed93d0823cbb2a41e227b156707",
+  "candidate_image": "sha256:dc7bb036ba656c50c0bb4e6732eb6a81d688b3bd938a73e45c212fcd519c04cd",
+  "template_id": "questions-zh-cn",
+  "template_version": "1.0.0",
+  "template_sha256": "eb5804259d000e6348b597e25487cba3bf8f7215987fffd09cf38851e1331df7",
+  "template_parameters_exact_equal_to_baseline": true,
+  "recording_skill_section_exact_equal": true,
+  "script_isolation": "landlock",
+  "script_timeout_seconds": 60,
+  "runs": [
+    {
+      "elapsed_seconds": 1.616321,
+      "process_peak_rss_kib": 135008,
+      "core_wall_seconds": 2.358572,
+      "status": "SUCCEEDED"
+    },
+    {
+      "elapsed_seconds": 1.612421,
+      "process_peak_rss_kib": 134728,
+      "core_wall_seconds": 2.362474,
+      "status": "SUCCEEDED"
+    },
+    {
+      "elapsed_seconds": 1.53338,
+      "process_peak_rss_kib": 135012,
+      "core_wall_seconds": 2.397044,
+      "status": "SUCCEEDED"
+    }
+  ],
+  "formal_core_publish_retrieve_hashes_checked": true,
+  "delivery": "isolated core; no real Gateway/QQ",
+  "questions": 32,
+  "options": 128,
+  "pdf_page_text_exact_equal_to_delivered": true,
+  "audit_and_original_unchanged": true,
+  "reader_automatic_passed": true,
+  "reader_searchable_equal": true,
+  "reader_checked_nonspace_glyphs": 6287,
+  "reader_versions": {
+    "pdfium": "153.0.7999.0",
+    "pypdfium2": "5.13.0",
+    "mupdf": [
+      "1.25.5",
+      "1.25.6",
+      "20250331000001"
+    ],
+    "poppler": "pdftoppm version 22.12.0\nCopyright 2005-2022 The Poppler Developers - http://poppler.freedesktop.org\nCopyright 1996-2011, 2022 Glyph & Cog, LLC"
+  },
+  "duplicate_font_streams": 0,
+  "word_render_pages": 10,
+  "pdf_pages": 9,
+  "candidate_pdf_sha256": "cf4a9aee6615e80ddcdb90229661c570f2847446d522539054fab3d1fac5fbd2",
+  "manual_review_this_round": "not repeated; required for new production artifacts",
+  "related_pytest": "36 passed, 5 SWIG warnings, 21.09s",
+  "ruff": "all checks passed",
+  "skill": "quick_validate passed",
+  "wheel_build": "offline setuptools75.8.2/wheel0.45.1; three template assets included",
+  "production": "read-only metadata checked; no deploy/restart/task/config/permission changes",
+  "unverified": [
+    "production document end-to-end",
+    "QQ receipt/download",
+    "Word client substitution",
+    "all-book performance",
+    "reader discrepancy root cause",
+    "CI"
+  ]
+}

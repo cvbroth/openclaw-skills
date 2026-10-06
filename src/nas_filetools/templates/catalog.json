@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "default": {
+    "id": "questions-zh-cn",
+    "version": "1.0.0"
+  },
+  "templates": [
+    {
+      "id": "questions-zh-cn",
+      "name": "中文单选题整理稿",
+      "version": "1.0.0",
+      "status": "published",
+      "purpose": "经核对OCR的单选题小样本Word/PDF排版",
+      "supported_structure": "部分/章节/题型、题干、①②③④、A–D选项、原PDF来源；不承诺表格、公式或任意扫描件",
+      "required_capabilities": [
+        "reviewed-single-choice-v1",
+        "python-docx==1.1.2",
+        "PyMuPDF==1.25.5",
+        "fixed-droid-font",
+        "native-font-subset"
+      ],
+      "sha256": "eb5804259d000e6348b597e25487cba3bf8f7215987fffd09cf38851e1331df7",
+      "preview_evidence": "docs/DOCUMENT_READER_COMPAT_REPORT.md; docs/DOCUMENT_DEPLOYMENT_PLAN.md"
+    }
+  ]
+}

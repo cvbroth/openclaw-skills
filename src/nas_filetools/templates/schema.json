@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "parameters": {
+    "font_family": {
+      "type": "string",
+      "enum": [
+        "Droid Sans Fallback"
+      ]
+    },
+    "body_pt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 48
+    },
+    "line_spacing": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 2
+    },
+    "space_after_pt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 48
+    },
+    "margin_cm": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 4
+    },
+    "width_cm": {
+      "type": "number",
+      "minimum": 14,
+      "maximum": 45
+    },
+    "height_cm": {
+      "type": "number",
+      "minimum": 14,
+      "maximum": 45
+    },
+    "title_pt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 48
+    },
+    "part_pt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 48
+    },
+    "chapter_pt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 48
+    },
+    "subject_pt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 48
+    },
+    "type_pt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 48
+    },
+    "source_pt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 48
+    },
+    "footer_pt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 48
+    },
+    "heading_before_pt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 48
+    },
+    "option_indent_cm": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 4
+    },
+    "option_hanging_cm": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 4
+    },
+    "short_question_max_fraction": {
+      "type": "number",
+      "minimum": 0.01,
+      "maximum": 0.49
+    },
+    "short_option_max_lines": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "short_stem_max_lines": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "minimum_start_lines": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 10
+    },
+    "footer_distance_cm": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 4
+    },
+    "max_pages": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    }
+  }
+}

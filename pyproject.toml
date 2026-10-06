@@ -19,6 +19,9 @@ nas-filetools = "nas_filetools.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+nas_filetools = ["templates/*.json", "templates/published/*/*.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = ["engines: real OCR/transcription engine tests (opt in)"]

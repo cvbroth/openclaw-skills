@@ -1,0 +1,5 @@
+# Append to all FOUR existing Compose files. Do not run without deployment approval.
+# No volume/config/security/limit overrides; restore by omitting this last file.
+services:
+  nas-filetools:
+    image: nas-filetools:document-candidate-20261006-12e8c61-r3
