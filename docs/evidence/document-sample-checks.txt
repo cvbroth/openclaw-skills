@@ -1,0 +1,16 @@
+2026-10-06 server development; branch feat/filetools-document-sample-20261006
+Linux isolated container; Python3.12.10; base image sha256:98f8cb503b120f060760c12ec87918f2510225292850055d69a832650ce3579a
+pytest -q -p no:cacheprovider: 99 passed, 15 skipped, 5 warnings in 32.96s
+After strengthening exact margin evidence validation:
+pytest -q -p no:cacheprovider tests/test_document_sample.py: 8 passed, 5 warnings in 0.42s
+ruff check --no-cache src tests scripts: All checks passed!
+Warnings: PyMuPDF SWIG DeprecationWarning; not test failures.
+Engine-enabled full regression, ASR, SDK/QQ/production/CI not run this round.
+Fixtures are synthetic, while python-docx/PyMuPDF output/layout/content checks use actual libraries.
+Real authorized 5-page sample OCR and restricted publication/retrieval are separate evidence, documented in DOCUMENT_SAMPLE_REPORT.md.
+Skill quick_validate.py: Skill is valid!
+Final document test image sha256:edb3ca0710298ff4fe36a613dfdd2ee295f750c90cf60ebe602d6d319b85adbe
+LibreOffice 7.4.7.2 40(Build:2); fc-match: Droid Sans Fallback Regular
+Real render: Word 10 pages; PyMuPDF PDF 8 pages; both complete ordered text equal to DOCX.
+Actual drawing trace/glyph bounding boxes and A4 checked; no missing glyph found.
+Human visual review: all 18 pages via contact sheets plus enlarged representative pages; no missing Chinese/cropping/blank page/abnormal whitespace observed.

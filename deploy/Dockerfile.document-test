@@ -1,0 +1,15 @@
+# Development rendering only. Never use this image as a production Worker.
+ARG FILETOOLS_IMAGE=filetools-recording-dev:20261005-9e853e8
+FROM ${FILETOOLS_IMAGE}
+USER root
+RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources \
+    && apt-get -o Acquire::https::Timeout=60 -o Acquire::Retries=2 update \
+    && apt-get -o Acquire::https::Timeout=60 -o Acquire::Retries=2 install -y --no-install-recommends libreoffice-writer fontconfig fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /usr/share/fonts/truetype/filetools \
+    && /opt/nas-filetools/.venv/bin/python -c 'from pathlib import Path; import fitz; Path("/usr/share/fonts/truetype/filetools/DroidSansFallback.ttf").write_bytes(fitz.Font("cjk").buffer)' \
+    && fc-cache -f
+WORKDIR /opt/nas-filetools-check
+ENV PYTHONPATH=/opt/nas-filetools-check/src
+USER 10001:10001
+ENTRYPOINT ["/opt/nas-filetools/.venv/bin/python"]
