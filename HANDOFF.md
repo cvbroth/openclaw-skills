@@ -196,3 +196,7 @@ cat HANDOFF.md
 ## 14. 已授权小范围生产部署（QQ验收待完成）
 
 审核基线694908cadb58537379952148826180261f6a8578。本次已部署document-candidate-r3 Worker，确切ID dc7bb036ba656c50c0bb4e6732eb6a81d688b3bd938a73e45c212fcd519c04cd；备份、真实管理健康、受限模块/模板预检及正式发布取回通过。Gateway未重建，既有挂载/配置/限额保持。等待真实Chen QQ私聊测试，尚未完成本轮生成/附件/独立渲染，不复用开发回执声称生产通过。维护必须使用完整五Compose文件；回滚和具体状态见[生产部署报告](docs/DOCUMENT_PRODUCTION_DEPLOYMENT_REPORT.md)。不处理全册、不永久保存或入库。
+
+## 15. 指定生产小样本生成及独立验收完成
+
+真实QQ探针、完整合成输入及第6–10页修订包经候选Worker运行成功，五页生产任务0fe1b69318ae456ca642b728d286be64已正式发布取回，32题128选项、原OCR和独立审计不变。Word10页、PDF9页全部实际渲染并逐页/重点放大查看通过，PDFium153/Poppler/MuPDF均通过。用户已确认附件实际可收到并下载；客户端下载SHA、Windows本次PDF和Word字体替换仍待反馈。曾发生的合成包缺raw_ocr失败已按指定任务stderr定位，原记录保留，未调限额/沙箱。镜像与完整五Compose维护集合保持，Gateway不重建、无回滚。参见[生产部署验收报告](docs/DOCUMENT_PRODUCTION_DEPLOYMENT_REPORT.md)和非私密证据。到授权小样本为止，不处理全册、不永久保存/入库。

@@ -1,6 +1,23 @@
-# 文档能力小范围生产部署：等待 QQ 端到端验收
+# 文档能力小范围生产部署与样本验收
 
 2026-10-06，myserver，分支 `feat/filetools-document-sample-20261006`。审核基线 `694908cadb58537379952148826180261f6a8578`，部署前 HEAD 相同、工作区无后续改动。本次用户明确授权部署及指定小样本；没有处理全册、重新OCR、永久保存、入库或修改模型/Samba/沙箱限额。历史部署方案中的“未执行”是准备轮次时点，本报告记录本次实际执行。
+
+## 当前结论（生产五页样本已完成独立验收）
+
+已授权候选Worker实际部署、健康、真实QQ受限调用、正式产物发布/取回及指定小样本隔离渲染通过。用户已明确反馈QQ附件能实际收到并下载；客户端下载文件的逐份SHA与Windows本次PDF复验、用户Word字体替换仍未反馈。Gateway未重建，无回滚，无全册/重新OCR/永久保存/知识库操作。以下阶段记录保留当时的待验证和失败事实；当前状态以本节及最后五页验收记录为准。
+
+| 验收阶段 | 当前真实结果 |
+|---|---|
+| 候选运行镜像与健康 | 审核dc7bb...ID一致，HEALTHY、active_workers=0；原挂载/限额保持 |
+| 真实QQ Worker探针 | 新job58ae...成功，实际正式输出字节/SHA通过 |
+| 合成输入失败与修正 | job5a4d...缺raw_ocr，私有stderr定位；不归因资源或函数不可用；完整包新job1046...成功 |
+| 合成Word/PDF | 正式取回、实际1页Word及三引擎PDF全页/放大检查通过 |
+| 已授权第6–10页32题 | 新job0fe1...成功；32题128选项、202段文字/样式、原OCR/审计与上版一致 |
+| 五页生产文件视觉 | Word10页、PDF9页全部逐页实际查看，重点区域放大；三引擎显示与分页检查通过 |
+| QQ收到及下载 | 用户明确确认，管理员取回校验另行记录，不冒用为客户端逐份哈希通过 |
+| 剩余限制 | 客户端SHA、Windows当前文件、Word字体替换待反馈；全册性能/任意输入/阅读器未验证，原PDF漏显深层根因仍未知 |
+
+完整五Compose维护集合和实际备份/回滚说明继续在下文；镜像仍是nas-filetools:document-candidate-20261006-12e8c61-r3（包1.2.1，不冒称正式新版本）。产物样本和渲染图仅保留ignored runtime。
 
 ## 已执行与可追溯状态
 
@@ -95,3 +112,27 @@ Codex Agent已查看Word实际渲染全部1页及PDF三引擎全部1页，并分
 metrics.word_render="not performed"与validation.word_render="not-checked-by-this-function"保持各自产物原文，不覆盖或把它们解释为生成时已渲染；本次渲染结果记录在独立报告/证据。Word字体仍未嵌入，用户端替换风险保留。此一页样本没有跨页长题等边界，不能替32题五页源样本验收；PDF根因未确定、Windows本次文件尚未复验，不推广为所有阅读器成功。非私密环境/哈希/自动与实际看版证据见[evidence/document-production-smoke-checks.json](evidence/document-production-smoke-checks.json)，图片及内容仍不提交Git。
 
 QQ用户反馈提供真实生成回执，但未提供成功媒体发送回执或客户端下载确认；管理员正式取回不等于QQ送达。本轮已请求用户确认两个附件实际可下载，并保留客户端哈希/Windows PDFium/Word字体反馈待验证。现可按原授权继续真实QQ登记现成五页包并生成；不得重读169页OCR、改32题原文/证据、处理全册或永久保存。五页生产文件必须另行完整取回、渲染、看版，不能复用本合成证据。
+
+## 五页生产文件：全部页面独立渲染及实际看版通过
+
+任务0fe1b69318ae456ca642b728d286be64，created_at=2026-10-06T12:39:40.536173+00:00，真实status SUCCEEDED。用已有真实Chen会话管理通道取得七项正式artifact_path引用，再逐项读取和核对字节/SHA；结果与用户回执一致。生产sample.docx为47176字节，SHA `fd6f54bfd1e58834b0db83cb5d21cca4f22415eb1c4effe0ebda6185a534a283`；sample.pdf为158059字节，SHA `93e8a5c2dbb77b19282f1c9dba35f52755165ac131bcb37415c81b9483bf0b37`。本次metadata/pdf标识变化不能冒用开发旧文件SHA。
+
+生产structured.json、original-ocr.md、issues.md与已审核候选样本逐字节相同；独立解析生产Word与上版全部202段文字和样式也完全一致（没有排除正文数字/来源/标题来放宽比较）。实际32题128选项，题干/选项/顺序保留。原OCR SHA9ca6e82cd2749b68ab3dffbd09735c235a7cccff5b59a1802a67eaf233a39f70；模型SHA200863834cde1d56cb7406c43635f827fcbe9b83d7db57a032655f28847ea196；疑点SHA0b4e0b054da7ac2bfe3b27b5510fdfc73584a3d33490f7ef784a4cebfa89bfcc。沿用此前实际原页核对证据，本轮没有重新OCR、改题文或重新制造verified声明；生成器本身不验证人工证据。
+
+实际metrics：生成入口内部1.493788秒、进程峰值RSS134944KiB（约131.8MiB），沿用生产60秒/Landlock，不能当完整队列/发布/QQ或整体Worker耗时内存，也不能推断全册容量。模板真实ID/version为questions-zh-cn/1.0.0，真实SHA eb5804259d000e6348b597e25487cba3bf8f7215987fffd09cf38851e1331df7；固定字体SHA仍一致。用户转述模板SHA少了一个字符，以正式metrics为准。用户转述“32条修订”与包中28条reviewed_edits不是同一计数：本次不依据转述改审计，疑点文件逐字节保留；32是题目数。
+
+仅将此次正式下载文件拷贝到ignored runtime/document-sample/production-sample-0fe1b69，独立验证容器无生产目录/socket、network:none、只读根、UID1000、cap-drop ALL/no-new-privileges。LibreOffice7.4.7.2实际打开Word导出为10页，Poppler实际栅格；原生PDF9页分别用PDFium153.0.7999.0/pypdfium2 5.13.0（scale1.7、默认选项）、Poppler22.12.0、MuPDF1.25.6逐页渲染。三引擎6287个非空白字符像素自动检查及可搜索次序通过，零遗漏候选；2个独立字体流、零重复字体流，PDF158059字节，没有体积反弹。
+
+Codex Agent实际查看Word全部10页、PDF各引擎全部9页（共37张全页实际栅格），另放大查看PDF第4页13/14/16题A–D和原PDF来源、26题末项和来源、17/31题等前缀区域，不用缩略图或文字提取替看版。各引擎中文、圈号、选项前缀、标题黑色、来源与自身页码完整，未见裁切/额外空白页或跨引擎缺字；Word/PDF分页可以不同。短题余白与末页剩余空白合理，非一题一页。
+
+| 边界 | Word实际渲染 | PDF实际渲染 |
+|---|---|---|
+| 第4题 | 第2页完整，题干开头3行 | 第2页完整，开头3行 |
+| 第14题 | 第4页完整，开头2行 | 第4页完整，开头2行 |
+| 第26题 | 第8页题干、A–D和来源同页 | 第7页题干、A–D和来源同页 |
+| 长题自然跨页 | 第24题7–8页、第27题8–9页 | 第24题6–7页，短选项不被强绑成空白大块 |
+| 全部来源 | 32题均跟随末项，零孤立 | 32题均跟随末项，零孤立 |
+
+生产validation/metrics仍保留生成时的visual_review required和Word未渲染表述，不覆盖原产物；独立验收结果在本报告及[evidence/document-production-sample-checks.json](evidence/document-production-sample-checks.json)。字体不嵌入是已知方案，不是生成失败，但用户端Word替换尚未验证。该Linux三引擎通过仅覆盖本次哈希，不表示历史深层根因已定位或Windows当前文件已复验。
+
+用户本轮明确说能实际收到并下载附件，记录为渠道收取/下载的真实反馈；未取得客户端下载逐份SHA或当前文件Windows图像，不标为这些细项已通过。不因附件可下载而自动保存；回执未声称永久保存/入库。本轮生成/发布/独立验收完成，停止在指定小样本，等待用户客户端复核，不自动处理剩余全册。Worker运行镜像仍审核dc7bb...ID、UID1000、网络none、只读根、2CPU/4GiB/pids96；收尾真实管理health仍HEALTHY/active_workers=0，Gateway未重建，无回滚。

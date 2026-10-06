@@ -1,0 +1,279 @@
+{
+  "scope": "authorized source pages6-10 only; no private text or images",
+  "job_id": "0fe1b69318ae456ca642b728d286be64",
+  "status": "SUCCEEDED",
+  "created_at": "2026-10-06T12:39:40.536173+00:00",
+  "outputs": [
+    {
+      "artifact_id": "b57e21fc31884d9a954b4b410beff158",
+      "file_id": "b0e5c11047c34c569662e9befec8dd74",
+      "bytes": 47176,
+      "sha256": "fd6f54bfd1e58834b0db83cb5d21cca4f22415eb1c4effe0ebda6185a534a283",
+      "name": "sample.docx"
+    },
+    {
+      "artifact_id": "2d580a10a2f241b1b4a5a5fd62257d28",
+      "file_id": "188b3444c5604c10b7a33852aad49df2",
+      "bytes": 158059,
+      "sha256": "93e8a5c2dbb77b19282f1c9dba35f52755165ac131bcb37415c81b9483bf0b37",
+      "name": "sample.pdf"
+    },
+    {
+      "artifact_id": "3c4b9e6be8a0418eafca74d507bfed83",
+      "file_id": "e57e26f8275743db97d0855666a87e1a",
+      "bytes": 223426,
+      "sha256": "200863834cde1d56cb7406c43635f827fcbe9b83d7db57a032655f28847ea196",
+      "name": "structured.json"
+    },
+    {
+      "artifact_id": "2f9f442d118f4b1584e028f5635d920a",
+      "file_id": "9561366cc9fe43fea30192c544077762",
+      "bytes": 17672,
+      "sha256": "9ca6e82cd2749b68ab3dffbd09735c235a7cccff5b59a1802a67eaf233a39f70",
+      "name": "original-ocr.md"
+    },
+    {
+      "artifact_id": "d76ff1a7e5d8423d985519f53c6d6f5a",
+      "file_id": "552a0e2939504edfb8fb915dc969ff29",
+      "bytes": 15991,
+      "sha256": "0b4e0b054da7ac2bfe3b27b5510fdfc73584a3d33490f7ef784a4cebfa89bfcc",
+      "name": "issues.md"
+    },
+    {
+      "artifact_id": "318b03df30cc4d3991dce2eab886c34e",
+      "file_id": "f2543b60deea4508989649d445ba44ec",
+      "bytes": 6253,
+      "sha256": "77a6d45abcef2aa46648e6eee559f9408736eaf5398c7ef1ad9a3b5a4279495d",
+      "name": "validation.json"
+    },
+    {
+      "artifact_id": "7581d9ce1d354599a5da9f1f19dd0fa6",
+      "file_id": "48139cb044ff4a5a9576ed85ca1b38eb",
+      "bytes": 540,
+      "sha256": "16a243e9eff883919cea18a7d8a8f0aaf94c25ae08563df7571583e409466e85",
+      "name": "generation-metrics.json"
+    }
+  ],
+  "metrics": {
+    "elapsed_seconds": 1.493788,
+    "process_peak_rss_kib": 134944,
+    "scope": [
+      6,
+      10
+    ],
+    "input_sha256": "bfcf84934a42fef6cc9eaeef355d0dd333e402cf9180fd34096e4c84417ba5ad",
+    "visual_review": "required; native content/geometry checks are insufficient",
+    "word_render": "not performed",
+    "font_sha256": "ee38813ea00c3e32add4268fff7fff9e39417b4913cb13be2415164a47807cc2",
+    "template_id": "questions-zh-cn",
+    "template_version": "1.0.0",
+    "template_sha256": "eb5804259d000e6348b597e25487cba3bf8f7215987fffd09cf38851e1331df7"
+  },
+  "exact_content_comparison": {
+    "exact_paragraph_text_and_style_equal": true,
+    "paragraphs": 202,
+    "questions": 32,
+    "options": 128
+  },
+  "audit_and_raw_byte_identical_to_previous": true,
+  "isolated_renderer_versions": {
+    "pdfium": "153.0.7999.0",
+    "pypdfium2": "5.13.0",
+    "mupdf": [
+      "1.25.5",
+      "1.25.6",
+      "20250331000001"
+    ],
+    "poppler": "pdftoppm version 22.12.0\nCopyright 2005-2022 The Poppler Developers - http://poppler.freedesktop.org\nCopyright 1996-2011, 2022 Glyph & Cog, LLC"
+  },
+  "pdf_scale": 1.7,
+  "pdf_automatic": {
+    "pages": 9,
+    "checked_nonspace_glyphs": 6287,
+    "automatic_ink_check_passed": true,
+    "pdfium_ordered_searchable_text_equal": true
+  },
+  "pdf_font_streams": {
+    "distinct": 2,
+    "duplicate": 0
+  },
+  "word_pdf_render": {
+    "word": {
+      "pages": 10,
+      "content_equal": true,
+      "fonts": [
+        "DroidSansFallback"
+      ],
+      "geometry_checked": true,
+      "pagination_boundaries": "checked",
+      "text_black": true,
+      "document_page_numbers": "checked",
+      "visual_review": "required",
+      "raster_engine": "Poppler pdftoppm"
+    },
+    "pdf": {
+      "pages": 9,
+      "content_equal": true,
+      "fonts": [
+        "Droid Sans Fallback Regular",
+        "NotoSansMath-Regular"
+      ],
+      "geometry_checked": true,
+      "pagination_boundaries": "checked",
+      "text_black": true,
+      "document_page_numbers": "checked",
+      "visual_review": "required",
+      "raster_engine": "Poppler pdftoppm"
+    }
+  },
+  "pagination": {
+    "word": {
+      "passed": true,
+      "source_orphans": 0,
+      "focus": [
+        {
+          "number": "4",
+          "pages": [
+            2
+          ],
+          "stem_opening_lines": 3,
+          "source_page": 2
+        },
+        {
+          "number": "14",
+          "pages": [
+            4
+          ],
+          "stem_opening_lines": 2,
+          "source_page": 4
+        },
+        {
+          "number": "26",
+          "pages": [
+            8
+          ],
+          "stem_opening_lines": 1,
+          "source_page": 8
+        }
+      ],
+      "long_question_spans": [
+        {
+          "number": "24",
+          "pages": [
+            7,
+            8
+          ]
+        },
+        {
+          "number": "27",
+          "pages": [
+            8,
+            9
+          ]
+        }
+      ]
+    },
+    "pdf": {
+      "passed": true,
+      "source_orphans": 0,
+      "focus": [
+        {
+          "number": "4",
+          "pages": [
+            2
+          ],
+          "stem_opening_lines": 3,
+          "source_page": 2
+        },
+        {
+          "number": "14",
+          "pages": [
+            4
+          ],
+          "stem_opening_lines": 2,
+          "source_page": 4
+        },
+        {
+          "number": "26",
+          "pages": [
+            7
+          ],
+          "stem_opening_lines": 1,
+          "source_page": 7
+        }
+      ],
+      "long_question_spans": [
+        {
+          "number": "24",
+          "pages": [
+            6,
+            7
+          ]
+        }
+      ]
+    }
+  },
+  "visual_review": {
+    "reviewer": "Codex agent viewing actual full-page and enlarged images; not client Word feedback",
+    "word_pages_viewed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "pdf_pages_viewed_by_each_engine": {
+      "pdfium": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "poppler": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "mupdf": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    "enlarged_focus": [
+      "PDF page4 questions13/14/16 options and source",
+      "question26 options/source",
+      "questions17 and31 options/source"
+    ],
+    "chinese_prefixes_sources_footer_complete": true,
+    "cropping_extra_blank_pages_detected": false
+  },
+  "user_feedback": {
+    "qq_attachment_receive_download": true,
+    "client_hashes_checked": false,
+    "windows_current_pdf_render": false,
+    "client_word_substitution_checked": false
+  }
+}
