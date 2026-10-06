@@ -192,3 +192,7 @@ cat HANDOFF.md
 用户已在原Windows、pypdfium2 5.13.0/PDFium153、scale1.7验收SHA为3ee015206c604d56af00563e6c4c74afbd2776cd85b6bf66943e80ce6b99951d的新版当前样本；第4页第13/14/16题前缀与来源正常，9页缩略图无新明显问题。根因仍未知，不扩大为所有文件/阅读器。保留12e8c614db898ed93d0823cbb2a41e227b156707后续增量。
 
 本轮授权只读核对生产安装、挂载、依赖和固定限额；没有生产任务、重启、部署或全册。建立继承实际Worker镜像的独立候选，预装短调用生成入口、固定中文字体及版本化试题模板清单。当前模板仅questions-zh-cn/1.0.0，样式原值迁入JSON，结构解析与录音规则保留；运行入口只读选择已发布版本，不执行附件样式配置。独立候选按真实60秒/Landlock完成小样本包装、file_id再登记、生成及发布取回，约1.53–1.62秒生成、峰值RSS约132MiB；生产真实Gateway/Worker/QQ与每份文档视觉验收仍待部署后分阶段核对。详见 [部署/回滚方案](docs/DOCUMENT_DEPLOYMENT_PLAN.md) 与 [模板管理](docs/DOCUMENT_TEMPLATES.md)。到候选准备完成为止，等待用户审核和另行部署授权。
+
+## 14. 已授权小范围生产部署（QQ验收待完成）
+
+审核基线694908cadb58537379952148826180261f6a8578。本次已部署document-candidate-r3 Worker，确切ID dc7bb036ba656c50c0bb4e6732eb6a81d688b3bd938a73e45c212fcd519c04cd；备份、真实管理健康、受限模块/模板预检及正式发布取回通过。Gateway未重建，既有挂载/配置/限额保持。等待真实Chen QQ私聊测试，尚未完成本轮生成/附件/独立渲染，不复用开发回执声称生产通过。维护必须使用完整五Compose文件；回滚和具体状态见[生产部署报告](docs/DOCUMENT_PRODUCTION_DEPLOYMENT_REPORT.md)。不处理全册、不永久保存或入库。
