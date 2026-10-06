@@ -83,3 +83,15 @@ document_compose=(docker compose --project-name openclaw
 新增有效document元数据但缺raw_ocr时不生成任何产物的回归；隔离开发17项输入/模板测试通过（5条上游SWIG警告），Skill校验通过。reference增量说明原文必填及零发布的诊断边界，备份在原私有备份目录skill-input-diagnostic-20261006/file-workspace。Skill SHA保持73992b3af93ea8154145e741ecb32de23d899fbb504b128b63389e42a09ffc3b；当前reference SHA `a8bfcb485a7292590a5665c337774aeba1d169aabca7db959bff739253566608`。最初回滚备份不覆盖。
 
 失败范围已定位到此合成包的输入校验；没有新证据显示既有提取/录音失败，也没有重新运行这些重任务，不能声称本轮已实测所有旧能力。无重建、回滚或限额提升。等待用户QQ登记修正后合成包，再经真实filetools_python生成并正式交付，成功后同样登记现成五页包；仍需独立取回生产文件实际渲染和客户端下载反馈。原始OCR与修订记录未覆盖、全册未处理。
+
+## 合成生产产物：正式取回、真实渲染与看版通过
+
+新生产任务104670a31e6448d0a714c4c587e45046，created_at=2026-10-06T12:30:43.874453+00:00，真实status为SUCCEEDED。管理员以既有真实Chen上下文通过files/artifact_path取回七项业务输出，逐项字节及SHA核对一致；未通过普通路径声称正式发布。生产docx 37985字节，SHA `3c00f977d5827c9751718783fa6c44d5ea24f7a630f522810f28834b8eed2549`；PDF62624字节，SHA `f8758df0268d8f39a9c9f454cccc622895c5ba2b20fe7e5b5e91acb452f7cfa7`，均与用户回执一致。原合成OCR189字节，SHA3843e067cee0d9ce03b72f716f49c956bf2487bc834a7f11171f34f4c975e50f保留。真实metrics：生成入口内部0.220087秒、进程峰值RSS95828KiB；内部计时不含模块导入/完整脚本/排队/发布/QQ，不能称完整后端耗时。模板SHA以实际取回metrics的eb5804259d000e6348b597e25487cba3bf8f7215987fffd09cf38851e1331df7为准，用户转述表格有一处抄写差异。
+
+将本次实际生产文件复制到ignored runtime/document-sample/production-smoke-104670a，用独立network:none、只读根、UID1000、cap-drop ALL/no-new-privileges开发容器，仅挂开发源码ro和本次取回副本rw；没有生产目录/socket。LibreOffice7.4.7.2实际打开并导出Word为1页，Poppler实际栅格；原生PDF由PDFium153.0.7999.0/pypdfium2 5.13.0（scale1.7默认设置）、Poppler22.12.0、MuPDF1.25.6实际逐页渲染，均1页。自动内容/顺序/页码/黑色/裁切边界通过，三引擎94非空白字符像素及可搜索次序通过，无遗漏候选。PDF两份字体流、零重复字体流。LibreOffice提示javaldx/java不可用但本次真实转换、内容及渲染完成；不据退出码替看版。
+
+Codex Agent已查看Word实际渲染全部1页及PDF三引擎全部1页，并分别查看放大的标题/题干/A–D/来源与页脚。中文及前缀完整，标题黑色，题干、四选项和来源同页，文档页码完整，无裁切或额外空白页；1题短文剩余页内空白属于正常版面，不是分页异常。本次合成样本独立视觉检查通过，**不是仅凭validation.json通过**，也不是用户端看版。Word与PDF段距略有不同，内容一致且无需相同分页。合成来源Page 1不是原册事实，标题/审计明确非原PDF。
+
+metrics.word_render="not performed"与validation.word_render="not-checked-by-this-function"保持各自产物原文，不覆盖或把它们解释为生成时已渲染；本次渲染结果记录在独立报告/证据。Word字体仍未嵌入，用户端替换风险保留。此一页样本没有跨页长题等边界，不能替32题五页源样本验收；PDF根因未确定、Windows本次文件尚未复验，不推广为所有阅读器成功。非私密环境/哈希/自动与实际看版证据见[evidence/document-production-smoke-checks.json](evidence/document-production-smoke-checks.json)，图片及内容仍不提交Git。
+
+QQ用户反馈提供真实生成回执，但未提供成功媒体发送回执或客户端下载确认；管理员正式取回不等于QQ送达。本轮已请求用户确认两个附件实际可下载，并保留客户端哈希/Windows PDFium/Word字体反馈待验证。现可按原授权继续真实QQ登记现成五页包并生成；不得重读169页OCR、改32题原文/证据、处理全册或永久保存。五页生产文件必须另行完整取回、渲染、看版，不能复用本合成证据。

@@ -1,0 +1,140 @@
+{
+  "scope": "one synthetic production question; no private sample content or images",
+  "job_id": "104670a31e6448d0a714c4c587e45046",
+  "status": "SUCCEEDED",
+  "created_at": "2026-10-06T12:30:43.874453+00:00",
+  "outputs": [
+    {
+      "artifact_id": "a76b0c8dbf834ed8ae04d1bc464c1be8",
+      "file_id": "6b9d17edbcd542e481f6c11fb468f47c",
+      "bytes": 37985,
+      "sha256": "3c00f977d5827c9751718783fa6c44d5ea24f7a630f522810f28834b8eed2549",
+      "name": "sample.docx"
+    },
+    {
+      "artifact_id": "da2f64c472604e87b6fa692827379ae5",
+      "file_id": "909f51e474d74ca39fe02d57516558aa",
+      "bytes": 62624,
+      "sha256": "f8758df0268d8f39a9c9f454cccc622895c5ba2b20fe7e5b5e91acb452f7cfa7",
+      "name": "sample.pdf"
+    },
+    {
+      "artifact_id": "3c2f23d3c4fe472db8451599410c8d5c",
+      "file_id": "4d3c0fd5247046d5878396791098efce",
+      "bytes": 3206,
+      "sha256": "dffea329440fb8a741ec7795e50063327e9f0a9aff3ea9910d40311083a85c0d",
+      "name": "structured.json"
+    },
+    {
+      "artifact_id": "d62046887ece4c4d8a6659376e8deee7",
+      "file_id": "e022183470ae43dda0fb6ffdcb30e37f",
+      "bytes": 189,
+      "sha256": "3843e067cee0d9ce03b72f716f49c956bf2487bc834a7f11171f34f4c975e50f",
+      "name": "original-ocr.md"
+    },
+    {
+      "artifact_id": "77d60e91e9df4935974c9cdcbca4c826",
+      "file_id": "5b83998619b84f22b5d3bd0b8a3601ef",
+      "bytes": 348,
+      "sha256": "0eebacfd687ce3b2de84c3fec1d67aa8ef49d01bb991fdef3cdd5701b9f45c96",
+      "name": "issues.md"
+    },
+    {
+      "artifact_id": "f2f872767a764cb3870eef5f07f96be8",
+      "file_id": "5be3faf421024a0aa263eae92a5207a6",
+      "bytes": 2115,
+      "sha256": "75c37389f13c30c1cb402bed20a31a565c424eda1c75b7d2e1141569f8bad88b",
+      "name": "validation.json"
+    },
+    {
+      "artifact_id": "4aab5d4e2b4349d7ba944c3282214d3b",
+      "file_id": "ebdf313d6c6b4df1a34aab3226af1db7",
+      "bytes": 538,
+      "sha256": "1aa5facad4d5c60e682f9a63981624f44278effee24677cf625ae4fd0641e1de",
+      "name": "generation-metrics.json"
+    }
+  ],
+  "metrics": {
+    "elapsed_seconds": 0.220087,
+    "process_peak_rss_kib": 95828,
+    "scope": [
+      1,
+      1
+    ],
+    "input_sha256": "bd3bd18744ab923674b3997abcc5854e3696480e205d7ffa574d9d0dcbb13f94",
+    "visual_review": "required; native content/geometry checks are insufficient",
+    "word_render": "not performed",
+    "font_sha256": "ee38813ea00c3e32add4268fff7fff9e39417b4913cb13be2415164a47807cc2",
+    "template_id": "questions-zh-cn",
+    "template_version": "1.0.0",
+    "template_sha256": "eb5804259d000e6348b597e25487cba3bf8f7215987fffd09cf38851e1331df7"
+  },
+  "isolated_renderer_versions": {
+    "pdfium": "153.0.7999.0",
+    "pypdfium2": "5.13.0",
+    "mupdf": [
+      "1.25.5",
+      "1.25.6",
+      "20250331000001"
+    ],
+    "poppler": "pdftoppm version 22.12.0\nCopyright 2005-2022 The Poppler Developers - http://poppler.freedesktop.org\nCopyright 1996-2011, 2022 Glyph & Cog, LLC"
+  },
+  "pdf_scale": 1.7,
+  "pdf_automatic": {
+    "pages": 1,
+    "checked_nonspace_glyphs": 94,
+    "automatic_ink_check_passed": true,
+    "pdfium_ordered_searchable_text_equal": true
+  },
+  "word_pdf_render": {
+    "word": {
+      "pages": 1,
+      "content_equal": true,
+      "fonts": [
+        "DroidSansFallback"
+      ],
+      "geometry_checked": true,
+      "pagination_boundaries": "checked",
+      "text_black": true,
+      "document_page_numbers": "checked",
+      "visual_review": "required",
+      "raster_engine": "Poppler pdftoppm"
+    },
+    "pdf": {
+      "pages": 1,
+      "content_equal": true,
+      "fonts": [
+        "Droid Sans Fallback Regular",
+        "NotoSansMath-Regular"
+      ],
+      "geometry_checked": true,
+      "pagination_boundaries": "checked",
+      "text_black": true,
+      "document_page_numbers": "checked",
+      "visual_review": "required",
+      "raster_engine": "Poppler pdftoppm"
+    }
+  },
+  "visual_review": {
+    "reviewer": "Codex agent using actual local images; not end-user feedback",
+    "pages_viewed": {
+      "word_poppler": [
+        1
+      ],
+      "native_pdf_pdfium": [
+        1
+      ],
+      "native_pdf_poppler": [
+        1
+      ],
+      "native_pdf_mupdf": [
+        1
+      ]
+    },
+    "full_page_and_enlarged_text_footer_viewed": true,
+    "chinese_option_prefixes_source_footer_complete": true,
+    "cropping_extra_blank_pages_detected": false,
+    "scope_limit": "does not cover multi-page pagination, Windows or font substitution"
+  },
+  "qq_media_delivery": "user-provided generation receipt; media send receipt and client download confirmation pending"
+}
