@@ -25,3 +25,19 @@ def test_stalled_test_child_is_stopped_without_extending_limit(tmp_path,monkeypa
 def test_zombie_status_keeps_previous_peak_without_crashing():
     # Regression: the first real OOM left /proc/status without memory fields.
     assert module.sample_peak_rss('Name:\tpython\nState:\tZ (zombie)\n', 123) == 123
+
+
+def test_page_validation_accepts_expansion_pages_and_rejects_duplicates():
+    assert module.validate_pages([16, 17, 132]) == [16, 17, 132]
+    try:
+        module.validate_pages([16, 16])
+    except ValueError as error:
+        assert 'distinct positive' in str(error)
+    else:
+        raise AssertionError('duplicate physical page was accepted')
+    try:
+        module.validate_pages([0])
+    except ValueError as error:
+        assert 'distinct positive' in str(error)
+    else:
+        raise AssertionError('zero physical page was accepted')

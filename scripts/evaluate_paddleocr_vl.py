@@ -36,6 +36,12 @@ def validate_ppstructure_compatibility(config):
             'a pinned local auxiliary chart model is required even though business recognition is disabled')
 
 
+def validate_pages(pages):
+    if not pages or any(page < 1 for page in pages) or len(set(pages)) != len(pages):
+        raise ValueError('--pages must contain distinct positive physical page numbers')
+    return pages
+
+
 def build_pipeline(engine, models):
     if engine == 'paddleocr-vl-1.5':
         from paddleocr import PaddleOCRVL
@@ -196,11 +202,15 @@ if __name__ == '__main__':
     for name in ('images', 'models', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--engine', choices=('paddleocr-vl-1.5', 'ppstructurev3'), default='paddleocr-vl-1.5')
-    parser.add_argument('--pages', nargs='+', type=int, choices=(6, 10, 30), default=[6, 10, 30])
+    parser.add_argument('--pages', nargs='+', type=int, default=[6, 10, 30])
     parser.add_argument('--load-timeout', type=int, default=180)
     parser.add_argument('--page-timeout', type=int, default=300)
     parser.add_argument('--child', action='store_true')
     args = parser.parse_args()
+    try:
+        validate_pages(args.pages)
+    except ValueError as error:
+        parser.error(str(error))
     if args.child:
         child(args.images, args.models, args.output, args.pages, args.engine)
     else:
