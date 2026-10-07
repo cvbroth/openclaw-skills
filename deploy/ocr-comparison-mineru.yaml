@@ -1,0 +1,8 @@
+model:
+  base_dir: /models
+  source: local
+  small_backend: onnx
+llm_aided:
+  features:
+    title_leveling: false
+    cross_page_table_cell_merge: false

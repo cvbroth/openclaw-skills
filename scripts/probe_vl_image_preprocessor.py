@@ -4,17 +4,22 @@ Tracing observes the unmodified Paddle __int__ call and preserves its exception.
 This is a preprocessing diagnostic, never a completed OCR inference.
 """
 import argparse
+from collections.abc import Mapping
 import json
 from pathlib import Path
 import sys
 from types import SimpleNamespace
 
 import numpy as np
-from paddlex.inference.models.doc_vlm.predictor import DocVLMPredictor
+from paddlex.inference.models.doc_vlm import predictor
+
+# PaddleX 3.7 split local and GenAI predictors; retain the 3.4 diagnostic.
+DocVLMPredictor = getattr(predictor, 'DocVLMPredictor', None) or predictor.DocVLMLocalPredictor
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', type=Path, required=True)
 parser.add_argument('--image', type=Path, required=True)
+parser.add_argument('--describe-output', action='store_true', help='shape-only diagnostic; never print image/tokens/text arrays')
 args = parser.parse_args()
 context = SimpleNamespace(model_name='PaddleOCR-VL-1.5-0.9B', model_dir=args.model,
                           model_group={'PP-DocBee': [], 'PP-Chart2Table': [],
@@ -35,8 +40,20 @@ def trace(frame, event, arg):
 
 sys.settrace(trace)
 try:
-    processor.preprocess([{'image': str(args.image), 'query': 'OCR:'}])
+    result = processor.preprocess([{'image': str(args.image), 'query': 'OCR:'}])
     outcome = {'preprocess': 'SUCCEEDED'}
+    if args.describe_output:
+        def describe(value):
+            if hasattr(value, 'shape'):
+                return {'shape': list(value.shape), 'dtype': str(value.dtype)}
+            if isinstance(value, Mapping):
+                return {key: describe(item) for key, item in value.items()}
+            if isinstance(value, (list, tuple)):
+                return {'count': len(value), 'first': describe(value[0]) if value else None}
+            return {'type': type(value).__name__}
+        outcome['output_shapes'] = describe(result)
+        if isinstance(result, Mapping) and 'image_grid_thw' in result:
+            outcome['image_grid_thw'] = np.array(result['image_grid_thw']).tolist()
 except Exception as error:
     outcome = {'preprocess': 'FAILED', 'error_type': type(error).__name__, 'error': str(error)}
 finally:

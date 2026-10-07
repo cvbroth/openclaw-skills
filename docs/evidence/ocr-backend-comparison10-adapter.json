@@ -1,0 +1,75 @@
+{
+  "scope": "native-export to minimal JSON; not OCR correctness or native-MD semantic completeness",
+  "pages": [
+    {
+      "physical_page": 9,
+      "native_blocks": 10,
+      "adapter_block_count_equal": true,
+      "native_text_coordinate_order_equal": true,
+      "raw_markdown_sha256": "eab1dc60a15aef62055e5e359804a9aed50448f092ad4cb1a1b5b646630057ff"
+    },
+    {
+      "physical_page": 10,
+      "native_blocks": 9,
+      "adapter_block_count_equal": true,
+      "native_text_coordinate_order_equal": true,
+      "raw_markdown_sha256": "0cd76e9a45a67bd8db480115e4c78c85acd46733a37dceffa9fdd2ff79a204cc"
+    },
+    {
+      "physical_page": 12,
+      "native_blocks": 10,
+      "adapter_block_count_equal": true,
+      "native_text_coordinate_order_equal": true,
+      "raw_markdown_sha256": "68c5b6b46512c48649a8677a661512cd07e0327cd63b6e04ee57c51592942b9c"
+    },
+    {
+      "physical_page": 16,
+      "native_blocks": 10,
+      "adapter_block_count_equal": true,
+      "native_text_coordinate_order_equal": true,
+      "raw_markdown_sha256": "d0cff3d0d01f4009701abef1c9868a72d8e84d86e5aa4ba0970285f130f78470"
+    },
+    {
+      "physical_page": 23,
+      "native_blocks": 13,
+      "adapter_block_count_equal": true,
+      "native_text_coordinate_order_equal": true,
+      "raw_markdown_sha256": "0a735a57eacce1d01b52969643fb3a2af2411c648ea2b072e8a74e3b3aae2009"
+    },
+    {
+      "physical_page": 75,
+      "native_blocks": 15,
+      "adapter_block_count_equal": true,
+      "native_text_coordinate_order_equal": true,
+      "raw_markdown_sha256": "1082c3687eb269a70065b6cbd1d532b668bf69d1ef9f403bb6d67ba902e1f1c7"
+    },
+    {
+      "physical_page": 81,
+      "native_blocks": 23,
+      "adapter_block_count_equal": true,
+      "native_text_coordinate_order_equal": true,
+      "raw_markdown_sha256": "30ce5b1b2674fa6e168641574db4ef04e80d9ac76c633dc6f7d13410928a68c9"
+    },
+    {
+      "physical_page": 136,
+      "native_blocks": 8,
+      "adapter_block_count_equal": true,
+      "native_text_coordinate_order_equal": true,
+      "raw_markdown_sha256": "b3dff969d1ce216a010bbe2737bbc2413f8d63fadb966495db58a55f1962fcca"
+    },
+    {
+      "physical_page": 150,
+      "native_blocks": 14,
+      "adapter_block_count_equal": true,
+      "native_text_coordinate_order_equal": true,
+      "raw_markdown_sha256": "6f406fbd046d2767f073c4c93e3cd2edaabf67de5d8cd4394988109ab9dbe5c9"
+    },
+    {
+      "physical_page": 168,
+      "native_blocks": 13,
+      "adapter_block_count_equal": true,
+      "native_text_coordinate_order_equal": true,
+      "raw_markdown_sha256": "36ccef75543f1196b882cecd623b561740a884913582567be5de86ec3553a89d"
+    }
+  ]
+}

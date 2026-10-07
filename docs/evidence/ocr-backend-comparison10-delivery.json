@@ -1,0 +1,24 @@
+{
+  "schema": "ocr-comparison-delivery-v1",
+  "local_package": "/home/chen/dev/openclaw-filetools-dev/runtime/paddleocr-vl-evaluation/backend-comparison10-r1/filetools-ocr-backend-comparison10-20261008.zip",
+  "shared_server_path": "/srv/storage/users/chen/FileTools-Deliveries/ocr-backend-comparison10-20261008/filetools-ocr-backend-comparison10-20261008.zip",
+  "windows_path": "\\\\myserver\\Chen\\FileTools-Deliveries\\ocr-backend-comparison10-20261008\\filetools-ocr-backend-comparison10-20261008.zip",
+  "bytes": 26650985,
+  "sha256": "33b56821a49fd9a81f69a1e226b8eb4a40505ac7003316b23cacab0d7e6126a3",
+  "zip_integrity": "passed",
+  "physical_pages": [
+    9,
+    10,
+    12,
+    16,
+    23,
+    75,
+    81,
+    136,
+    150,
+    168
+  ],
+  "delivery_kind": "shared development experiment, not FileTools/QQ published artifact",
+  "private_content_in_git": false,
+  "user_download_verified": false
+}

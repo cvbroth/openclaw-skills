@@ -1,0 +1,19 @@
+# Isolated CPU research images; never a production Worker image.
+# Expected local base ID: sha256:f6e54e5c5198c28045a86f7a7cbb4a883160dec7034914424b1dae5b58de6ca2
+FROM filetools-paddleocr-vl-eval:cpu-3.4.0-paddle3.2.2-numpy2.3.5 AS paddle
+USER root
+RUN /opt/paddle-vl/bin/python -m pip install --timeout 40 --retries 2 'paddleocr[doc-parser]==3.7.0' 'paddlex==3.7.2' 'numpy==2.3.5' && /opt/paddle-vl/bin/python -m pip freeze > /opt/paddle-vl/environment.freeze.txt
+USER 1000:1000
+ENTRYPOINT ["/opt/paddle-vl/bin/python"]
+
+# Expected local base ID: sha256:edb3ca0710298ff4fe36a613dfdd2ee295f750c90cf60ebe602d6d319b85adbe
+FROM filetools-document-test:20261006-364d4d6 AS mineru
+USER root
+RUN /usr/local/bin/python -m venv /opt/comparison && /opt/comparison/bin/python -m pip install --index-url https://pypi.tuna.tsinghua.edu.cn/simple --timeout 40 --retries 2 --report /opt/comparison/install-report.json 'mineru==4.0.10' && /opt/comparison/bin/python -m pip freeze > /opt/comparison/environment.freeze.txt
+USER 1000:1000
+ENTRYPOINT ["/opt/comparison/bin/python"]
+
+FROM python:3.11.14-slim-bookworm@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d AS monkey
+RUN python -m pip install --timeout 40 --retries 2 --report /opt/torch-install-report.json torch==2.5.1+cpu torchvision==0.20.1+cpu --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.tuna.tsinghua.edu.cn/simple && python -m pip install --index-url https://pypi.tuna.tsinghua.edu.cn/simple --timeout 40 --retries 2 --report /opt/install-report.json 'transformers==4.57.1' 'accelerate==1.11.0' 'gradio==5.30.0' 'pypdfium2==5.10.1' 'qwen_vl_utils==0.0.14' 'opencv-python-headless==4.11.0.86' einops huggingface_hub pillow modelscope && python -m pip freeze > /opt/environment.freeze.txt
+USER 1000:1000
+ENTRYPOINT ["python"]

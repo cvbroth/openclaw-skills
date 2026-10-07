@@ -1,0 +1,1048 @@
+{
+  "schema": "sanitized-ocr-comparison10-evidence-v1",
+  "source_pdf_sha256": "0007677dc510b01ffed36bd1250fafd8a7b0101f383e3603257b45e379a6f28b",
+  "physical_pages": [
+    9,
+    10,
+    12,
+    16,
+    23,
+    75,
+    81,
+    136,
+    150,
+    168
+  ],
+  "new_cloud_calls": 0,
+  "tests": {
+    "synthetic_and_watchdog_passed": 15,
+    "ruff": "passed"
+  },
+  "runs": {
+    "paddle/pilot-1": {
+      "receipt": {
+        "status": "TIMED_OUT",
+        "exit_code": -15,
+        "wall_seconds": 344.2456106999889,
+        "process_peak_rss_kib": 9614148,
+        "timeout": {
+          "stage": {
+            "phase": "page",
+            "physical_page": 12,
+            "started": 830684.612610363
+          },
+          "limit_seconds": 300
+        },
+        "pages_requested": [
+          12
+        ],
+        "backend": "paddle",
+        "model_load_limit_seconds": 180,
+        "page_limit_seconds": 300,
+        "cgroup_memory.peak": "11510177792",
+        "cgroup_memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cgroup_memory.swap.peak": "0",
+        "cgroup_cpu.stat": "usage_usec 345772497\nuser_usec 311646591\nsystem_usec 34125905\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 3444\nnr_throttled 6\nthrottled_usec 4195\nnr_bursts 0\nburst_usec 0"
+      },
+      "metrics": {
+        "backend": "paddle",
+        "device": "cpu",
+        "cpu_threads": 2,
+        "import_seconds": 0.0001692099031060934,
+        "pages": [],
+        "versions": {
+          "paddleocr": "3.7.0",
+          "paddlex": "3.7.2",
+          "paddlepaddle": "3.2.2",
+          "numpy": "2.3.5"
+        },
+        "model_load_seconds": 43.107161044026725
+      }
+    },
+    "monkey/pilot-1": {
+      "receipt": {
+        "status": "TIMED_OUT",
+        "exit_code": -15,
+        "wall_seconds": 306.9474724100437,
+        "process_peak_rss_kib": 8312708,
+        "timeout": {
+          "stage": {
+            "phase": "page",
+            "physical_page": 12,
+            "started": 831434.442801236
+          },
+          "limit_seconds": 300
+        },
+        "pages_requested": [
+          12
+        ],
+        "backend": "monkey",
+        "model_load_limit_seconds": 180,
+        "page_limit_seconds": 300,
+        "cgroup_memory.peak": "8415035392",
+        "cgroup_memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cgroup_memory.swap.peak": "0",
+        "cgroup_cpu.stat": "usage_usec 604963753\nuser_usec 496886380\nsystem_usec 108077372\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 3071\nnr_throttled 2433\nthrottled_usec 901071117\nnr_bursts 0\nburst_usec 0"
+      },
+      "metrics": {
+        "backend": "monkey",
+        "device": "cpu",
+        "cpu_threads": 2,
+        "import_seconds": 1.5394537859829143,
+        "pages": [],
+        "versions": {
+          "numpy": "2.4.6",
+          "torch": "2.5.1+cpu",
+          "transformers": "4.57.1",
+          "accelerate": "1.11.0"
+        },
+        "model_load_seconds": 4.675096235005185
+      }
+    },
+    "mineru/pilot-1": {
+      "receipt": {
+        "status": "FAILED",
+        "exit_code": 1,
+        "wall_seconds": 2.040442139026709,
+        "process_peak_rss_kib": 196112,
+        "timeout": null,
+        "pages_requested": [
+          12
+        ],
+        "backend": "mineru",
+        "model_load_limit_seconds": 180,
+        "page_limit_seconds": 300,
+        "cgroup_memory.peak": "149860352",
+        "cgroup_memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cgroup_memory.swap.peak": "0",
+        "cgroup_cpu.stat": "usage_usec 2323957\nuser_usec 2089961\nsystem_usec 233995\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 23\nnr_throttled 2\nthrottled_usec 379098\nnr_bursts 0\nburst_usec 0"
+      },
+      "metrics": {
+        "backend": "mineru",
+        "device": "cpu",
+        "cpu_threads": 2,
+        "import_seconds": 0.4792804839089513,
+        "pages": [],
+        "versions": {
+          "numpy": "2.5.3",
+          "mineru": "4.0.10",
+          "onnxruntime": "1.30.0"
+        },
+        "model_load_scope": "parser constructor only; ONNX weights are lazy-loaded in first inference",
+        "onnx_initializations": [
+          {
+            "model_path": "/opt/comparison/lib/python3.12/site-packages/magika/models/standard_v3_3/model.onnx",
+            "seconds": 0.02734427503310144,
+            "providers": [
+              "CPUExecutionProvider"
+            ],
+            "intra_op_threads": 4,
+            "inter_op_threads": 1
+          }
+        ],
+        "model_load_seconds": 0.10998035105876625
+      }
+    },
+    "mineru/pilot-2": {
+      "receipt": {
+        "status": "SUCCEEDED",
+        "exit_code": 0,
+        "wall_seconds": 11.037963588023558,
+        "process_peak_rss_kib": 1308836,
+        "timeout": null,
+        "pages_requested": [
+          12
+        ],
+        "backend": "mineru",
+        "model_load_limit_seconds": 180,
+        "page_limit_seconds": 300,
+        "cgroup_memory.peak": "1345224704",
+        "cgroup_memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cgroup_memory.swap.peak": "0",
+        "cgroup_cpu.stat": "usage_usec 17431900\nuser_usec 16219324\nsystem_usec 1212575\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 112\nnr_throttled 35\nthrottled_usec 583951\nnr_bursts 0\nburst_usec 0"
+      },
+      "metrics": {
+        "backend": "mineru",
+        "device": "cpu",
+        "cpu_threads": 2,
+        "import_seconds": 0.5701911669457331,
+        "pages": [
+          {
+            "physical_page": 12,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 9.67229466396384,
+            "process_cpu_seconds": 14.872717,
+            "process_peak_rss_kib_cumulative": 1308836,
+            "first_inference_in_process": true,
+            "input_sha256": "81d706884884e0610632493c29b56250aea4fc164096c7db6b10026a8ebc034c"
+          }
+        ],
+        "versions": {
+          "numpy": "2.5.3",
+          "mineru": "4.0.10",
+          "onnxruntime": "1.30.0"
+        },
+        "model_load_scope": "parser constructor only; ONNX weights are lazy-loaded in first inference",
+        "onnx_initializations": [
+          {
+            "model_path": "/opt/comparison/lib/python3.12/site-packages/magika/models/standard_v3_3/model.onnx",
+            "seconds": 0.03248484607320279,
+            "providers": [
+              "CPUExecutionProvider"
+            ],
+            "intra_op_threads": 4,
+            "inter_op_threads": 1
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_tiny_det_infer.onnx",
+            "seconds": 0.04728220799006522,
+            "providers": [
+              "CPUExecutionProvider"
+            ],
+            "intra_op_threads": 2,
+            "inter_op_threads": 1
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_small_rec_infer.onnx",
+            "seconds": 0.09940932295285165,
+            "providers": [
+              "CPUExecutionProvider"
+            ],
+            "intra_op_threads": 2,
+            "inter_op_threads": 1
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/Layout/PP-DocLayoutV2/inference.onnx",
+            "seconds": 1.2881786070065573,
+            "providers": [
+              "CPUExecutionProvider"
+            ],
+            "intra_op_threads": 2,
+            "inter_op_threads": 1
+          }
+        ],
+        "model_load_seconds": 0.13925972790457308
+      }
+    },
+    "mineru/remaining-1": {
+      "receipt": {
+        "status": "SUCCEEDED",
+        "exit_code": 0,
+        "wall_seconds": 46.741036084946245,
+        "process_peak_rss_kib": 1532796,
+        "timeout": null,
+        "pages_requested": [
+          9,
+          10,
+          16,
+          23,
+          75,
+          81,
+          136,
+          150,
+          168
+        ],
+        "backend": "mineru",
+        "model_load_limit_seconds": 180,
+        "page_limit_seconds": 300,
+        "cgroup_memory.peak": "1601556480",
+        "cgroup_memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cgroup_memory.swap.peak": "0",
+        "cgroup_cpu.stat": "usage_usec 89180199\nuser_usec 87651516\nsystem_usec 1528683\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 469\nnr_throttled 284\nthrottled_usec 2858948\nnr_bursts 0\nburst_usec 0"
+      },
+      "metrics": {
+        "backend": "mineru",
+        "device": "cpu",
+        "cpu_threads": 2,
+        "import_seconds": 0.38498500699643046,
+        "pages": [
+          {
+            "physical_page": 9,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 8.03314123104792,
+            "process_cpu_seconds": 12.610083000000001,
+            "process_peak_rss_kib_cumulative": 1308448,
+            "first_inference_in_process": true,
+            "input_sha256": "fc76a69a8c45c409e698abafd50a4e2a1672512a9ae3283c0379425a85f5bf0c"
+          },
+          {
+            "physical_page": 10,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 4.60954426205717,
+            "process_cpu_seconds": 9.030325999999999,
+            "process_peak_rss_kib_cumulative": 1444108,
+            "first_inference_in_process": false,
+            "input_sha256": "713179b41b1a1673f3306055bc6781c6899035b1a6ca9d9ac8f972c07f9418cc"
+          },
+          {
+            "physical_page": 16,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 5.499747821944766,
+            "process_cpu_seconds": 10.795732999999998,
+            "process_peak_rss_kib_cumulative": 1448464,
+            "first_inference_in_process": false,
+            "input_sha256": "b6f32e6feb099c2876c46b4088a88111b097d9438effe0d7091c8d1abfcbc333"
+          },
+          {
+            "physical_page": 23,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 4.384921333985403,
+            "process_cpu_seconds": 8.615203000000001,
+            "process_peak_rss_kib_cumulative": 1458204,
+            "first_inference_in_process": false,
+            "input_sha256": "10eca256252fed33100c29c5ad5163555a01cf3b6c1f0e3d2be6c87bb1422742"
+          },
+          {
+            "physical_page": 75,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 4.441950150998309,
+            "process_cpu_seconds": 8.662951000000007,
+            "process_peak_rss_kib_cumulative": 1495072,
+            "first_inference_in_process": false,
+            "input_sha256": "372ebe66549cc670499e8dc36416da52bee837b4f906f71743dd5821b59d80e3"
+          },
+          {
+            "physical_page": 81,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 4.41573938797228,
+            "process_cpu_seconds": 8.633852000000005,
+            "process_peak_rss_kib_cumulative": 1529800,
+            "first_inference_in_process": false,
+            "input_sha256": "4fc3266eb57319c76457de4fe30cd64fdb0b52072a7558e6cb12e3f327b5d2f1"
+          },
+          {
+            "physical_page": 136,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 5.393935230909847,
+            "process_cpu_seconds": 10.529780000000002,
+            "process_peak_rss_kib_cumulative": 1531484,
+            "first_inference_in_process": false,
+            "input_sha256": "d03c10b417ed71597894c99a3a7474ef191981f445605956636e4f3007066884"
+          },
+          {
+            "physical_page": 150,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 4.190106545924209,
+            "process_cpu_seconds": 8.092460000000017,
+            "process_peak_rss_kib_cumulative": 1531760,
+            "first_inference_in_process": false,
+            "input_sha256": "3a6f333014a42df57888f3215a75d8037336758ea0bd6d3b22351ff8b80b293c"
+          },
+          {
+            "physical_page": 168,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 4.645546973915771,
+            "process_cpu_seconds": 9.035918999999978,
+            "process_peak_rss_kib_cumulative": 1531848,
+            "first_inference_in_process": false,
+            "input_sha256": "ec3577d2fbd4ec9c207a56b9f8f4aa5a08f092583e610a4230e8496e10b2d738"
+          }
+        ],
+        "versions": {
+          "numpy": "2.5.3",
+          "mineru": "4.0.10",
+          "onnxruntime": "1.30.0"
+        },
+        "model_load_scope": "parser constructor only; ONNX weights are lazy-loaded in first inference",
+        "onnx_initializations": [
+          {
+            "model_path": "/opt/comparison/lib/python3.12/site-packages/magika/models/standard_v3_3/model.onnx",
+            "seconds": 0.021418610005639493,
+            "providers": [
+              "CPUExecutionProvider"
+            ],
+            "intra_op_threads": 4,
+            "inter_op_threads": 1
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_tiny_det_infer.onnx",
+            "seconds": 0.021195303997956216,
+            "providers": [
+              "CPUExecutionProvider"
+            ],
+            "intra_op_threads": 2,
+            "inter_op_threads": 1
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_small_rec_infer.onnx",
+            "seconds": 0.0875154760433361,
+            "providers": [
+              "CPUExecutionProvider"
+            ],
+            "intra_op_threads": 2,
+            "inter_op_threads": 1
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/Layout/PP-DocLayoutV2/inference.onnx",
+            "seconds": 0.8694870809558779,
+            "providers": [
+              "CPUExecutionProvider"
+            ],
+            "intra_op_threads": 2,
+            "inter_op_threads": 1
+          }
+        ],
+        "model_load_seconds": 0.08646776410751045
+      }
+    },
+    "mineru/input-shape-diagnostic": {
+      "receipt": {
+        "status": "FAILED",
+        "exit_code": 1,
+        "wall_seconds": 1.0236601389478892,
+        "process_peak_rss_kib": 112556,
+        "timeout": null,
+        "pages_requested": [
+          12
+        ],
+        "backend": "mineru",
+        "model_load_limit_seconds": 180,
+        "page_limit_seconds": 300,
+        "cgroup_memory.peak": "100515840",
+        "cgroup_memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cgroup_memory.swap.peak": "0",
+        "cgroup_cpu.stat": "usage_usec 1135270\nuser_usec 1012565\nsystem_usec 122704\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 12\nnr_throttled 1\nthrottled_usec 181891\nnr_bursts 0\nburst_usec 0"
+      },
+      "metrics": {
+        "backend": "mineru",
+        "device": "cpu",
+        "cpu_threads": 2,
+        "import_seconds": 0.4614995929878205,
+        "pages": [],
+        "versions": {
+          "numpy": "2.5.3",
+          "mineru": "4.0.10",
+          "onnxruntime": "1.30.0"
+        },
+        "model_load_scope": "parser constructor only; ONNX weights are lazy-loaded in first inference",
+        "onnx_initializations": [
+          {
+            "model_path": "/opt/comparison/lib/python3.12/site-packages/magika/models/standard_v3_3/model.onnx",
+            "seconds": 0.022074584034271538,
+            "providers": [
+              "CPUExecutionProvider"
+            ],
+            "intra_op_threads": 4,
+            "inter_op_threads": 1
+          }
+        ],
+        "model_load_seconds": 0.09325054893270135
+      }
+    },
+    "mineru/input-shape-diagnostic-2": {
+      "receipt": {
+        "status": "SUCCEEDED",
+        "exit_code": 0,
+        "wall_seconds": 9.229229449993,
+        "process_peak_rss_kib": 1301496,
+        "timeout": null,
+        "pages_requested": [
+          12
+        ],
+        "backend": "mineru",
+        "model_load_limit_seconds": 180,
+        "page_limit_seconds": 300,
+        "cgroup_memory.peak": "1350172672",
+        "cgroup_memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cgroup_memory.swap.peak": "0",
+        "cgroup_cpu.stat": "usage_usec 14511590\nuser_usec 13526654\nsystem_usec 984936\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 93\nnr_throttled 26\nthrottled_usec 387305\nnr_bursts 0\nburst_usec 0"
+      },
+      "metrics": {
+        "backend": "mineru",
+        "device": "cpu",
+        "cpu_threads": 2,
+        "import_seconds": 0.3888756859814748,
+        "pages": [
+          {
+            "physical_page": 12,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 7.989912218996324,
+            "process_cpu_seconds": 12.349969,
+            "process_peak_rss_kib_cumulative": 1301496,
+            "first_inference_in_process": true,
+            "input_sha256": "81d706884884e0610632493c29b56250aea4fc164096c7db6b10026a8ebc034c"
+          }
+        ],
+        "versions": {
+          "numpy": "2.5.3",
+          "mineru": "4.0.10",
+          "onnxruntime": "1.30.0"
+        },
+        "model_load_scope": "parser constructor only; ONNX weights are lazy-loaded in first inference",
+        "onnx_initializations": [
+          {
+            "model_path": "/opt/comparison/lib/python3.12/site-packages/magika/models/standard_v3_3/model.onnx",
+            "seconds": 0.023406813968904316,
+            "providers": [
+              "CPUExecutionProvider"
+            ],
+            "intra_op_threads": 4,
+            "inter_op_threads": 1
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_tiny_det_infer.onnx",
+            "seconds": 0.021252688020467758,
+            "providers": [
+              "CPUExecutionProvider"
+            ],
+            "intra_op_threads": 2,
+            "inter_op_threads": 1
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_small_rec_infer.onnx",
+            "seconds": 0.09403068700339645,
+            "providers": [
+              "CPUExecutionProvider"
+            ],
+            "intra_op_threads": 2,
+            "inter_op_threads": 1
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/Layout/PP-DocLayoutV2/inference.onnx",
+            "seconds": 0.8661735439673066,
+            "providers": [
+              "CPUExecutionProvider"
+            ],
+            "intra_op_threads": 2,
+            "inter_op_threads": 1
+          }
+        ],
+        "model_load_seconds": 0.0871329540386796,
+        "observed_model_tensor_shapes": [
+          {
+            "model_path": "/opt/comparison/lib/python3.12/site-packages/magika/models/standard_v3_3/model.onnx",
+            "inputs": {
+              "bytes": {
+                "shape": [
+                  1,
+                  2048
+                ],
+                "dtype": "int64"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/Layout/PP-DocLayoutV2/inference.onnx",
+            "inputs": {
+              "image": {
+                "shape": [
+                  1,
+                  3,
+                  800,
+                  800
+                ],
+                "dtype": "float32"
+              },
+              "scale_factor": {
+                "shape": [
+                  1,
+                  2
+                ],
+                "dtype": "float32"
+              },
+              "im_shape": {
+                "shape": [
+                  1,
+                  2
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_tiny_det_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  1,
+                  3,
+                  160,
+                  832
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_tiny_det_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  2,
+                  3,
+                  320,
+                  960
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_tiny_det_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  1,
+                  3,
+                  192,
+                  960
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_tiny_det_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  1,
+                  3,
+                  160,
+                  736
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_tiny_det_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  1,
+                  3,
+                  128,
+                  960
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_tiny_det_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  1,
+                  3,
+                  384,
+                  960
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_tiny_det_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  1,
+                  3,
+                  288,
+                  960
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_tiny_det_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  1,
+                  3,
+                  352,
+                  160
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_tiny_det_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  1,
+                  3,
+                  128,
+                  128
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_small_rec_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  6,
+                  3,
+                  48,
+                  320
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_small_rec_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  6,
+                  3,
+                  48,
+                  457
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_small_rec_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  6,
+                  3,
+                  48,
+                  740
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_small_rec_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  6,
+                  3,
+                  48,
+                  992
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_small_rec_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  6,
+                  3,
+                  48,
+                  1548
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_small_rec_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  6,
+                  3,
+                  48,
+                  1658
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_small_rec_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  6,
+                  3,
+                  48,
+                  1777
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_small_rec_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  6,
+                  3,
+                  48,
+                  2064
+                ],
+                "dtype": "float32"
+              }
+            }
+          },
+          {
+            "model_path": "/models/MinerU-4_models_onnx/OCR/paddleocr/ch_PP-OCRv6_small_rec_infer.onnx",
+            "inputs": {
+              "x": {
+                "shape": [
+                  2,
+                  3,
+                  48,
+                  2067
+                ],
+                "dtype": "float32"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "pages": [
+    {
+      "physical_page": 9,
+      "mineru": {
+        "physical_page": 9,
+        "status": "SUCCEEDED",
+        "elapsed_seconds": 8.03314123104792,
+        "process_cpu_seconds": 12.610083000000001,
+        "process_peak_rss_kib_cumulative": 1308448,
+        "first_inference_in_process": true,
+        "input_sha256": "fc76a69a8c45c409e698abafd50a4e2a1672512a9ae3283c0379425a85f5bf0c"
+      },
+      "m3": {
+        "status": "HISTORICAL_RESULT_MISSING"
+      }
+    },
+    {
+      "physical_page": 10,
+      "mineru": {
+        "physical_page": 10,
+        "status": "SUCCEEDED",
+        "elapsed_seconds": 4.60954426205717,
+        "process_cpu_seconds": 9.030325999999999,
+        "process_peak_rss_kib_cumulative": 1444108,
+        "first_inference_in_process": false,
+        "input_sha256": "713179b41b1a1673f3306055bc6781c6899035b1a6ca9d9ac8f972c07f9418cc"
+      },
+      "m3": {
+        "status": "HISTORICAL_RESULT_MISSING"
+      }
+    },
+    {
+      "physical_page": 12,
+      "mineru": {
+        "physical_page": 12,
+        "status": "SUCCEEDED",
+        "elapsed_seconds": 9.67229466396384,
+        "process_cpu_seconds": 14.872717,
+        "process_peak_rss_kib_cumulative": 1308836,
+        "first_inference_in_process": true,
+        "input_sha256": "81d706884884e0610632493c29b56250aea4fc164096c7db6b10026a8ebc034c"
+      },
+      "m3": {
+        "status": "succeeded",
+        "elapsed_seconds": 10.337826328002848,
+        "usage": {
+          "input_tokens": 3794,
+          "output_tokens": 816,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 128,
+          "service_tier": "standard"
+        },
+        "http_status": 200,
+        "returned_model": "MiniMax-M3",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "physical_page": 16,
+      "mineru": {
+        "physical_page": 16,
+        "status": "SUCCEEDED",
+        "elapsed_seconds": 5.499747821944766,
+        "process_cpu_seconds": 10.795732999999998,
+        "process_peak_rss_kib_cumulative": 1448464,
+        "first_inference_in_process": false,
+        "input_sha256": "b6f32e6feb099c2876c46b4088a88111b097d9438effe0d7091c8d1abfcbc333"
+      },
+      "m3": {
+        "status": "succeeded",
+        "elapsed_seconds": 15.02663469093386,
+        "usage": {
+          "input_tokens": 3794,
+          "output_tokens": 910,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 128,
+          "service_tier": "standard"
+        },
+        "http_status": 200,
+        "returned_model": "MiniMax-M3",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "physical_page": 23,
+      "mineru": {
+        "physical_page": 23,
+        "status": "SUCCEEDED",
+        "elapsed_seconds": 4.384921333985403,
+        "process_cpu_seconds": 8.615203000000001,
+        "process_peak_rss_kib_cumulative": 1458204,
+        "first_inference_in_process": false,
+        "input_sha256": "10eca256252fed33100c29c5ad5163555a01cf3b6c1f0e3d2be6c87bb1422742"
+      },
+      "m3": {
+        "status": "succeeded",
+        "elapsed_seconds": 12.417022847919725,
+        "usage": {
+          "input_tokens": 3794,
+          "output_tokens": 676,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 128,
+          "service_tier": "standard"
+        },
+        "http_status": 200,
+        "returned_model": "MiniMax-M3",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "physical_page": 75,
+      "mineru": {
+        "physical_page": 75,
+        "status": "SUCCEEDED",
+        "elapsed_seconds": 4.441950150998309,
+        "process_cpu_seconds": 8.662951000000007,
+        "process_peak_rss_kib_cumulative": 1495072,
+        "first_inference_in_process": false,
+        "input_sha256": "372ebe66549cc670499e8dc36416da52bee837b4f906f71743dd5821b59d80e3"
+      },
+      "m3": {
+        "status": "succeeded",
+        "elapsed_seconds": 9.548418182996102,
+        "usage": {
+          "input_tokens": 3794,
+          "output_tokens": 696,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 128,
+          "service_tier": "standard"
+        },
+        "http_status": 200,
+        "returned_model": "MiniMax-M3",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "physical_page": 81,
+      "mineru": {
+        "physical_page": 81,
+        "status": "SUCCEEDED",
+        "elapsed_seconds": 4.41573938797228,
+        "process_cpu_seconds": 8.633852000000005,
+        "process_peak_rss_kib_cumulative": 1529800,
+        "first_inference_in_process": false,
+        "input_sha256": "4fc3266eb57319c76457de4fe30cd64fdb0b52072a7558e6cb12e3f327b5d2f1"
+      },
+      "m3": {
+        "status": "succeeded",
+        "elapsed_seconds": 8.086511446977966,
+        "usage": {
+          "input_tokens": 3794,
+          "output_tokens": 576,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 128,
+          "service_tier": "standard"
+        },
+        "http_status": 200,
+        "returned_model": "MiniMax-M3",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "physical_page": 136,
+      "mineru": {
+        "physical_page": 136,
+        "status": "SUCCEEDED",
+        "elapsed_seconds": 5.393935230909847,
+        "process_cpu_seconds": 10.529780000000002,
+        "process_peak_rss_kib_cumulative": 1531484,
+        "first_inference_in_process": false,
+        "input_sha256": "d03c10b417ed71597894c99a3a7474ef191981f445605956636e4f3007066884"
+      },
+      "m3": {
+        "status": "failed-http",
+        "elapsed_seconds": 7.004612902994268,
+        "http_status": 500
+      }
+    },
+    {
+      "physical_page": 150,
+      "mineru": {
+        "physical_page": 150,
+        "status": "SUCCEEDED",
+        "elapsed_seconds": 4.190106545924209,
+        "process_cpu_seconds": 8.092460000000017,
+        "process_peak_rss_kib_cumulative": 1531760,
+        "first_inference_in_process": false,
+        "input_sha256": "3a6f333014a42df57888f3215a75d8037336758ea0bd6d3b22351ff8b80b293c"
+      },
+      "m3": {
+        "status": "succeeded",
+        "elapsed_seconds": 11.19555201602634,
+        "usage": {
+          "input_tokens": 3794,
+          "output_tokens": 549,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 128,
+          "service_tier": "standard"
+        },
+        "http_status": 200,
+        "returned_model": "MiniMax-M3",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "physical_page": 168,
+      "mineru": {
+        "physical_page": 168,
+        "status": "SUCCEEDED",
+        "elapsed_seconds": 4.645546973915771,
+        "process_cpu_seconds": 9.035918999999978,
+        "process_peak_rss_kib_cumulative": 1531848,
+        "first_inference_in_process": false,
+        "input_sha256": "ec3577d2fbd4ec9c207a56b9f8f4aa5a08f092583e610a4230e8496e10b2d738"
+      },
+      "m3": {
+        "status": "succeeded",
+        "elapsed_seconds": 10.556823240011,
+        "usage": {
+          "input_tokens": 3794,
+          "output_tokens": 758,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 128,
+          "service_tier": "standard"
+        },
+        "http_status": 200,
+        "returned_model": "MiniMax-M3",
+        "stop_reason": "end_turn"
+      }
+    }
+  ],
+  "reference_scope": {
+    "p23_characters": 66,
+    "excluded_uncertain_characters": 217,
+    "mineru_edits": 2,
+    "m3_edits": 0,
+    "p10_characters": 174,
+    "mineru_edits_p10": 1,
+    "reviewer": "development-side image comparison, not user confirmation"
+  }
+}
