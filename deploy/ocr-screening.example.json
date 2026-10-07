@@ -1,0 +1,52 @@
+{
+  "version": "screening-local-example-1.0.0",
+  "image": {
+    "analysis_width": 600,
+    "blur_edge_variance_min": 100,
+    "contrast_p95_p5_min": 80,
+    "skew_degrees_max": 1,
+    "skew_search_degrees": 3,
+    "skew_gain_min": 0.02,
+    "minimum_dpi": 220,
+    "edge_band_fraction": 0.01,
+    "edge_ink_fraction_max": 0.08
+  },
+  "ocr_structure": {
+    "version": "experimental-1",
+    "spatial_overlap": 0.35,
+    "box_padding_px": 8,
+    "lane_overlap": 0.45,
+    "same_row_overlap": 0.45,
+    "low_recognition_score": 0.9,
+    "status_boundary": "structural evidence and review state; never accuracy probability"
+  },
+  "risk": {
+    "low_score_fraction_high": 0.15,
+    "low_score_fraction_medium": 0.03
+  },
+  "mandatory_review": {
+    "pending": true,
+    "recovered": true,
+    "order": true,
+    "duplicate": true,
+    "question_option": true,
+    "critical_disagreement": true,
+    "source_damage": true
+  },
+  "future_visual": {
+    "normal_page_sample_fraction": 0.1,
+    "trigger_risks": [
+      "source_damage",
+      "pending",
+      "order",
+      "duplicate",
+      "critical_disagreement",
+      "unknown"
+    ]
+  },
+  "scoring": {
+    "enabled": false,
+    "normalization": null,
+    "weights": null
+  }
+}

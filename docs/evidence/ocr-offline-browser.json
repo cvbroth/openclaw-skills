@@ -1,0 +1,93 @@
+{
+  "browser": "140.0.7339.16",
+  "offline": true,
+  "scheme": "file://",
+  "pages": [
+    {
+      "physical_page": 6,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 10,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 11,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 13,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 16,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 17,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 18,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 23,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 30,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 33,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 54,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 61,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 63,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 75,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 114,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 127,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 131,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 132,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 146,
+      "displayed_cards_including_page_controls": 26
+    },
+    {
+      "physical_page": 168,
+      "displayed_cards_including_page_controls": 26
+    }
+  ],
+  "page_errors": [],
+  "external_requests": [],
+  "json_export_operations": 1,
+  "imported_into_demo": false,
+  "developer_local_cjk_font": true,
+  "boundary": "automated browser smoke, not user visual or whole-page content acceptance"
+}

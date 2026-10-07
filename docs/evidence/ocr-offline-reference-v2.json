@@ -1,0 +1,78 @@
+{
+  "schema": "reference-revision-summary-v1",
+  "parent_reference_sha256": "bb2c6fa40e44bc2da75671eab97971ae7df72c1292a51b739464712eb0617fb0",
+  "reference_v2_sha256": "012ef8edeadf4888c36bb2884b657d15b95cc62d2ede3daf6abe87293d1604af",
+  "excluded_historical_reference_characters": 217,
+  "source_unreadable_glyph_count": "unknown; full uncertain lines excluded conservatively, not counted as unreadable individual glyphs",
+  "reference_nonwhitespace": 3395,
+  "reviewer_type": "developer-agent",
+  "user_confirmed": false,
+  "scope": "22 complete question blocks plus two partial ROIs (5 options); not full-page accuracy",
+  "scores_by_page": {
+    "11": {
+      "baseline_raw": {
+        "reference_characters": 1278,
+        "edit_distance": 2,
+        "cer": 0.001564945226917058
+      },
+      "contrast125": {
+        "reference_characters": 1278,
+        "edit_distance": 0,
+        "cer": 0.0
+      },
+      "median3-contrast125": {
+        "reference_characters": 1278,
+        "edit_distance": 2,
+        "cer": 0.001564945226917058
+      }
+    },
+    "13": {
+      "baseline_raw": {
+        "reference_characters": 1169,
+        "edit_distance": 4,
+        "cer": 0.003421727972626176
+      },
+      "contrast125": {
+        "reference_characters": 1169,
+        "edit_distance": 6,
+        "cer": 0.0051325919589392645
+      },
+      "median3-contrast125": {
+        "reference_characters": 1169,
+        "edit_distance": 6,
+        "cer": 0.0051325919589392645
+      }
+    },
+    "127": {
+      "baseline_raw": {
+        "reference_characters": 512,
+        "edit_distance": 0,
+        "cer": 0.0
+      }
+    },
+    "131": {
+      "baseline_raw": {
+        "reference_characters": 370,
+        "edit_distance": 7,
+        "cer": 0.01891891891891892
+      }
+    },
+    "23": {
+      "baseline_raw": {
+        "reference_characters": 66,
+        "edit_distance": 4,
+        "cer": 0.06060606060606061
+      },
+      "contrast125": {
+        "reference_characters": 66,
+        "edit_distance": 5,
+        "cer": 0.07575757575757576
+      },
+      "median3-contrast125": {
+        "reference_characters": 66,
+        "edit_distance": 5,
+        "cer": 0.07575757575757576
+      }
+    }
+  }
+}

@@ -1,0 +1,1919 @@
+{
+  "schema": "offline-review-screening-evidence-v1",
+  "config_version": "screening-experimental-1.0.0",
+  "config_sha256": "d11e936cdd76a0b9016da8f23aeca37108458eab69b63c3f8b8c2edef0c55682",
+  "initial_revision_hash": "68f1ceb7c27d923f86fcf7aac6d2c92d06a7cc340447f5e4dc0a25e16bc56853",
+  "pages": [
+    {
+      "physical_page": 6,
+      "image_sha256": "0ba4119c9b88c6410bc78c6974eaa90744ac3cd7d739903509883e1c48a61876",
+      "native_sha256": "84388af31fa9e4eef940805aafa8e99595b2f33fbd18673d39677063ad43f33d",
+      "original_markdown_sha256": "f910bb8bb151bed564a353a39b1da0e4f93580dcf194c8dff5fc50c9f95c6a24",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 5693.237155927173,
+            "contrast_p95_p5": 156,
+            "edge_ink_fractions": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "29 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.0,
+          "native_mean_score": 0.989848951047117,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "low",
+          "reasons": [],
+          "counts": {
+            "pending": 0,
+            "recovered": 0,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 0,
+            "original_export_gap": 0
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [],
+        "review_status": "需复核",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 10,
+      "image_sha256": "713179b41b1a1673f3306055bc6781c6899035b1a6ca9d9ac8f972c07f9418cc",
+      "native_sha256": "28d03f73eeb211d725b4b49d9931ea3f1b20b01dcb48c7cc2fc695c00740726a",
+      "original_markdown_sha256": "9e024a06bb0434aadaf8e7c51a7238810931adf25225eb969072d81512e7d0dd",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 6609.510334692236,
+            "contrast_p95_p5": 155,
+            "edge_ink_fractions": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "1 low native score regions",
+            "39 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.0196078431372549,
+          "native_mean_score": 0.984917495764938,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "pending"
+          ],
+          "counts": {
+            "pending": 1,
+            "recovered": 0,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 0,
+            "original_export_gap": 0
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "pending"
+        ],
+        "review_status": "无法确定",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "pending",
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 11,
+      "image_sha256": "92e138cedab4c4a73225ce0011bc9685daa6f46581303c3df454ddc9c34993c1",
+      "native_sha256": "5d84b25bf150418df30355c8ad74829c923977da123b661a58440996c9041288",
+      "original_markdown_sha256": "5de5ca7c50121c7604f689448b4aca52e9f32d9cfca09d4378f2d38965d101c4",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 6543.411289677293,
+            "contrast_p95_p5": 151,
+            "edge_ink_fractions": [
+              0.0,
+              0.0025,
+              0.0,
+              0.0
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "high",
+          "reasons": [
+            "1 low native score regions",
+            "43 critical-text regions require checking",
+            "5 variant critical disagreements"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.017543859649122806,
+          "native_mean_score": 0.9862370564226519,
+          "variant_coverage": "available",
+          "critical_disagreements": 5,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "pending",
+            "question_option",
+            "critical_disagreement"
+          ],
+          "counts": {
+            "pending": 2,
+            "recovered": 0,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 1,
+            "original_export_gap": 0
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "pending",
+          "question_option",
+          "critical_disagreement"
+        ],
+        "review_status": "无法确定",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "critical_disagreement",
+            "pending",
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 13,
+      "image_sha256": "9523055da6c698d418d6ee9aac1de81cb61710fdf3273cbfb539d8184c356cb6",
+      "native_sha256": "a925db2db192e3c14d7fb2ebb15daa99251df14d80fc925671de1ffa4ed0adf8",
+      "original_markdown_sha256": "9b36e22a482c23e8c130cc914d5d09511cd20fe7121b00e9c5166a195e8d85e5",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 6773.956854252076,
+            "contrast_p95_p5": 164,
+            "edge_ink_fractions": [
+              0.0,
+              0.0022222222222222222,
+              0.0,
+              0.0
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "high",
+          "reasons": [
+            "1 low native score regions",
+            "48 critical-text regions require checking",
+            "6 variant critical disagreements"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.015873015873015872,
+          "native_mean_score": 0.9698928594589233,
+          "variant_coverage": "available",
+          "critical_disagreements": 6,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "recovered",
+            "question_option",
+            "critical_disagreement"
+          ],
+          "counts": {
+            "pending": 0,
+            "recovered": 1,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 1,
+            "original_export_gap": 1
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "recovered",
+          "question_option",
+          "critical_disagreement"
+        ],
+        "review_status": "需复核",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "critical_disagreement",
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 16,
+      "image_sha256": "b6f32e6feb099c2876c46b4088a88111b097d9438effe0d7091c8d1abfcbc333",
+      "native_sha256": "2b324df37cc20fd31a80c05031b015710c0a216dee9f95ef10ab7c9273909dbc",
+      "original_markdown_sha256": "33bb201b82632f2c1c02c5162695d2050a3bf013fc2f4a306930709ae422bd24",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 7415.674290453409,
+            "contrast_p95_p5": 173,
+            "edge_ink_fractions": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "33 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.0,
+          "native_mean_score": 0.9900267073448669,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "question_option"
+          ],
+          "counts": {
+            "pending": 0,
+            "recovered": 0,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 1,
+            "original_export_gap": 0
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "question_option"
+        ],
+        "review_status": "需复核",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 17,
+      "image_sha256": "0ea7e3a0750a287ee57db2754c34db5e3fb2a96c96e7c8a9f2d216327e69d271",
+      "native_sha256": "6ec42eb212eb03c1312077a2c27e97d24d267c4a25fd56e53ce294dade1dc59e",
+      "original_markdown_sha256": "c1714c987ccb0da6e3f328eb933402f77bec8ccf229f2eefa9edb23941253cc8",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 7044.090204435388,
+            "contrast_p95_p5": 167,
+            "edge_ink_fractions": [
+              0.0,
+              0.0022222222222222222,
+              0.0,
+              0.0
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "37 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.0,
+          "native_mean_score": 0.968367690289462,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "medium",
+          "reasons": [],
+          "counts": {
+            "pending": 0,
+            "recovered": 0,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 0,
+            "original_export_gap": 1
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [],
+        "review_status": "需复核",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 18,
+      "image_sha256": "5fbff116ccbeddf63662b35b5f46d0c20a213f8a71f1279ab077585388986c9a",
+      "native_sha256": "f412edbe265ecb66debce2b88bf296cb1a81b9f4c8784ab899ade34ce94f9e17",
+      "original_markdown_sha256": "564e28e8d2c5814bd4b9a1499f029db64cdbda5cd1ce1a0a2a78263b016e534b",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 6947.135267189218,
+            "contrast_p95_p5": 157,
+            "edge_ink_fractions": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "49 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.0,
+          "native_mean_score": 0.9887784211361994,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "pending",
+            "recovered",
+            "question_option"
+          ],
+          "counts": {
+            "pending": 1,
+            "recovered": 4,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 1,
+            "original_export_gap": 0
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "pending",
+          "recovered",
+          "question_option"
+        ],
+        "review_status": "无法确定",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "pending",
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 23,
+      "image_sha256": "10eca256252fed33100c29c5ad5163555a01cf3b6c1f0e3d2be6c87bb1422742",
+      "native_sha256": "75d529b737b79669bf18eb16e3ba22936bdf59a1514515c516eb37d501b2b77f",
+      "original_markdown_sha256": "917917add7a93f9feb9574a9f7c7ef695e69b3ea21cdb0434b7e0cc22b329eb4",
+      "screening": {
+        "image": {
+          "risk": "high",
+          "reasons": [
+            "user reports damaged source; needs clearer source"
+          ],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 6162.54467440359,
+            "contrast_p95_p5": 152,
+            "edge_ink_fractions": [
+              0.0,
+              0.0022222222222222222,
+              0.0,
+              0.0
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "high",
+          "reasons": [
+            "42 low native score regions",
+            "30 critical-text regions require checking",
+            "22 variant critical disagreements"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.7368421052631579,
+          "native_mean_score": 0.8489447340630648,
+          "variant_coverage": "available",
+          "critical_disagreements": 22,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "question_option",
+            "critical_disagreement",
+            "source_damage"
+          ],
+          "counts": {
+            "pending": 0,
+            "recovered": 0,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 7,
+            "original_export_gap": 1
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "question_option",
+          "critical_disagreement",
+          "source_damage"
+        ],
+        "review_status": "无法确定",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "critical_disagreement",
+            "source_damage",
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 30,
+      "image_sha256": "6e3066f049f4adc52728f132e4d8ab1995c7ef5a3937864bd8f0d2f126f54b88",
+      "native_sha256": "95931e5146f24d755258d7c26539af6349079ad5a42ee8a31bea1af3eb0619eb",
+      "original_markdown_sha256": "d5fe2e4dcfa6d7318ec452f9b5063aade06405139298a5170412f8adda2f5fef",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 5749.459834761396,
+            "contrast_p95_p5": 159,
+            "edge_ink_fractions": [
+              0.0,
+              0.008888888888888889,
+              0.0,
+              0.00039261876717707107
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "41 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.0,
+          "native_mean_score": 0.9908587193489075,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "question_option"
+          ],
+          "counts": {
+            "pending": 0,
+            "recovered": 0,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 1,
+            "original_export_gap": 0
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "question_option"
+        ],
+        "review_status": "需复核",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 33,
+      "image_sha256": "d585317dfec5c677d4bf1e393ffc8cded4f6fa4001cc5b3c21833da69e501867",
+      "native_sha256": "ec8516259d4fc0c0d67df1c4476cc71e98e81223ab4509bf0e0923d7a4b07d6d",
+      "original_markdown_sha256": "7958635a359a445c6801f7d75af646b35ec0e61028e597f3d717d00a83740058",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 7092.32913155783,
+            "contrast_p95_p5": 159,
+            "edge_ink_fractions": [
+              0.0,
+              0.0022222222222222222,
+              0.06949352179034157,
+              0.0005889281507656066
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "37 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.0,
+          "native_mean_score": 0.9864924160801635,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "question_option"
+          ],
+          "counts": {
+            "pending": 0,
+            "recovered": 0,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 1,
+            "original_export_gap": 1
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "question_option"
+        ],
+        "review_status": "需复核",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 54,
+      "image_sha256": "5fa6d993b55adb12344750d2138f99cfe262f2a67797518c4ca0e29b36367199",
+      "native_sha256": "9a15761c4de192d808f5696dbd7a2aa0b3280dc8dc8f6741b7401b630ec5dcef",
+      "original_markdown_sha256": "a6374720ed6fab5b3a9476de99da9d964cc704774c3d121ad32d5e8a18335863",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 6353.594696422354,
+            "contrast_p95_p5": 151,
+            "edge_ink_fractions": [
+              0.0,
+              0.0,
+              0.0009815469179426776,
+              0.004122497055359246
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "46 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.0,
+          "native_mean_score": 0.9861393198370934,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "low",
+          "reasons": [],
+          "counts": {
+            "pending": 0,
+            "recovered": 0,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 0,
+            "original_export_gap": 0
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [],
+        "review_status": "需复核",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 61,
+      "image_sha256": "c2a52918229344323159d15f78dfdfc8791163d15e98e7faf6f3e4a4126f15e3",
+      "native_sha256": "50fcba0002fddc654cb21d97ac464532b60a830cddb19b18d6b6c19691122db1",
+      "original_markdown_sha256": "ec115a1a42586d4df5b9d710c9f48973eac4edb3fc05dbd44df13189d8b3844c",
+      "screening": {
+        "image": {
+          "risk": "medium",
+          "reasons": [
+            "edge ink/crop candidate"
+          ],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 6482.882685017601,
+            "contrast_p95_p5": 173,
+            "edge_ink_fractions": [
+              0.0,
+              0.0022222222222222222,
+              0.14055751864939145,
+              0.005104043973301924
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "41 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.0,
+          "native_mean_score": 0.9867930114269257,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "pending",
+            "question_option"
+          ],
+          "counts": {
+            "pending": 1,
+            "recovered": 0,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 1,
+            "original_export_gap": 1
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "pending",
+          "question_option"
+        ],
+        "review_status": "无法确定",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "pending",
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 63,
+      "image_sha256": "580cb127b88ef3cb74128ae524a901a39a37e763dfcf6ed65c403a66dac1eee2",
+      "native_sha256": "d96252ec0e5ed6d26b1feed00d52048a07ca58a0b8d0558c6fc91a4e9abf861f",
+      "original_markdown_sha256": "c12284f7cbfe9ba674ce8f82feb7957be92715a053dc256e2ba0c02c371dc448",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 6189.6420730306445,
+            "contrast_p95_p5": 143,
+            "edge_ink_fractions": [
+              0.0,
+              0.0022222222222222222,
+              0.011189634864546525,
+              0.0
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "33 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.0,
+          "native_mean_score": 0.9870915386987769,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "question_option"
+          ],
+          "counts": {
+            "pending": 0,
+            "recovered": 0,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 1,
+            "original_export_gap": 0
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "question_option"
+        ],
+        "review_status": "需复核",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 75,
+      "image_sha256": "372ebe66549cc670499e8dc36416da52bee837b4f906f71743dd5821b59d80e3",
+      "native_sha256": "51c4c544f82674673269af42dab4f8c776c80e09ced55413d5c6df400582f399",
+      "original_markdown_sha256": "7446bbac50b1937e369b9d53601225835f471bd41cf15d42d6911c17a22bb984",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 5731.763565760762,
+            "contrast_p95_p5": 152,
+            "edge_ink_fractions": [
+              0.0,
+              0.0022222222222222222,
+              0.00039261876717707107,
+              0.009815469179426776
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "50 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.0,
+          "native_mean_score": 0.9866287273875738,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "low",
+          "reasons": [],
+          "counts": {
+            "pending": 0,
+            "recovered": 0,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 0,
+            "original_export_gap": 0
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [],
+        "review_status": "需复核",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 114,
+      "image_sha256": "ea8c3e52def820defc1f67839c4ddb47421f1259e24cbe2c596e44682f64a56f",
+      "native_sha256": "550f7f82cb87cea9ff8a7794d59b00e66fc839e5863294f41ec520d2d0ee3dfa",
+      "original_markdown_sha256": "e5db444dc2e7729ae2ceb6b6649ec5827bc16f18d7dc9568b7a0e082f89544b3",
+      "screening": {
+        "image": {
+          "risk": "medium",
+          "reasons": [
+            "edge ink/crop candidate"
+          ],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 6269.8510894209585,
+            "contrast_p95_p5": 177,
+            "edge_ink_fractions": [
+              0.0005555555555555556,
+              0.0,
+              0.15371024734982333,
+              0.010797016097369454
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "medium",
+          "reasons": [
+            "3 low native score regions",
+            "55 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.046153846153846156,
+          "native_mean_score": 0.973616312688856,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "order",
+            "question_option"
+          ],
+          "counts": {
+            "pending": 0,
+            "recovered": 0,
+            "order": 1,
+            "duplicate": 0,
+            "question_option": 4,
+            "original_export_gap": 1
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "order",
+          "question_option"
+        ],
+        "review_status": "需复核",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "order",
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 127,
+      "image_sha256": "24b7b0a3b1732e87b62b59c6d031afe16e5339633f924b20cf020f72e2c16c9a",
+      "native_sha256": "c4c005f6e758ab7b0da0a173c0677fdcbe96c94fbbb9d8d41dd1781f82e1b9a2",
+      "original_markdown_sha256": "0f62c4bdd9d77297d9a56c5d80c33f6d07354dd78baf7a22e0cd5724f60e694a",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 7032.583247803992,
+            "contrast_p95_p5": 170,
+            "edge_ink_fractions": [
+              0.0016666666666666668,
+              0.01638888888888889,
+              0.0,
+              0.0
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "42 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.0,
+          "native_mean_score": 0.9874265193939209,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "recovered",
+            "question_option"
+          ],
+          "counts": {
+            "pending": 0,
+            "recovered": 15,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 1,
+            "original_export_gap": 0
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "recovered",
+          "question_option"
+        ],
+        "review_status": "需复核",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 131,
+      "image_sha256": "60aebbc69acbf5e28cefd3cdfe18db8a567a4777e83b0de8d1c064cf1bda796b",
+      "native_sha256": "59669de7a5a7f62680e759b1288705dafb4905bb6fb9052662b0522f569be495",
+      "original_markdown_sha256": "dce7f1bf37cf9b1bbbd08887d3a7ea21b991d0639491e824a65936fdc2b00e68",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 6598.114933873168,
+            "contrast_p95_p5": 157,
+            "edge_ink_fractions": [
+              0.0002777777777777778,
+              0.0022222222222222222,
+              0.0,
+              0.0
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "1 low native score regions",
+            "42 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.017857142857142856,
+          "native_mean_score": 0.9520051539467093,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "pending",
+            "recovered",
+            "question_option"
+          ],
+          "counts": {
+            "pending": 1,
+            "recovered": 16,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 1,
+            "original_export_gap": 0
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "pending",
+          "recovered",
+          "question_option"
+        ],
+        "review_status": "无法确定",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "pending",
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 132,
+      "image_sha256": "0791a7dfcdfc7f1e453b794703329eebf567c562c427d0c32ae2b85991b91e4a",
+      "native_sha256": "9a7d33414c0623ef01df3af3838d653a78096a99ae7405d31a15690d7a42695d",
+      "original_markdown_sha256": "bd64d89218b50620280d9f86ebffd07cfd57e695493f4b9c58eb3d66074be3a0",
+      "screening": {
+        "image": {
+          "risk": "medium",
+          "reasons": [
+            "edge ink/crop candidate"
+          ],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 6883.624826525591,
+            "contrast_p95_p5": 174,
+            "edge_ink_fractions": [
+              0.0002777777777777778,
+              0.0,
+              0.09363957597173145,
+              0.0009815469179426776
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "medium",
+          "reasons": [
+            "2 low native score regions",
+            "45 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.03773584905660377,
+          "native_mean_score": 0.9661058624679187,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "pending"
+          ],
+          "counts": {
+            "pending": 2,
+            "recovered": 0,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 0,
+            "original_export_gap": 1
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "pending"
+        ],
+        "review_status": "无法确定",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "pending",
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 146,
+      "image_sha256": "a22964bd40173a3e12ad2264adeaf2092eac0b5576d9d678a016cedd47e0e34d",
+      "native_sha256": "94216b9d55a039b99b1282e019e65dc65586e6ba5aae0630708ff972b9b378cc",
+      "original_markdown_sha256": "1d4c2f451d5515493615ddf6f7bba88a45d4d5ebc169754547117f9ad3b4fbb3",
+      "screening": {
+        "image": {
+          "risk": "medium",
+          "reasons": [
+            "edge ink/crop candidate"
+          ],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 6189.079210201307,
+            "contrast_p95_p5": 163,
+            "edge_ink_fractions": [
+              0.0,
+              0.0,
+              0.1440910875539851,
+              0.00019630938358853554
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "37 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.0,
+          "native_mean_score": 0.9894790869692097,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "high",
+          "reasons": [
+            "pending",
+            "recovered",
+            "order",
+            "question_option"
+          ],
+          "counts": {
+            "pending": 1,
+            "recovered": 1,
+            "order": 1,
+            "duplicate": 0,
+            "question_option": 2,
+            "original_export_gap": 1
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [
+          "pending",
+          "recovered",
+          "order",
+          "question_option"
+        ],
+        "review_status": "无法确定",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "order",
+            "pending",
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    },
+    {
+      "physical_page": 168,
+      "image_sha256": "ec3577d2fbd4ec9c207a56b9f8f4aa5a08f092583e610a4230e8496e10b2d738",
+      "native_sha256": "cb781723f9c301ce72a46a88f7895a24e8404faeba6d261035ba4d0ee6e3788d",
+      "original_markdown_sha256": "a9f291e536cb4225b4675832c3ce4a884c1339f6b22ffe35e6c1c86579d9bca8",
+      "screening": {
+        "image": {
+          "risk": "unknown",
+          "reasons": [],
+          "unknown": [
+            "skew unresolved by coarse projection"
+          ],
+          "metrics": {
+            "dimensions_px": [
+              1819,
+              2573
+            ],
+            "dpi": 220,
+            "dpi_source": "explicit manifest",
+            "analysis_dimensions_px": [
+              600,
+              849
+            ],
+            "edge_variance": 6389.444949465834,
+            "contrast_p95_p5": 153,
+            "edge_ink_fractions": [
+              0.0,
+              0.0,
+              0.0,
+              0.0009815469179426776
+            ],
+            "skew_degrees_coarse": null,
+            "skew_projection_gain": 0.0,
+            "coverage": [
+              "grayscale edge variance",
+              "global histogram",
+              "coarse ±3 degree horizontal projection",
+              "edge ink proxy",
+              "pixel dimensions and declared DPI"
+            ],
+            "blind_spots": [
+              "not readability truth",
+              "local damaged glyphs can escape global metrics",
+              "edge ink is not proof of cropping",
+              "layout/sidebars confound skew",
+              "DPI does not measure effective glyph resolution"
+            ]
+          }
+        },
+        "recognition": {
+          "risk": "low",
+          "reasons": [
+            "50 critical-text regions require checking"
+          ],
+          "native_score_source": "PP-StructureV3 overall_ocr_res.rec_scores (per recognized line)",
+          "low_score_fraction": 0.0,
+          "native_mean_score": 0.9610324375557177,
+          "variant_coverage": "unknown: no same-page variants",
+          "critical_disagreements": 0,
+          "not_correctness_probability": true
+        },
+        "structure": {
+          "risk": "low",
+          "reasons": [],
+          "counts": {
+            "pending": 0,
+            "recovered": 0,
+            "order": 0,
+            "duplicate": 0,
+            "question_option": 0,
+            "original_export_gap": 0
+          },
+          "coverage": "text and spatial checks; not full semantic validation"
+        },
+        "mandatory_review_reasons": [],
+        "review_status": "需复核",
+        "page_verified": false,
+        "total_score": null,
+        "future_visual": {
+          "trigger_reasons": [
+            "unknown"
+          ],
+          "normal_page_sample_selected": false,
+          "performed": false,
+          "boundary": "reserved records only; no model dependency or call"
+        }
+      }
+    }
+  ],
+  "items": 1448,
+  "dimension_risk_counts": {
+    "image": {
+      "unknown": 15,
+      "high": 1,
+      "medium": 4
+    },
+    "recognition": {
+      "low": 15,
+      "high": 3,
+      "medium": 2
+    },
+    "structure": {
+      "low": 4,
+      "high": 15,
+      "medium": 1
+    }
+  },
+  "whole_pages_confirmed": 0,
+  "all_initially_unconfirmed": true,
+  "elapsed_seconds": 16.55556519899983,
+  "process_peak_rss_kib": 74784,
+  "inference_runs": 0,
+  "model_calls": 0,
+  "preprocessing_default": false,
+  "calibration": "uncalibrated experimental rules; not accuracy"
+}

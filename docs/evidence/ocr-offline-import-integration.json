@@ -1,0 +1,19 @@
+{
+  "schema": "offline-review-integration-v1",
+  "actual_browser_receipt_imported": true,
+  "reviewer_type": "developer-agent",
+  "user_confirmations": 0,
+  "new_revision": 1,
+  "new_revision_sha256": "7f62f4a586150985352d9c0d680640d22ce1c389da459921af038084295493ad",
+  "rejections": {
+    "duplicate": "DUPLICATE_IMPORT",
+    "stale": "STALE_REVISION",
+    "unknown": "UNKNOWN_ID"
+  },
+  "original_demo_revision": 0,
+  "all_original_items_unconfirmed": true,
+  "all_20_original_repaired_texts_order_unchanged": true,
+  "source_assets_and_crops_hashes_verified": true,
+  "zip_crc_and_relative_paths_verified": true,
+  "scope": "isolated copy only; not human acceptance or production"
+}
