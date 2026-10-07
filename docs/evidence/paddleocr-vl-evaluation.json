@@ -1,0 +1,121 @@
+{
+  "baseline": "868c25dc3683f184aeb33eb1462fbfeee9df7246",
+  "scope_physical_pages": [
+    6,
+    10,
+    30
+  ],
+  "third_page_selection": "Existing preflight multiple-choice candidate; image confirms type switch, reset numbering and inline options",
+  "hardware": {
+    "cpu": "Intel Xeon E3-1270 v5 3.60GHz",
+    "physical_cores": 4,
+    "logical_cpus": 8,
+    "avx2": true,
+    "host_total_mib": 31023,
+    "host_available_mib_snapshot": 19088,
+    "dev_disk_available_gib_snapshot": 312,
+    "gpu": "NVIDIA GT218 GeForce 210 PCI 10de:0a65",
+    "driver": "nouveau",
+    "nvidia_smi_available": false,
+    "cuda_device_nodes": false,
+    "vram_bytes": null,
+    "production_worker_memory_limit_bytes": 4294967296,
+    "load_average_snapshot": [
+      3.06,
+      2.36,
+      1.3
+    ]
+  },
+  "base_image_id": "sha256:f00d08c74004014b9cc098cd2f705befae75ee945c6698b77e42e5bca7cb9f68",
+  "limits": {
+    "cpu": 2,
+    "memory_bytes": 8589934592,
+    "memory_plus_swap_bytes": 8589934592,
+    "pids": 96,
+    "model_load_seconds": 180,
+    "each_page_seconds": 300,
+    "network": "none"
+  },
+  "models_verified": {
+    "file_count": 18,
+    "bytes": 2062328724
+  },
+  "reference_review": "Agent visually transcribed 517 selected non-whitespace characters; no user second human review performed",
+  "production_changes": false,
+  "inference_status": "BLOCKED_MODEL_LOAD_OOM",
+  "synthetic_tests": {
+    "passed": 6,
+    "scope": "CER, watchdog termination and zombie status, fixed revision/LFS hash/Git blob gates; not OCR recognition"
+  },
+  "evaluation_date": "2026-10-07",
+  "image_id": "sha256:2b423d1a39d0a064e35fdef74f88bf2b34837b9eba8b36d85329bf18941f3cb3",
+  "image_virtual_size_bytes": 1556082193,
+  "model_load_seconds": null,
+  "pages_recognized": 0,
+  "page_inference_seconds": {
+    "6": null,
+    "10": null,
+    "30": null
+  },
+  "cold_start": "fresh process load failed; no first inference",
+  "warm_inference": "not performed",
+  "runtime_receipt": {
+    "status": "FAILED",
+    "wall_seconds": 34.50165964302141,
+    "exit_code": -9,
+    "monitored_process_peak_rss_kib": 8369148,
+    "timeout": null,
+    "model_load_limit_seconds": 180,
+    "page_limit_seconds": 300,
+    "pages_requested": [
+      6,
+      10,
+      30
+    ],
+    "offline": true,
+    "identity": "independent evaluation, not FileTools production",
+    "container_memory_peak_bytes": 8589934592
+  },
+  "container_terminal_state": {
+    "status": "exited",
+    "oom_killed": true,
+    "exit_code": 2
+  },
+  "import_seconds": 3.8836415139958262,
+  "model_memory_shortfall": "8 GiB cap reached while loading; sufficient target capacity not measured",
+  "recommendation": "Current 8 GiB CPU trial cannot proceed. Prefer compatible GPU/self-hosted remote evaluation; a higher-memory CPU experiment needs separately agreed bounds. OCR quality benefit unknown.",
+  "pip_check": "No broken requirements found",
+  "cv2_version": "4.10.0",
+  "environment_lock_sha256": "7e32c435b8d74a7bcbdfecbfe5f16ac5386d4e984f0f1b024396a43a968258bd",
+  "dependency_install_step_log_seconds": 8223.8,
+  "first_attempt": {
+    "oom_killed": true,
+    "monitor_error": "TypeError while reading zombie memory fields; fixed and regression tested",
+    "peak_rss_kib": null
+  },
+  "manual_user_second_review": "not performed",
+  "full_question_expectations_from_viewed_images": {
+    "6": {
+      "complete_in_page": 5,
+      "option_labels": 20
+    },
+    "10": {
+      "complete_in_page": 5,
+      "previous_page_continuation": 1,
+      "option_labels": 24
+    },
+    "30": {
+      "single_choice": 3,
+      "multiple_choice": 5,
+      "option_labels": 32
+    }
+  },
+  "engine_completeness": "PaddleOCR-VL unassessed: failed before page processing",
+  "limitations": [
+    "No completed model load, page inference, warm inference, or new-model CER",
+    "Requests compatibility warning; not established as OOM cause",
+    "Two installed OpenCV distributions; actual cv2 import 4.10.0. pip check does not prove binary compatibility",
+    "Locked rebuild recipe was produced from measured image freeze; revised recipe not rebuilt",
+    "Reported CER baseline deliberately targets known suspect blocks; not whole-page/book accuracy"
+  ]
+}

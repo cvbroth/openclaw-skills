@@ -1,0 +1,10 @@
+# Independent CPU evaluation only; never a production Worker.
+FROM filetools-document-compat:20261006-pdfium513
+USER root
+COPY paddlepaddle-3.2.2-cp312-cp312-linux_x86_64.whl /tmp/
+RUN /usr/local/bin/python -c "import hashlib; from pathlib import Path; p=Path('/tmp/paddlepaddle-3.2.2-cp312-cp312-linux_x86_64.whl'); assert hashlib.sha256(p.read_bytes()).hexdigest() == 'f6b3b73d47acc82cf545896e6e5c31b55a7f9a26dc0acb28abcc24069d9396dd'" && cp -a /opt/nas-filetools/.venv /opt/paddle-vl && /opt/paddle-vl/bin/python -m pip install --no-deps /tmp/paddlepaddle-3.2.2-cp312-cp312-linux_x86_64.whl && rm /tmp/*.whl
+COPY paddleocr-vl-eval.requirements.lock /tmp/constraints.txt
+RUN /opt/paddle-vl/bin/python -m pip install --constraint /tmp/constraints.txt --no-cache-dir --timeout 45 --retries 2 'paddlepaddle==3.2.2' 'paddleocr[doc-parser]==3.4.0' 'paddlex==3.4.0' 'PyMuPDF==1.25.5' 'Pillow==11.1.0'
+RUN /opt/paddle-vl/bin/python -m pip freeze > /opt/paddle-vl/environment.freeze.txt
+USER 1000:1000
+ENTRYPOINT ["/opt/paddle-vl/bin/python"]

@@ -1,0 +1,128 @@
+[
+  {
+    "repository": "PaddlePaddle/PaddleOCR-VL-1.5",
+    "revision": "2a4195faa5e7914c12f2fc601d72c81caf8d2da5",
+    "file": "vl/LICENSE",
+    "bytes": 11376,
+    "sha256": "b8c4d7deccd236af023af1c88c4d4e8f0fc2f41914e0fb23a3ec9678fb5a8456"
+  },
+  {
+    "repository": "PaddlePaddle/PaddleOCR-VL-1.5",
+    "revision": "2a4195faa5e7914c12f2fc601d72c81caf8d2da5",
+    "file": "vl/README.md",
+    "bytes": 22955,
+    "sha256": "0eeebf42ca617495dec7343909667a79840b240d7cb6c5572e221fad0b128557"
+  },
+  {
+    "repository": "PaddlePaddle/PaddleOCR-VL-1.5",
+    "revision": "2a4195faa5e7914c12f2fc601d72c81caf8d2da5",
+    "file": "vl/added_tokens.json",
+    "bytes": 25381,
+    "sha256": "f59f889088e0fe21c523e7cf121bb6dca3b0bb148cb7159fbb4572c74dfc5644"
+  },
+  {
+    "repository": "PaddlePaddle/PaddleOCR-VL-1.5",
+    "revision": "2a4195faa5e7914c12f2fc601d72c81caf8d2da5",
+    "file": "vl/chat_template.jinja",
+    "bytes": 1474,
+    "sha256": "2f27812dab7f333e471884e0c803d807f11953d5453140dfb1aaba234f872bc8"
+  },
+  {
+    "repository": "PaddlePaddle/PaddleOCR-VL-1.5",
+    "revision": "2a4195faa5e7914c12f2fc601d72c81caf8d2da5",
+    "file": "vl/config.json",
+    "bytes": 2059,
+    "sha256": "ce7f4565f8b1db78532ad5d1b9ebe55c2139d49bd4cb04778b580a08a598f171"
+  },
+  {
+    "repository": "PaddlePaddle/PaddleOCR-VL-1.5",
+    "revision": "2a4195faa5e7914c12f2fc601d72c81caf8d2da5",
+    "file": "vl/generation_config.json",
+    "bytes": 133,
+    "sha256": "a6701d78ab3b4d972307cdec3b69d4c13f46e0d5140514f50ab7d84259324b94"
+  },
+  {
+    "repository": "PaddlePaddle/PaddleOCR-VL-1.5",
+    "revision": "2a4195faa5e7914c12f2fc601d72c81caf8d2da5",
+    "file": "vl/inference.yml",
+    "bytes": 43,
+    "sha256": "b70e21114423f553b433e977f16c1360092ac9f609e04bc5c10fed3a8a791a6e"
+  },
+  {
+    "repository": "PaddlePaddle/PaddleOCR-VL-1.5",
+    "revision": "2a4195faa5e7914c12f2fc601d72c81caf8d2da5",
+    "file": "vl/model.safetensors",
+    "bytes": 1917255968,
+    "sha256": "d557c9d8997ae57ed3b1b33bdf347be878cc335687f32ca105341c16973f8958"
+  },
+  {
+    "repository": "PaddlePaddle/PaddleOCR-VL-1.5",
+    "revision": "2a4195faa5e7914c12f2fc601d72c81caf8d2da5",
+    "file": "vl/preprocessor_config.json",
+    "bytes": 641,
+    "sha256": "111872ab1e8bb7fd040ac5087bfced7ab8f011f02139b088cba294964c3b1d0e"
+  },
+  {
+    "repository": "PaddlePaddle/PaddleOCR-VL-1.5",
+    "revision": "2a4195faa5e7914c12f2fc601d72c81caf8d2da5",
+    "file": "vl/processor_config.json",
+    "bytes": 137,
+    "sha256": "1568858960a9760c54431dae693a6152e601ff55cdf6d2eab97a4a99958faea0"
+  },
+  {
+    "repository": "PaddlePaddle/PaddleOCR-VL-1.5",
+    "revision": "2a4195faa5e7914c12f2fc601d72c81caf8d2da5",
+    "file": "vl/special_tokens_map.json",
+    "bytes": 1151,
+    "sha256": "d3a125c03103deb2acaf7730791bdbbf196f620e5a2213b664511ff9b4b25bab"
+  },
+  {
+    "repository": "PaddlePaddle/PaddleOCR-VL-1.5",
+    "revision": "2a4195faa5e7914c12f2fc601d72c81caf8d2da5",
+    "file": "vl/tokenizer.json",
+    "bytes": 11189060,
+    "sha256": "c8a215a59183d0d0781adc33bacd3ce6162716f7fd568fb30234a74d69803a7d"
+  },
+  {
+    "repository": "PaddlePaddle/PaddleOCR-VL-1.5",
+    "revision": "2a4195faa5e7914c12f2fc601d72c81caf8d2da5",
+    "file": "vl/tokenizer.model",
+    "bytes": 1614363,
+    "sha256": "34ef7db83df785924fb83d7b887b6e822a031c56e15cff40aaf9b982988180df"
+  },
+  {
+    "repository": "PaddlePaddle/PaddleOCR-VL-1.5",
+    "revision": "2a4195faa5e7914c12f2fc601d72c81caf8d2da5",
+    "file": "vl/tokenizer_config.json",
+    "bytes": 186947,
+    "sha256": "1f979337347cc0cb72a6282d8a23ed183539aa81a87a906f022aee2bab83c7c5"
+  },
+  {
+    "repository": "PaddlePaddle/PP-DocLayoutV3",
+    "revision": "241f8bdfc77a7c7bee915a5057aaee58c235a8d3",
+    "file": "layout/README.md",
+    "bytes": 12092,
+    "sha256": "08b60d8d7a14ddfbe29bcef9e2c2c75bf012bb0412f4e41a2bdfe5687a741dc7"
+  },
+  {
+    "repository": "PaddlePaddle/PP-DocLayoutV3",
+    "revision": "241f8bdfc77a7c7bee915a5057aaee58c235a8d3",
+    "file": "layout/inference.json",
+    "bytes": 1196890,
+    "sha256": "2b68367c5b312a03de5a6e1642c597c8f95165a7e40cd59c6700cf4a5042f4fd"
+  },
+  {
+    "repository": "PaddlePaddle/PP-DocLayoutV3",
+    "revision": "241f8bdfc77a7c7bee915a5057aaee58c235a8d3",
+    "file": "layout/inference.pdiparams",
+    "bytes": 130806572,
+    "sha256": "70bd316b0582769ec968829fd1feb1a6a58b7c941b938327e551b6b12b45c137"
+  },
+  {
+    "repository": "PaddlePaddle/PP-DocLayoutV3",
+    "revision": "241f8bdfc77a7c7bee915a5057aaee58c235a8d3",
+    "file": "layout/inference.yml",
+    "bytes": 1482,
+    "sha256": "506fcfac13b3b546ae40d7886b44126420f392adb694e3f8bb6a6286a1f90fdc"
+  }
+]
