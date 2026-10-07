@@ -1,0 +1,27 @@
+{
+  "version": "ocr-m3-comparison-experimental-1.0.0",
+  "visual_quality": {
+    "dimensions": {
+      "clarity": {"weight": 0.3},
+      "glyph_damage": {"weight": 0.25},
+      "contrast_background": {"weight": 0.15},
+      "deformation": {"weight": 0.1},
+      "crop_obstruction": {"weight": 0.2}
+    },
+    "grade_values": {"good": 100, "minor": 70, "major": 25},
+    "minimum_known_weight": 0.8,
+    "risk_thresholds": {"normal_min": 80, "review_min": 40},
+    "critical_caps": {"critical_body_unreadable": 39, "critical_crop_obstruction": 19},
+    "mandatory_review": ["invalid_response", "unknown_coverage", "pending", "order", "duplicate", "critical_disagreement", "source_damage"]
+  },
+  "candidate_selection": {
+    "trigger_risks": [
+      "pending", "order", "duplicate", "critical_disagreement", "source_damage",
+      "recovered", "question_option", "low_score", "original_export_gap"
+    ],
+    "crop_padding_px": 24,
+    "merge_gap_px": 36,
+    "maximum_regions_per_page": 12,
+    "normal_page_sample_fraction": 0.2
+  }
+}

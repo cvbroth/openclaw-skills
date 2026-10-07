@@ -1,0 +1,30 @@
+{
+  "browser": "140.0.7339.16",
+  "offline": true,
+  "pages": [
+    {
+      "physical_page": 11,
+      "loaded_region_images": 4
+    },
+    {
+      "physical_page": 23,
+      "loaded_region_images": 1
+    },
+    {
+      "physical_page": 114,
+      "loaded_region_images": 3
+    },
+    {
+      "physical_page": 127,
+      "loaded_region_images": 7
+    },
+    {
+      "physical_page": 131,
+      "loaded_region_images": 10
+    }
+  ],
+  "page_errors": [],
+  "external_requests": [],
+  "confirmed_or_imported": false,
+  "boundary": "browser interaction/asset checks; source-image inspection separately recorded"
+}

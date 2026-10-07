@@ -1,0 +1,1587 @@
+{
+  "schema": "ocr-m3-comparison-evidence-v1",
+  "config_sha256": "1716fbff1843aa0b9e9c448674dc64006d0ef2ab1c3b861c8cddac93886358de",
+  "prompt_preparation_config_sha256": "d70734adff36385911f0d01d3d95507d99b27acd273db0092b8976b52deef157",
+  "config_version": "ocr-m3-comparison-experimental-1.0.0",
+  "pages": [
+    {
+      "physical_page": 11,
+      "image_sha256": "92e138cedab4c4a73225ce0011bc9685daa6f46581303c3df454ddc9c34993c1",
+      "native_sha256": "5d84b25bf150418df30355c8ad74829c923977da123b661a58440996c9041288",
+      "candidate_receipt": {
+        "selected_item_count": 6,
+        "merged_region_count": 4,
+        "returned_region_count": 4,
+        "overflow_region_count": 0,
+        "overflow_item_ids": []
+      },
+      "routes": {
+        "direct": {
+          "ok": true,
+          "model": "MiniMax-M3",
+          "provider": "minimax-portal",
+          "usage": {
+            "input": 25492,
+            "output": 1278,
+            "cacheRead": 21376,
+            "cacheWrite": 0,
+            "total": 48146,
+            "reported_cost": 0
+          },
+          "parse": {
+            "strict_json": true,
+            "salvaged_fields": []
+          },
+          "elapsed_seconds": 28.831230878829956,
+          "view_image_log_mentions": 2,
+          "image_tool_calls": 1,
+          "provider_http_requests": 2,
+          "tool_names": [
+            "view_image"
+          ],
+          "provider_200": true,
+          "response_sha256": "b935a2fe4d28a79689d58be4e6f94e6b4f0b1230f4247420c7655aa0d29883a5",
+          "actual_prompt_sha256": "aa554c42789da9c049899d3e97d0f3b8eef4c78f0f28141f60d1146c30536826",
+          "prepared_prompt_sha256": "aa554c42789da9c049899d3e97d0f3b8eef4c78f0f28141f60d1146c30536826",
+          "prompt_matches_preparation": true,
+          "quality": {
+            "experimental_readability_score": 100.0,
+            "known_weight": 1.0,
+            "missing_dimensions": [],
+            "critical_flags": [],
+            "screening_suggestion": "正常抽查",
+            "human_acceptance_status": "未确认",
+            "dimensions": {
+              "clarity": {
+                "grade": "good",
+                "weight": 0.3,
+                "region_count": 0
+              },
+              "glyph_damage": {
+                "grade": "good",
+                "weight": 0.25,
+                "region_count": 0
+              },
+              "contrast_background": {
+                "grade": "good",
+                "weight": 0.15,
+                "region_count": 0
+              },
+              "deformation": {
+                "grade": "good",
+                "weight": 0.1,
+                "region_count": 0
+              },
+              "crop_obstruction": {
+                "grade": "good",
+                "weight": 0.2,
+                "region_count": 0
+              }
+            },
+            "not_accuracy_or_probability": true
+          },
+          "system_screening": {
+            "screening_suggestion": "正常抽查",
+            "blockers": [],
+            "normal_page_sample_selected": false,
+            "human_acceptance_status": "未确认"
+          }
+        },
+        "review": {
+          "ok": true,
+          "model": "MiniMax-M3",
+          "provider": "minimax-portal",
+          "usage": {
+            "input": 50102,
+            "output": 1718,
+            "cacheRead": 24448,
+            "cacheWrite": 0,
+            "total": 76268,
+            "reported_cost": 0
+          },
+          "parse": {
+            "strict_json": false,
+            "error_offset": 0,
+            "salvaged_fields": [
+              "wrapped_json_object"
+            ]
+          },
+          "elapsed_seconds": 52.65351724624634,
+          "view_image_log_mentions": 10,
+          "image_tool_calls": 5,
+          "provider_http_requests": 3,
+          "tool_names": [
+            "view_image"
+          ],
+          "provider_200": true,
+          "response_sha256": "481ec8c72791043dd6679352f2495473fd432b36ec929c96d3c413e3fa8c39b4",
+          "actual_prompt_sha256": "352a3e84f13a40e73318b5fbb0b6b4a2855baacaf741f1c52c1e0c6974d1f8ba",
+          "prepared_prompt_sha256": "352a3e84f13a40e73318b5fbb0b6b4a2855baacaf741f1c52c1e0c6974d1f8ba",
+          "prompt_matches_preparation": true,
+          "quality": {
+            "experimental_readability_score": 86.5,
+            "known_weight": 1.0,
+            "missing_dimensions": [],
+            "critical_flags": [],
+            "screening_suggestion": "正常抽查",
+            "human_acceptance_status": "未确认",
+            "dimensions": {
+              "clarity": {
+                "grade": "good",
+                "weight": 0.3,
+                "region_count": 0
+              },
+              "glyph_damage": {
+                "grade": "minor",
+                "weight": 0.25,
+                "region_count": 1
+              },
+              "contrast_background": {
+                "grade": "good",
+                "weight": 0.15,
+                "region_count": 0
+              },
+              "deformation": {
+                "grade": "good",
+                "weight": 0.1,
+                "region_count": 0
+              },
+              "crop_obstruction": {
+                "grade": "minor",
+                "weight": 0.2,
+                "region_count": 1
+              }
+            },
+            "not_accuracy_or_probability": true
+          },
+          "system_screening": {
+            "screening_suggestion": "需人工查看",
+            "blockers": [
+              "critical_disagreement",
+              "invalid_response",
+              "pending"
+            ],
+            "normal_page_sample_selected": false,
+            "human_acceptance_status": "未确认"
+          },
+          "candidate_status_counts": {
+            "keep": 5,
+            "replace": 1
+          },
+          "applied_unconfirmed_text_edits": 1
+        }
+      },
+      "local_structure_counts": {
+        "raw_lines": 57,
+        "covered_before": 55,
+        "covered_after": 55,
+        "recovered_lines": 0,
+        "pending_lines": 2
+      }
+    },
+    {
+      "physical_page": 23,
+      "image_sha256": "10eca256252fed33100c29c5ad5163555a01cf3b6c1f0e3d2be6c87bb1422742",
+      "native_sha256": "75d529b737b79669bf18eb16e3ba22936bdf59a1514515c516eb37d501b2b77f",
+      "candidate_receipt": {
+        "selected_item_count": 55,
+        "merged_region_count": 1,
+        "returned_region_count": 1,
+        "overflow_region_count": 0,
+        "overflow_item_ids": []
+      },
+      "routes": {
+        "direct": {
+          "ok": true,
+          "model": "MiniMax-M3",
+          "provider": "minimax-portal",
+          "usage": {
+            "input": 46506,
+            "output": 1422,
+            "cacheRead": 473,
+            "cacheWrite": 0,
+            "total": 48401,
+            "reported_cost": 0
+          },
+          "parse": {
+            "strict_json": false,
+            "error_offset": 1612,
+            "salvaged_fields": [
+              "body_text",
+              "visual_quality"
+            ]
+          },
+          "elapsed_seconds": 44.462971687316895,
+          "view_image_log_mentions": 2,
+          "image_tool_calls": 1,
+          "provider_http_requests": 2,
+          "tool_names": [
+            "view_image"
+          ],
+          "provider_200": true,
+          "response_sha256": "81a91961caf9bbed073374e3caf06b9e45889c5caa87849f001fd9cde65148fc",
+          "actual_prompt_sha256": "d962ddf4947162c7b509003ee1c08b0267da7427f034b0369ea0e5b862dd24eb",
+          "prepared_prompt_sha256": "d962ddf4947162c7b509003ee1c08b0267da7427f034b0369ea0e5b862dd24eb",
+          "prompt_matches_preparation": true,
+          "quality": {
+            "experimental_readability_score": 83.5,
+            "known_weight": 1.0,
+            "missing_dimensions": [],
+            "critical_flags": [],
+            "screening_suggestion": "正常抽查",
+            "human_acceptance_status": "未确认",
+            "dimensions": {
+              "clarity": {
+                "grade": "minor",
+                "weight": 0.3,
+                "region_count": 3
+              },
+              "glyph_damage": {
+                "grade": "minor",
+                "weight": 0.25,
+                "region_count": 5
+              },
+              "contrast_background": {
+                "grade": "good",
+                "weight": 0.15,
+                "region_count": 0
+              },
+              "deformation": {
+                "grade": "good",
+                "weight": 0.1,
+                "region_count": 0
+              },
+              "crop_obstruction": {
+                "grade": "good",
+                "weight": 0.2,
+                "region_count": 0
+              }
+            },
+            "not_accuracy_or_probability": true
+          },
+          "system_screening": {
+            "screening_suggestion": "需人工查看",
+            "blockers": [
+              "invalid_response",
+              "unknown_coverage"
+            ],
+            "normal_page_sample_selected": false,
+            "human_acceptance_status": "未确认"
+          }
+        },
+        "review": {
+          "ok": true,
+          "model": "MiniMax-M3",
+          "provider": "minimax-portal",
+          "usage": {
+            "input": 63252,
+            "output": 7340,
+            "cacheRead": 60416,
+            "cacheWrite": 0,
+            "total": 131008,
+            "reported_cost": 0
+          },
+          "parse": {
+            "strict_json": false,
+            "error_offset": 0,
+            "salvaged_fields": [
+              "wrapped_json_object"
+            ]
+          },
+          "elapsed_seconds": 104.22892904281616,
+          "view_image_log_mentions": 4,
+          "image_tool_calls": 2,
+          "provider_http_requests": 4,
+          "tool_names": [
+            "read",
+            "view_image"
+          ],
+          "provider_200": true,
+          "response_sha256": "47c12aabd710f3c882c1b4e800d11f540e289ea4d3c2ecf3ac78d2c1719ac63b",
+          "actual_prompt_sha256": "5affd2bc773599a62b642cded058dd50b3708a31e8f882d35efe81fed784e9a2",
+          "prepared_prompt_sha256": "17311c654c89df3e605fc19f62fe4230b2569ba8a7ef5b516ee3c451187c395c",
+          "prompt_matches_preparation": false,
+          "quality": {
+            "experimental_readability_score": 86.5,
+            "known_weight": 1.0,
+            "missing_dimensions": [],
+            "critical_flags": [],
+            "screening_suggestion": "正常抽查",
+            "human_acceptance_status": "未确认",
+            "dimensions": {
+              "clarity": {
+                "grade": "good",
+                "weight": 0.3,
+                "region_count": 0
+              },
+              "glyph_damage": {
+                "grade": "minor",
+                "weight": 0.25,
+                "region_count": 2
+              },
+              "contrast_background": {
+                "grade": "good",
+                "weight": 0.15,
+                "region_count": 0
+              },
+              "deformation": {
+                "grade": "good",
+                "weight": 0.1,
+                "region_count": 0
+              },
+              "crop_obstruction": {
+                "grade": "minor",
+                "weight": 0.2,
+                "region_count": 1
+              }
+            },
+            "not_accuracy_or_probability": true
+          },
+          "system_screening": {
+            "screening_suggestion": "需要更清晰来源",
+            "blockers": [
+              "critical_disagreement",
+              "invalid_response",
+              "source_damage"
+            ],
+            "normal_page_sample_selected": false,
+            "human_acceptance_status": "未确认"
+          },
+          "candidate_status_counts": {
+            "keep": 54,
+            "nonbody": 1
+          },
+          "applied_unconfirmed_text_edits": 0
+        }
+      },
+      "local_structure_counts": {
+        "raw_lines": 57,
+        "covered_before": 57,
+        "covered_after": 57,
+        "recovered_lines": 0,
+        "pending_lines": 0
+      }
+    },
+    {
+      "physical_page": 114,
+      "image_sha256": "ea8c3e52def820defc1f67839c4ddb47421f1259e24cbe2c596e44682f64a56f",
+      "native_sha256": "550f7f82cb87cea9ff8a7794d59b00e66fc839e5863294f41ec520d2d0ee3dfa",
+      "candidate_receipt": {
+        "selected_item_count": 9,
+        "merged_region_count": 3,
+        "returned_region_count": 3,
+        "overflow_region_count": 0,
+        "overflow_item_ids": []
+      },
+      "routes": {
+        "direct": {
+          "ok": true,
+          "model": "MiniMax-M3",
+          "provider": "minimax-portal",
+          "usage": {
+            "input": 45126,
+            "output": 1326,
+            "cacheRead": 508,
+            "cacheWrite": 0,
+            "total": 46960,
+            "reported_cost": 0
+          },
+          "parse": {
+            "strict_json": true,
+            "salvaged_fields": []
+          },
+          "elapsed_seconds": 39.201151609420776,
+          "view_image_log_mentions": 2,
+          "image_tool_calls": 1,
+          "provider_http_requests": 2,
+          "tool_names": [
+            "view_image"
+          ],
+          "provider_200": true,
+          "response_sha256": "f89ef6991379c4164c6d135ba79ef8c78101ce6399cf5326ab0ab3e79a62a0bb",
+          "actual_prompt_sha256": "75f0c1e0da465b9acd2384eec95be1a7a508fac879d254ce21f08d2e1a175cf3",
+          "prepared_prompt_sha256": "75f0c1e0da465b9acd2384eec95be1a7a508fac879d254ce21f08d2e1a175cf3",
+          "prompt_matches_preparation": true,
+          "quality": {
+            "experimental_readability_score": 83.5,
+            "known_weight": 1.0,
+            "missing_dimensions": [],
+            "critical_flags": [],
+            "screening_suggestion": "正常抽查",
+            "human_acceptance_status": "未确认",
+            "dimensions": {
+              "clarity": {
+                "grade": "minor",
+                "weight": 0.3,
+                "region_count": 2
+              },
+              "glyph_damage": {
+                "grade": "minor",
+                "weight": 0.25,
+                "region_count": 1
+              },
+              "contrast_background": {
+                "grade": "good",
+                "weight": 0.15,
+                "region_count": 0
+              },
+              "deformation": {
+                "grade": "good",
+                "weight": 0.1,
+                "region_count": 0
+              },
+              "crop_obstruction": {
+                "grade": "good",
+                "weight": 0.2,
+                "region_count": 0
+              }
+            },
+            "not_accuracy_or_probability": true
+          },
+          "system_screening": {
+            "screening_suggestion": "正常抽查",
+            "blockers": [],
+            "normal_page_sample_selected": false,
+            "human_acceptance_status": "未确认"
+          }
+        },
+        "review": {
+          "ok": true,
+          "model": "MiniMax-M3",
+          "provider": "minimax-portal",
+          "usage": {
+            "input": 53060,
+            "output": 2076,
+            "cacheRead": 364,
+            "cacheWrite": 0,
+            "total": 55500,
+            "reported_cost": 0
+          },
+          "parse": {
+            "strict_json": false,
+            "error_offset": 0,
+            "salvaged_fields": [
+              "wrapped_json_object"
+            ]
+          },
+          "elapsed_seconds": 46.4954719543457,
+          "view_image_log_mentions": 8,
+          "image_tool_calls": 4,
+          "provider_http_requests": 2,
+          "tool_names": [
+            "view_image"
+          ],
+          "provider_200": true,
+          "response_sha256": "d485f1368ba2fb8fb13d807dd6e5ad97bfc38a0cc7e617e700cf4d51b6b3323f",
+          "actual_prompt_sha256": "36bc4dbe4797be6a5c2814455c66bdb193951127e2a8b183227eb48e4d06bbcd",
+          "prepared_prompt_sha256": "36bc4dbe4797be6a5c2814455c66bdb193951127e2a8b183227eb48e4d06bbcd",
+          "prompt_matches_preparation": true,
+          "quality": {
+            "experimental_readability_score": 86.5,
+            "known_weight": 1.0,
+            "missing_dimensions": [],
+            "critical_flags": [],
+            "screening_suggestion": "正常抽查",
+            "human_acceptance_status": "未确认",
+            "dimensions": {
+              "clarity": {
+                "grade": "good",
+                "weight": 0.3,
+                "region_count": 0
+              },
+              "glyph_damage": {
+                "grade": "minor",
+                "weight": 0.25,
+                "region_count": 2
+              },
+              "contrast_background": {
+                "grade": "good",
+                "weight": 0.15,
+                "region_count": 0
+              },
+              "deformation": {
+                "grade": "good",
+                "weight": 0.1,
+                "region_count": 0
+              },
+              "crop_obstruction": {
+                "grade": "minor",
+                "weight": 0.2,
+                "region_count": 2
+              }
+            },
+            "not_accuracy_or_probability": true
+          },
+          "system_screening": {
+            "screening_suggestion": "需人工查看",
+            "blockers": [
+              "invalid_response",
+              "order"
+            ],
+            "normal_page_sample_selected": false,
+            "human_acceptance_status": "未确认"
+          },
+          "candidate_status_counts": {
+            "replace": 3,
+            "keep": 6
+          },
+          "applied_unconfirmed_text_edits": 3
+        }
+      },
+      "local_structure_counts": {
+        "raw_lines": 67,
+        "covered_before": 65,
+        "covered_after": 65,
+        "recovered_lines": 0,
+        "pending_lines": 0
+      }
+    },
+    {
+      "physical_page": 127,
+      "image_sha256": "24b7b0a3b1732e87b62b59c6d031afe16e5339633f924b20cf020f72e2c16c9a",
+      "native_sha256": "c4c005f6e758ab7b0da0a173c0677fdcbe96c94fbbb9d8d41dd1781f82e1b9a2",
+      "candidate_receipt": {
+        "selected_item_count": 16,
+        "merged_region_count": 7,
+        "returned_region_count": 7,
+        "overflow_region_count": 0,
+        "overflow_item_ids": []
+      },
+      "routes": {
+        "direct": {
+          "ok": true,
+          "model": "MiniMax-M3",
+          "provider": "minimax-portal",
+          "usage": {
+            "input": 41944,
+            "output": 1310,
+            "cacheRead": 4972,
+            "cacheWrite": 0,
+            "total": 48226,
+            "reported_cost": 0
+          },
+          "parse": {
+            "strict_json": false,
+            "error_offset": 2608,
+            "salvaged_fields": [
+              "body_text",
+              "visual_quality"
+            ]
+          },
+          "elapsed_seconds": 29.827630758285522,
+          "view_image_log_mentions": 2,
+          "image_tool_calls": 1,
+          "provider_http_requests": 2,
+          "tool_names": [
+            "view_image"
+          ],
+          "provider_200": true,
+          "response_sha256": "d2f732c699758f981f73fe35f8f06e9956ed866a3c0be0dcbd2f75db7924a498",
+          "actual_prompt_sha256": "e2de6ba54027f4dc7eab626893a09b26f64912189a03a88a331c98550e840768",
+          "prepared_prompt_sha256": "e2de6ba54027f4dc7eab626893a09b26f64912189a03a88a331c98550e840768",
+          "prompt_matches_preparation": true,
+          "quality": {
+            "experimental_readability_score": 86.5,
+            "known_weight": 1.0,
+            "missing_dimensions": [],
+            "critical_flags": [],
+            "screening_suggestion": "正常抽查",
+            "human_acceptance_status": "未确认",
+            "dimensions": {
+              "clarity": {
+                "grade": "good",
+                "weight": 0.3,
+                "region_count": 0
+              },
+              "glyph_damage": {
+                "grade": "minor",
+                "weight": 0.25,
+                "region_count": 1
+              },
+              "contrast_background": {
+                "grade": "good",
+                "weight": 0.15,
+                "region_count": 0
+              },
+              "deformation": {
+                "grade": "good",
+                "weight": 0.1,
+                "region_count": 0
+              },
+              "crop_obstruction": {
+                "grade": "minor",
+                "weight": 0.2,
+                "region_count": 1
+              }
+            },
+            "not_accuracy_or_probability": true
+          },
+          "system_screening": {
+            "screening_suggestion": "需人工查看",
+            "blockers": [
+              "invalid_response",
+              "unknown_coverage"
+            ],
+            "normal_page_sample_selected": false,
+            "human_acceptance_status": "未确认"
+          }
+        },
+        "review": {
+          "ok": true,
+          "model": "MiniMax-M3",
+          "provider": "minimax-portal",
+          "usage": {
+            "input": 54232,
+            "output": 2236,
+            "cacheRead": 27440,
+            "cacheWrite": 0,
+            "total": 83908,
+            "reported_cost": 0
+          },
+          "parse": {
+            "strict_json": false,
+            "error_offset": 0,
+            "salvaged_fields": [
+              "wrapped_json_object"
+            ]
+          },
+          "elapsed_seconds": 55.203402042388916,
+          "view_image_log_mentions": 16,
+          "image_tool_calls": 8,
+          "provider_http_requests": 3,
+          "tool_names": [
+            "view_image"
+          ],
+          "provider_200": true,
+          "response_sha256": "d32a43bceb173c2a396751671f084c427252d724a27008eedd66537add9c54e2",
+          "actual_prompt_sha256": "8fbe598637152ba1aa6e1f985248634f18a00a4ec7a510d147fe8d9e8c0ea162",
+          "prepared_prompt_sha256": "8fbe598637152ba1aa6e1f985248634f18a00a4ec7a510d147fe8d9e8c0ea162",
+          "prompt_matches_preparation": true,
+          "quality": {
+            "experimental_readability_score": 92.5,
+            "known_weight": 1.0,
+            "missing_dimensions": [],
+            "critical_flags": [],
+            "screening_suggestion": "正常抽查",
+            "human_acceptance_status": "未确认",
+            "dimensions": {
+              "clarity": {
+                "grade": "good",
+                "weight": 0.3,
+                "region_count": 0
+              },
+              "glyph_damage": {
+                "grade": "minor",
+                "weight": 0.25,
+                "region_count": 0
+              },
+              "contrast_background": {
+                "grade": "good",
+                "weight": 0.15,
+                "region_count": 0
+              },
+              "deformation": {
+                "grade": "good",
+                "weight": 0.1,
+                "region_count": 0
+              },
+              "crop_obstruction": {
+                "grade": "good",
+                "weight": 0.2,
+                "region_count": 0
+              }
+            },
+            "not_accuracy_or_probability": true
+          },
+          "system_screening": {
+            "screening_suggestion": "需人工查看",
+            "blockers": [
+              "invalid_response"
+            ],
+            "normal_page_sample_selected": false,
+            "human_acceptance_status": "未确认"
+          },
+          "candidate_status_counts": {
+            "keep": 16
+          },
+          "applied_unconfirmed_text_edits": 0
+        }
+      },
+      "local_structure_counts": {
+        "raw_lines": 58,
+        "covered_before": 43,
+        "covered_after": 58,
+        "recovered_lines": 15,
+        "pending_lines": 0
+      }
+    },
+    {
+      "physical_page": 131,
+      "image_sha256": "60aebbc69acbf5e28cefd3cdfe18db8a567a4777e83b0de8d1c064cf1bda796b",
+      "native_sha256": "59669de7a5a7f62680e759b1288705dafb4905bb6fb9052662b0522f569be495",
+      "candidate_receipt": {
+        "selected_item_count": 18,
+        "merged_region_count": 10,
+        "returned_region_count": 10,
+        "overflow_region_count": 0,
+        "overflow_item_ids": []
+      },
+      "routes": {
+        "direct": {
+          "ok": true,
+          "model": "MiniMax-M3",
+          "provider": "minimax-portal",
+          "usage": {
+            "input": 41978,
+            "output": 1176,
+            "cacheRead": 4972,
+            "cacheWrite": 0,
+            "total": 48126,
+            "reported_cost": 0
+          },
+          "parse": {
+            "strict_json": false,
+            "error_offset": 618,
+            "salvaged_fields": [
+              "body_text",
+              "visual_quality"
+            ]
+          },
+          "elapsed_seconds": 55.57297325134277,
+          "view_image_log_mentions": 2,
+          "image_tool_calls": 1,
+          "provider_http_requests": 2,
+          "tool_names": [
+            "view_image"
+          ],
+          "provider_200": true,
+          "response_sha256": "dc4740f03a1ec5654cc533ba37e69e14115413544aa07b6959d87995fe6d09d7",
+          "actual_prompt_sha256": "eee99f0e1412a1fc8501c96cf63800eefa29b88b40a27d5a138aa8acbeb7c8b7",
+          "prepared_prompt_sha256": "eee99f0e1412a1fc8501c96cf63800eefa29b88b40a27d5a138aa8acbeb7c8b7",
+          "prompt_matches_preparation": true,
+          "quality": {
+            "experimental_readability_score": 100.0,
+            "known_weight": 1.0,
+            "missing_dimensions": [],
+            "critical_flags": [],
+            "screening_suggestion": "正常抽查",
+            "human_acceptance_status": "未确认",
+            "dimensions": {
+              "clarity": {
+                "grade": "good",
+                "weight": 0.3,
+                "region_count": 0
+              },
+              "glyph_damage": {
+                "grade": "good",
+                "weight": 0.25,
+                "region_count": 0
+              },
+              "contrast_background": {
+                "grade": "good",
+                "weight": 0.15,
+                "region_count": 0
+              },
+              "deformation": {
+                "grade": "good",
+                "weight": 0.1,
+                "region_count": 0
+              },
+              "crop_obstruction": {
+                "grade": "good",
+                "weight": 0.2,
+                "region_count": 0
+              }
+            },
+            "not_accuracy_or_probability": true
+          },
+          "system_screening": {
+            "screening_suggestion": "需人工查看",
+            "blockers": [
+              "invalid_response",
+              "unknown_coverage"
+            ],
+            "normal_page_sample_selected": false,
+            "human_acceptance_status": "未确认"
+          }
+        },
+        "review": {
+          "ok": true,
+          "model": "MiniMax-M3",
+          "provider": "minimax-portal",
+          "usage": {
+            "input": 51381,
+            "output": 2953,
+            "cacheRead": 62551,
+            "cacheWrite": 0,
+            "total": 116885,
+            "reported_cost": 0
+          },
+          "parse": {
+            "strict_json": false,
+            "error_offset": 0,
+            "salvaged_fields": [
+              "visual_quality",
+              "candidate_results_ids_status_replacement_only"
+            ]
+          },
+          "elapsed_seconds": 130.83862686157227,
+          "view_image_log_mentions": 22,
+          "image_tool_calls": 11,
+          "provider_http_requests": 4,
+          "tool_names": [
+            "view_image"
+          ],
+          "provider_200": true,
+          "response_sha256": "d32c205aaf50207e07dbd46a2ed8c5e9fb34ce73336480d1a6f9fc531bc23dfc",
+          "actual_prompt_sha256": "54233864698c021bf715e0e300c0b7dc1802c8ca3a0f71b345053b06c06be47e",
+          "prepared_prompt_sha256": "54233864698c021bf715e0e300c0b7dc1802c8ca3a0f71b345053b06c06be47e",
+          "prompt_matches_preparation": true,
+          "quality": {
+            "screening_suggestion": "unknown",
+            "error": "ASSESSMENT_REGIONS:crop_obstruction",
+            "human_acceptance_status": "未确认",
+            "dimensions": {}
+          },
+          "system_screening": {
+            "screening_suggestion": "需人工查看",
+            "blockers": [
+              "invalid_response",
+              "pending",
+              "unknown_coverage"
+            ],
+            "normal_page_sample_selected": false,
+            "human_acceptance_status": "未确认"
+          },
+          "candidate_status_counts": {
+            "keep": 17,
+            "nonbody": 1
+          },
+          "applied_unconfirmed_text_edits": 0
+        }
+      },
+      "local_structure_counts": {
+        "raw_lines": 57,
+        "covered_before": 39,
+        "covered_after": 55,
+        "recovered_lines": 16,
+        "pending_lines": 1
+      }
+    }
+  ],
+  "reference_scores": [
+    {
+      "id": "p11-q33",
+      "physical_page": 11,
+      "reference_characters": 98,
+      "reference_sha256": "4141bb18f826159bcebd97a81dd71721f7b45ef8d330c7971bca09dcf9a53a3c",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 98,
+          "edit_distance": 1,
+          "cer": 0.01020408163265306,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 98,
+          "edit_distance": 1,
+          "cer": 0.01020408163265306,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 98,
+          "edit_distance": 1,
+          "cer": 0.01020408163265306,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 98,
+          "edit_distance": 2,
+          "cer": 0.02040816326530612,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 98,
+          "edit_distance": 1,
+          "cer": 0.01020408163265306,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p11-q34",
+      "physical_page": 11,
+      "reference_characters": 77,
+      "reference_sha256": "80424151cf6dc4c54fc5c1f486e8ffb45f3dce7e1e8771a329ec5d19f3f80dce",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 77,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 77,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 77,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 77,
+          "edit_distance": 2,
+          "cer": 0.025974025974025976,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 77,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p11-q35",
+      "physical_page": 11,
+      "reference_characters": 101,
+      "reference_sha256": "e4ee3202aa94c07abd8314bb7283e5cd92317eae1da90512f194e7c1d631a82c",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 101,
+          "edit_distance": 1,
+          "cer": 0.009900990099009901,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 101,
+          "edit_distance": 1,
+          "cer": 0.009900990099009901,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 101,
+          "edit_distance": 1,
+          "cer": 0.009900990099009901,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 101,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 101,
+          "edit_distance": 1,
+          "cer": 0.009900990099009901,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p11-q36",
+      "physical_page": 11,
+      "reference_characters": 71,
+      "reference_sha256": "53517ae8317d6af1b6a65930d776b07d4f811573598f42da7575a9af64589d40",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 71,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 71,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 71,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 71,
+          "edit_distance": 3,
+          "cer": 0.04225352112676056,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 71,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p11-q37",
+      "physical_page": 11,
+      "reference_characters": 238,
+      "reference_sha256": "1d08b223c5e2fdbe2f05238d4d708a95b9958bec2cc025ae233c5a679217118a",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 238,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 238,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 238,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 238,
+          "edit_distance": 10,
+          "cer": 0.04201680672268908,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 238,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p11-q38",
+      "physical_page": 11,
+      "reference_characters": 123,
+      "reference_sha256": "fcb3b4154513ca07b0a9f1141fb4e171d8959d5e791e0789fbfbec752df1e7ef",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 123,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 123,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 123,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 123,
+          "edit_distance": 2,
+          "cer": 0.016260162601626018,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 123,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p11-q39",
+      "physical_page": 11,
+      "reference_characters": 314,
+      "reference_sha256": "70ae39a3f9abe304e866541667006399ba76b24e72814c2167167b51772c4fad",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 314,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 314,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 314,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 314,
+          "edit_distance": 14,
+          "cer": 0.044585987261146494,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 314,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p11-q40",
+      "physical_page": 11,
+      "reference_characters": 256,
+      "reference_sha256": "690e1b5657377fb57488fa31bc6561b232d731f919353ecad1f7baf458f0709c",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 256,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 256,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 256,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 256,
+          "edit_distance": 10,
+          "cer": 0.0390625,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 256,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p127-q108",
+      "physical_page": 127,
+      "reference_characters": 157,
+      "reference_sha256": "d3275f17c5b42714579b0f4fad5d5946503ec0c04c2fa7d7d0a702eedc8f2bf0",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 157,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 157,
+          "edit_distance": 37,
+          "cer": 0.2356687898089172,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 157,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 157,
+          "edit_distance": 1,
+          "cer": 0.006369426751592357,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 157,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p127-q109",
+      "physical_page": 127,
+      "reference_characters": 96,
+      "reference_sha256": "90ac13c95234301e36fd4987d4e16dc3baf71aab792ba84c8c30b5f417740087",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 96,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 96,
+          "edit_distance": 20,
+          "cer": 0.20833333333333334,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 96,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 96,
+          "edit_distance": 1,
+          "cer": 0.010416666666666666,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 96,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p127-q111",
+      "physical_page": 127,
+      "reference_characters": 123,
+      "reference_sha256": "c0c4342eeb8244527dfb2f3c8b6eb7c3126910b24ca7d3f22641c58d020aaca6",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 123,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 123,
+          "edit_distance": 56,
+          "cer": 0.45528455284552843,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 123,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 123,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 123,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p127-q112",
+      "physical_page": 127,
+      "reference_characters": 136,
+      "reference_sha256": "955e28505dfaba3a146e457d272b5d97ea140202567ee3f46d85ffbddecedc6b",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 136,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 136,
+          "edit_distance": 39,
+          "cer": 0.2867647058823529,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 136,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 136,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 136,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p131-q4",
+      "physical_page": 131,
+      "reference_characters": 249,
+      "reference_sha256": "600cdf36a90a30f2e7cac0fdf88278835cdfa4b7ed37b21541bd22a8a0055178",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 249,
+          "edit_distance": 7,
+          "cer": 0.028112449799196786,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 249,
+          "edit_distance": 57,
+          "cer": 0.2289156626506024,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 249,
+          "edit_distance": 7,
+          "cer": 0.028112449799196786,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 249,
+          "edit_distance": 5,
+          "cer": 0.020080321285140562,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 249,
+          "edit_distance": 7,
+          "cer": 0.028112449799196786,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p131-q5",
+      "physical_page": 131,
+      "reference_characters": 121,
+      "reference_sha256": "ef89a093385be8d1fe1eaba979b757bede66192a02bf48fe86688a8b610b1406",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 121,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 121,
+          "edit_distance": 56,
+          "cer": 0.4628099173553719,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 121,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 121,
+          "edit_distance": 4,
+          "cer": 0.03305785123966942,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 121,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p23-confirmable-option-c",
+      "physical_page": 23,
+      "reference_characters": 15,
+      "reference_sha256": "373ebb6c5e903accf28eb6d8ed5fa2ac333effb2faf7f24b87b65c7fd826538e",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 15,
+          "edit_distance": 2,
+          "cer": 0.13333333333333333,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 15,
+          "edit_distance": 2,
+          "cer": 0.13333333333333333,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 15,
+          "edit_distance": 2,
+          "cer": 0.13333333333333333,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 15,
+          "edit_distance": 1,
+          "cer": 0.06666666666666667,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 15,
+          "edit_distance": 2,
+          "cer": 0.13333333333333333,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p23-confirmable-q130-options",
+      "physical_page": 23,
+      "reference_characters": 51,
+      "reference_sha256": "44bfe291f70733a8edd10750a4ef2f2a774b9b5d779862b7fcc73062c8914be7",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 51,
+          "edit_distance": 2,
+          "cer": 0.0392156862745098,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 51,
+          "edit_distance": 2,
+          "cer": 0.0392156862745098,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 51,
+          "edit_distance": 2,
+          "cer": 0.0392156862745098,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 51,
+          "edit_distance": 1,
+          "cer": 0.0196078431372549,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 51,
+          "edit_distance": 2,
+          "cer": 0.0392156862745098,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p114-q8",
+      "physical_page": 114,
+      "reference_characters": 157,
+      "reference_sha256": "49c73ecdd37753fb48f5d3b9c1964fcdf6eb6e1d1dce02224fa5bfb3699a0e50",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 157,
+          "edit_distance": 32,
+          "cer": 0.20382165605095542,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 157,
+          "edit_distance": 15,
+          "cer": 0.09554140127388536,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 157,
+          "edit_distance": 15,
+          "cer": 0.09554140127388536,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 157,
+          "edit_distance": 8,
+          "cer": 0.050955414012738856,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 157,
+          "edit_distance": 14,
+          "cer": 0.08917197452229299,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    },
+    {
+      "id": "p114-q14",
+      "physical_page": 114,
+      "reference_characters": 135,
+      "reference_sha256": "4915b3f4aef6eb2d539af8a42008e6bcb1bb57895bdd890245ae397f26336fec",
+      "scores": {
+        "local_raw": {
+          "reference_characters": 135,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_native_assembly": {
+          "reference_characters": 135,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_recovered": {
+          "reference_characters": 135,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "m3_direct": {
+          "reference_characters": 135,
+          "edit_distance": 12,
+          "cer": 0.08888888888888889,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "local_m3_review": {
+          "reference_characters": 135,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      }
+    }
+  ],
+  "reference_status": "开发侧看图核对，未经用户确认",
+  "scope": "selected blocks; not page/book accuracy",
+  "totals": {
+    "local_raw": {
+      "reference_characters": 2518,
+      "edit_distance": 45,
+      "cer": 0.017871326449563147
+    },
+    "local_native_assembly": {
+      "reference_characters": 2518,
+      "edit_distance": 286,
+      "cer": 0.11358220810166798
+    },
+    "local_recovered": {
+      "reference_characters": 2518,
+      "edit_distance": 28,
+      "cer": 0.011119936457505957
+    },
+    "m3_direct": {
+      "reference_characters": 2518,
+      "edit_distance": 76,
+      "cer": 0.030182684670373314
+    },
+    "local_m3_review": {
+      "reference_characters": 2518,
+      "edit_distance": 27,
+      "cer": 0.010722795869737888
+    }
+  }
+}
