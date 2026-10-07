@@ -1,0 +1,7 @@
+# Independent diagnostic candidate; unchanged baseline remains available.
+FROM filetools-paddleocr-vl-eval:cpu-3.4.0-paddle3.2.2@sha256:2b423d1a39d0a064e35fdef74f88bf2b34837b9eba8b36d85329bf18941f3cb3
+USER root
+# NumPy 2.4 expires non-0D scalar conversion used by Paddle 3.2.2.
+# 2.3.5 also satisfies the installed SciPy's numpy>=2.0 requirement.
+RUN /opt/paddle-vl/bin/python -m pip install --no-deps --no-cache-dir numpy==2.3.5 && /opt/paddle-vl/bin/python -m pip check && /opt/paddle-vl/bin/python -m pip freeze > /opt/paddle-vl/environment.freeze.txt
+USER 1000:1000

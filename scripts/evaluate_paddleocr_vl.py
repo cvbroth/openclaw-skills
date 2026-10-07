@@ -33,7 +33,7 @@ def validate_ppstructure_compatibility(config):
             and 'chart_recognition_model_dir' not in config['models']):
         raise RuntimeError(
             'PPSTRUCTUREV3_CONFIG_BLOCKED: pinned PaddleX initializes ChartRecognition even when disabled; '
-            'the optional chart model is intentionally not installed for this text-only evaluation')
+            'a pinned local auxiliary chart model is required even though business recognition is disabled')
 
 
 def build_pipeline(engine, models):
@@ -50,7 +50,8 @@ def build_pipeline(engine, models):
         config = yaml.safe_load(config_path.read_text())
         validate_ppstructure_compatibility(config)
         from paddleocr import PPStructureV3
-        parameters = {**config['models'], **config['options'], **config.get('runtime', {})}
+        parameters = {**config['models'], **config['options'], **config.get('runtime', {}),
+                      'device': config['device'], 'cpu_threads': config['cpu_threads']}
         parameters = {key: (str(models / value) if key.endswith('_model_dir') and value else value)
                       for key, value in parameters.items()}
         return PPStructureV3(**parameters)
@@ -97,8 +98,13 @@ def child(images, models, output, pages, engine):
         directory = output / f'page-{page}'
         directory.mkdir(exist_ok=True)
         count = 0
+        failure_phase = 'inference'
+        inference_finished = None
         try:
-            for result in pipeline.predict(str(incoming)):
+            results = list(pipeline.predict(str(incoming)))
+            inference_finished = time.monotonic()
+            failure_phase = 'export'
+            for result in results:
                 result.save_to_json(str(directory))
                 result.save_to_markdown(str(directory))
                 count += 1
@@ -107,6 +113,7 @@ def child(images, models, output, pages, engine):
                 'elapsed_seconds': time.monotonic() - started,
                 'process_cpu_seconds': process_cpu_seconds() - page_cpu_started,
                 'error_type': type(error).__name__, 'error': str(error)[:500],
+                'failure_phase': failure_phase,
                 'process_peak_rss_kib_cumulative': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
                 'input_image_sha256': hashlib.sha256(incoming.read_bytes()).hexdigest()})
             record(output / 'metrics.json', metrics)
@@ -114,6 +121,8 @@ def child(images, models, output, pages, engine):
         metrics['pages'].append({'physical_page': page, 'status': 'SUCCEEDED',
             'elapsed_seconds': time.monotonic() - started,
             'process_cpu_seconds': process_cpu_seconds() - page_cpu_started,
+            'inference_seconds': inference_finished - started,
+            'export_seconds': time.monotonic() - inference_finished,
             'inference_order': index + 1, 'cold_first_inference': index == 0,
             'process_peak_rss_kib_cumulative': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
             'page_results': count, 'input_image_sha256': hashlib.sha256(incoming.read_bytes()).hexdigest()})
@@ -173,6 +182,10 @@ def monitor(images, models, output, pages, load_timeout, page_timeout, engine):
         receipt['container_memory_peak_bytes'] = int(Path('/sys/fs/cgroup/memory.peak').read_text())
     except (OSError, ValueError):
         receipt['container_memory_peak_bytes'] = None
+    try:
+        receipt['container_cpu_stat'] = dict(line.split() for line in Path('/sys/fs/cgroup/cpu.stat').read_text().splitlines())
+    except (OSError, ValueError):
+        receipt['container_cpu_stat'] = None
     record(output / 'run-receipt.json', receipt)
     print(json.dumps(receipt))
     return receipt

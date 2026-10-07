@@ -1,0 +1,33 @@
+{
+  "purpose": "observer-only initialization calibration; not OCR speed",
+  "models": [
+    {
+      "model_name": "PP-DocLayout-L",
+      "construction_seconds": 2.6350724829826504,
+      "rss_before_kib": 249672,
+      "rss_after_kib": 649260,
+      "cumulative_peak_rss_kib": 654508
+    },
+    {
+      "model_name": "PP-OCRv5_server_det",
+      "construction_seconds": 1.5147480610758066,
+      "rss_before_kib": 649260,
+      "rss_after_kib": 761408,
+      "cumulative_peak_rss_kib": 760572
+    },
+    {
+      "model_name": "PP-OCRv5_server_rec",
+      "construction_seconds": 2.163446994032711,
+      "rss_before_kib": 761408,
+      "rss_after_kib": 868372,
+      "cumulative_peak_rss_kib": 867484
+    },
+    {
+      "model_name": "PP-Chart2Table",
+      "construction_seconds": 9.621610602014698,
+      "rss_before_kib": 868372,
+      "rss_after_kib": 4293328,
+      "cumulative_peak_rss_kib": 6806356
+    }
+  ]
+}

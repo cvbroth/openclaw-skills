@@ -1,0 +1,21 @@
+{
+  "numpy": "2.5.3",
+  "observed_int_calls": [
+    {
+      "call_file": "/opt/paddle-vl/lib/python3.12/site-packages/paddle/base/dygraph/math_op_patch.py",
+      "call_line": 228,
+      "caller_file": "/opt/paddle-vl/lib/python3.12/site-packages/paddlex/inference/models/doc_vlm/processors/paddleocr_vl/_paddleocr_vl.py",
+      "caller_line": 160,
+      "tensor_shape": [
+        1
+      ],
+      "array_shape": [
+        1
+      ],
+      "size": 1
+    }
+  ],
+  "preprocess": "FAILED",
+  "error_type": "TypeError",
+  "error": "only 0-dimensional arrays can be converted to Python scalars"
+}

@@ -1,0 +1,118 @@
+{
+  "scope": "selected image-verified blocks only; not entire pages/book",
+  "annotation_sha256": "b93e3e2d8d3d05621ceb912ca6d97ea70430d4bf5121696cecf16212fe3ce7de",
+  "blocks": [
+    {
+      "id": "p6-q4-stem",
+      "physical_page": 6,
+      "reference_image_sha256": "0ba4119c9b88c6410bc78c6974eaa90744ac3cd7d739903509883e1c48a61876",
+      "review_method": "Agent visually transcribed and compared original 220dpi page; no user second human review claimed",
+      "reference_sha256": "25a4dfa1447b64cb3963c3725648f8859f0c4a5e50df698d9cabd40867c98873",
+      "engines": {
+        "rapidocr-existing": {
+          "reference_characters": 111,
+          "edit_distance": 43,
+          "cer": 0.38738738738738737,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "paddleocr-vl-1.5": {
+          "status": "no completed recognition; CER unavailable"
+        },
+        "ppstructurev3": {
+          "reference_characters": 111,
+          "edit_distance": 2,
+          "cer": 0.018018018018018018,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "completeness": {
+        "paddleocr-vl": "unavailable: page6 CPU inference exceeded300s; later pages not attempted",
+        "ppstructurev3": "selected block present; transcription accuracy evaluated separately"
+      }
+    },
+    {
+      "id": "p10-q32-stem",
+      "physical_page": 10,
+      "reference_image_sha256": "713179b41b1a1673f3306055bc6781c6899035b1a6ca9d9ac8f972c07f9418cc",
+      "review_method": "Agent visually transcribed and compared original 220dpi page; no user second human review claimed",
+      "reference_sha256": "960cc0779330f7a90966677502cd2d3b1a68bafd4b2cd0869ed34b3d3ff80ae0",
+      "engines": {
+        "rapidocr-existing": {
+          "reference_characters": 174,
+          "edit_distance": 45,
+          "cer": 0.25862068965517243,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "paddleocr-vl-1.5": {
+          "status": "no completed recognition; CER unavailable"
+        },
+        "ppstructurev3": {
+          "reference_characters": 174,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "completeness": {
+        "paddleocr-vl": "unavailable: page6 CPU inference exceeded300s; later pages not attempted",
+        "ppstructurev3": "selected block present; transcription accuracy evaluated separately"
+      }
+    },
+    {
+      "id": "p30-multi-q1",
+      "physical_page": 30,
+      "reference_image_sha256": "6e3066f049f4adc52728f132e4d8ab1995c7ef5a3937864bd8f0d2f126f54b88",
+      "review_method": "Agent visually transcribed and compared original 220dpi page; no user second human review claimed",
+      "reference_sha256": "cec6167832d77208bea7d081d14c5c67875b805b46ab8b46b2a0acc24ad02605",
+      "engines": {
+        "rapidocr-existing": {
+          "reference_characters": 139,
+          "edit_distance": 1,
+          "cer": 0.007194244604316547,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "paddleocr-vl-1.5": {
+          "status": "no completed recognition; CER unavailable"
+        },
+        "ppstructurev3": {
+          "reference_characters": 139,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "completeness": {
+        "paddleocr-vl": "unavailable: page6 CPU inference exceeded300s; later pages not attempted",
+        "ppstructurev3": "selected block present; transcription accuracy evaluated separately"
+      }
+    },
+    {
+      "id": "p30-multi-q5",
+      "physical_page": 30,
+      "reference_image_sha256": "6e3066f049f4adc52728f132e4d8ab1995c7ef5a3937864bd8f0d2f126f54b88",
+      "review_method": "Agent visually transcribed and compared original 220dpi page; no user second human review claimed",
+      "reference_sha256": "be0c554f372256de81b9d3cb4fa84b6578e757035bf0391a64fac3c0fb52adde",
+      "engines": {
+        "rapidocr-existing": {
+          "reference_characters": 93,
+          "edit_distance": 1,
+          "cer": 0.010752688172043012,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "paddleocr-vl-1.5": {
+          "status": "no completed recognition; CER unavailable"
+        },
+        "ppstructurev3": {
+          "reference_characters": 93,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "completeness": {
+        "paddleocr-vl": "unavailable: page6 CPU inference exceeded300s; later pages not attempted",
+        "ppstructurev3": "selected block present; transcription accuracy evaluated separately"
+      }
+    }
+  ]
+}

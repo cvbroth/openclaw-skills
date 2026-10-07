@@ -1,0 +1,159 @@
+{
+  "vl_numpy235": {
+    "run": {
+      "status": "TIMED_OUT",
+      "wall_seconds": 342.729626268032,
+      "exit_code": -15,
+      "monitored_process_peak_rss_kib": 9330808,
+      "timeout": {
+        "phase": {
+          "phase": "page",
+          "page": 6
+        },
+        "limit_seconds": 300
+      },
+      "model_load_limit_seconds": 180,
+      "page_limit_seconds": 300,
+      "engine": "paddleocr-vl-1.5",
+      "pages_requested": [
+        6,
+        10,
+        30
+      ],
+      "offline": true,
+      "identity": "independent evaluation, not FileTools production",
+      "container_memory_peak_bytes": 9390972928
+    },
+    "metrics": {
+      "engine": "paddleocr-vl-1.5",
+      "pipeline_config_sha256": "f4e3894ff86455980658e670bc0927dc526aa5d374ca1c1ee698c4d81a087316",
+      "package_import_seconds": 2.856734144035727,
+      "package_import_process_cpu_seconds": 3.00576,
+      "device": "cpu",
+      "cpu_threads": 2,
+      "gpu_peak_vram_bytes": null,
+      "gpu_status": "no CUDA device exposed",
+      "pages": [],
+      "model_load_seconds": 39.08057568199001,
+      "model_load_process_cpu_seconds": 39.146577,
+      "process_peak_rss_after_load_kib": 9330808
+    },
+    "image_id": "sha256:f6e54e5c5198c28045a86f7a7cbb4a883160dec7034914424b1dae5b58de6ca2",
+    "cpu_snapshot": {
+      "at_run_wall_seconds_approx": 291,
+      "container_usage_seconds": 294.746738,
+      "docker_cpu_percent_at_earlier_snapshot": 100.61,
+      "boundary": "samples before timeout, not final cumulative CPU usage"
+    },
+    "container_state": {
+      "Status": "exited",
+      "OOMKilled": false,
+      "ExitCode": 2,
+      "Error": ""
+    }
+  },
+  "ppstructurev3": {
+    "run": {
+      "status": "SUCCEEDED",
+      "wall_seconds": 81.44559257698711,
+      "exit_code": 0,
+      "monitored_process_peak_rss_kib": 6762944,
+      "timeout": null,
+      "model_load_limit_seconds": 180,
+      "page_limit_seconds": 300,
+      "engine": "ppstructurev3",
+      "pages_requested": [
+        6,
+        10,
+        30
+      ],
+      "offline": true,
+      "identity": "independent evaluation, not FileTools production",
+      "container_memory_peak_bytes": 6718320640,
+      "container_cpu_stat": {
+        "usage_usec": "152119722",
+        "user_usec": "136117941",
+        "system_usec": "16001780",
+        "nice_usec": "0",
+        "core_sched.force_idle_usec": "0",
+        "nr_periods": "815",
+        "nr_throttled": "423",
+        "throttled_usec": "1037507",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      }
+    },
+    "metrics": {
+      "engine": "ppstructurev3",
+      "pipeline_config_sha256": "ab10c67c5698b9de90a51329bb091c219c09e8b0a51a955bd84985b1d4ec1051",
+      "package_import_seconds": 2.1103002870222554,
+      "package_import_process_cpu_seconds": 2.249507,
+      "device": "cpu",
+      "cpu_threads": 2,
+      "gpu_peak_vram_bytes": null,
+      "gpu_status": "no CUDA device exposed",
+      "pages": [
+        {
+          "physical_page": 6,
+          "status": "SUCCEEDED",
+          "elapsed_seconds": 21.02979175094515,
+          "process_cpu_seconds": 41.586288999999994,
+          "inference_seconds": 21.019109518965706,
+          "export_seconds": 0.010689268005080521,
+          "inference_order": 1,
+          "cold_first_inference": true,
+          "process_peak_rss_kib_cumulative": 6762944,
+          "page_results": 1,
+          "input_image_sha256": "0ba4119c9b88c6410bc78c6974eaa90744ac3cd7d739903509883e1c48a61876"
+        },
+        {
+          "physical_page": 10,
+          "status": "SUCCEEDED",
+          "elapsed_seconds": 22.7998348249821,
+          "process_cpu_seconds": 45.52583400000002,
+          "inference_seconds": 22.789141242974438,
+          "export_seconds": 0.010700530023314059,
+          "inference_order": 2,
+          "cold_first_inference": false,
+          "process_peak_rss_kib_cumulative": 6762944,
+          "page_results": 1,
+          "input_image_sha256": "713179b41b1a1673f3306055bc6781c6899035b1a6ca9d9ac8f972c07f9418cc"
+        },
+        {
+          "physical_page": 30,
+          "status": "SUCCEEDED",
+          "elapsed_seconds": 18.378804879961535,
+          "process_cpu_seconds": 36.687976000000006,
+          "inference_seconds": 18.367233308963478,
+          "export_seconds": 0.011578687001019716,
+          "inference_order": 3,
+          "cold_first_inference": false,
+          "process_peak_rss_kib_cumulative": 6762944,
+          "page_results": 1,
+          "input_image_sha256": "6e3066f049f4adc52728f132e4d8ab1995c7ef5a3937864bd8f0d2f126f54b88"
+        }
+      ],
+      "model_load_seconds": 16.088903445051983,
+      "model_load_process_cpu_seconds": 24.624889,
+      "process_peak_rss_after_load_kib": 6762944
+    },
+    "image_id": "sha256:dc202cf886fa3e3d239765f27df55b9b1c4b11885d11f8252dd8a4631860ae93",
+    "container_state": {
+      "Status": "exited",
+      "OOMKilled": false,
+      "ExitCode": 0,
+      "Error": ""
+    }
+  },
+  "inputs": {
+    "6": "0ba4119c9b88c6410bc78c6974eaa90744ac3cd7d739903509883e1c48a61876",
+    "10": "713179b41b1a1673f3306055bc6781c6899035b1a6ca9d9ac8f972c07f9418cc",
+    "30": "6e3066f049f4adc52728f132e4d8ab1995c7ef5a3937864bd8f0d2f126f54b88"
+  },
+  "reference": {
+    "original_annotations_sha256": "56dc7972ad44cada87c5dbe597820087bcb69d6a7612ec85d09f1bd84d665bbb",
+    "reference_changed": false,
+    "method": "Agent original-image transcription, repeated visual review; not user human-certified"
+  },
+  "production_changed": false
+}

@@ -26,6 +26,22 @@
       "archive_bytes": 84869120,
       "archive_sha256": "d99be2ffd348943ab52876179168be4fb5b14f5f0812f2ae4c76d89ec2ea750a",
       "directory": "ppstructure/text-recognition"
+    },
+    {
+      "name": "PP-Chart2Table",
+      "url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-Chart2Table_infer.tar",
+      "archive": "PP-Chart2Table.tar",
+      "archive_bytes": 1434695680,
+      "archive_sha256": "70d4c2e77bec599f2ad178bd58bea734860cb8403bddaa9c68ee50acfabfd5df",
+      "directory": "ppstructure/chart-initialization",
+      "purpose": "authorized initialization dependency; chart business inference disabled",
+      "required_files": [
+        "inference.yml",
+        "config.json",
+        "model_state.pdparams",
+        "tokenizer_config.json",
+        "qwen.tiktoken"
+      ]
     }
   ]
 }

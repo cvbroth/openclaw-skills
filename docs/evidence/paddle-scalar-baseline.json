@@ -1,0 +1,30 @@
+{
+  "versions": {
+    "numpy": "2.5.3",
+    "paddlepaddle": "3.2.2",
+    "paddlex": "3.4.0",
+    "paddleocr": "3.4.0"
+  },
+  "expression": "paddle.to_tensor([1, 10, 10]).prod() // 2 // 2",
+  "tensor_shape": [
+    1
+  ],
+  "array_shape": [
+    1
+  ],
+  "array_size": 1,
+  "numpy_requirements": {
+    "paddlepaddle": [
+      "numpy>=1.21"
+    ],
+    "paddlex": [
+      "numpy>=1.24"
+    ],
+    "scipy": [
+      "numpy<2.8,>=2.0.0",
+      "numpydoc; extra == \"doc\""
+    ]
+  },
+  "error_type": "TypeError",
+  "error": "only 0-dimensional arrays can be converted to Python scalars"
+}

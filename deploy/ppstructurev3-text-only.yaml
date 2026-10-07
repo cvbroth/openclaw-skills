@@ -6,15 +6,17 @@ paddleocr_version: 3.4.0
 paddlepaddle_version: 3.2.2
 # PaddleX 3.4.0 unconditionally constructs ChartRecognition during pipeline
 # initialization even when use_chart_recognition is false. The fixed config
-# intentionally does not provide this unused model; evaluation must stop with
-# a compatibility block instead of triggering an implicit network download.
+# provides the explicitly authorized official auxiliary model locally.
+# Chart business inference remains disabled; no implicit network download.
 compatibility_constraints:
   disabled_chart_predictor_still_initialized: true
-  status: blocked-until-upstream-configurable-or-explicitly-authorized
+  status: authorized-official-auxiliary-model-local-only
 device: cpu
 cpu_threads: 2
 runtime: {}
 models:
+  chart_recognition_model_name: PP-Chart2Table
+  chart_recognition_model_dir: ppstructure/chart-initialization
   layout_detection_model_name: PP-DocLayout-L
   layout_detection_model_dir: ppstructure/layout
   text_detection_model_name: PP-OCRv5_server_det

@@ -42,7 +42,8 @@ def prepare(lock_path, archive_root, model_root):
             if len(inference_files) != 1:
                 raise ValueError('UNEXPECTED_MODEL_LAYOUT: ' + model['name'])
             source_dir = inference_files[0].parent
-            if not (source_dir / 'inference.json').is_file() or not (source_dir / 'inference.pdiparams').is_file():
+            required = model.get('required_files', ['inference.json', 'inference.pdiparams'])
+            if not all((source_dir / name).is_file() for name in required):
                 raise ValueError('MODEL_REQUIRED_FILES_MISSING: ' + model['name'])
             if target.exists():
                 shutil.rmtree(target)
