@@ -1,0 +1,9 @@
+{
+  "version": "experimental-1",
+  "spatial_overlap": 0.35,
+  "box_padding_px": 8,
+  "lane_overlap": 0.45,
+  "same_row_overlap": 0.45,
+  "low_recognition_score": 0.90,
+  "status_boundary": "structural evidence and review state; never accuracy probability"
+}

@@ -1,0 +1,2053 @@
+{
+  "schema": "ocr-review-evaluation-v1",
+  "scope": "selected full-question ROIs only; not whole-page/book accuracy",
+  "reference_sha256": "bb2c6fa40e44bc2da75671eab97971ae7df72c1292a51b739464712eb0617fb0",
+  "reference_characters": 3612,
+  "reference_blocks": [
+    {
+      "id": "p11-q33",
+      "physical_page": 11,
+      "reference_image_sha256": "92e138cedab4c4a73225ce0011bc9685daa6f46581303c3df454ddc9c34993c1",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "4141bb18f826159bcebd97a81dd71721f7b45ef8d330c7971bca09dcf9a53a3c",
+      "bbox": [
+        245.4422788605697,
+        193.52012711864407,
+        1704.4602698650674,
+        347.51853813559325
+      ],
+      "reference_characters": 98,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 98,
+          "edit_distance": 1,
+          "cer": 0.01020408163265306,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 98,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 98,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p11-q34",
+      "physical_page": 11,
+      "reference_image_sha256": "92e138cedab4c4a73225ce0011bc9685daa6f46581303c3df454ddc9c34993c1",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "80424151cf6dc4c54fc5c1f486e8ffb45f3dce7e1e8771a329ec5d19f3f80dce",
+      "bbox": [
+        245.4422788605697,
+        355.69544491525426,
+        1704.4602698650674,
+        504.2425847457627
+      ],
+      "reference_characters": 77,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 77,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 77,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 77,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p11-q35",
+      "physical_page": 11,
+      "reference_image_sha256": "92e138cedab4c4a73225ce0011bc9685daa6f46581303c3df454ddc9c34993c1",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "e4ee3202aa94c07abd8314bb7283e5cd92317eae1da90512f194e7c1d631a82c",
+      "bbox": [
+        245.4422788605697,
+        512.4194915254237,
+        1704.4602698650674,
+        771.354872881356
+      ],
+      "reference_characters": 101,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 101,
+          "edit_distance": 1,
+          "cer": 0.009900990099009901,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 101,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 101,
+          "edit_distance": 1,
+          "cer": 0.009900990099009901,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p11-q36",
+      "physical_page": 11,
+      "reference_image_sha256": "92e138cedab4c4a73225ce0011bc9685daa6f46581303c3df454ddc9c34993c1",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "53517ae8317d6af1b6a65930d776b07d4f811573598f42da7575a9af64589d40",
+      "bbox": [
+        245.4422788605697,
+        776.8061440677966,
+        1704.4602698650674,
+        928.0789194915254
+      ],
+      "reference_characters": 71,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 71,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 71,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 71,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p11-q37",
+      "physical_page": 11,
+      "reference_image_sha256": "92e138cedab4c4a73225ce0011bc9685daa6f46581303c3df454ddc9c34993c1",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "1d08b223c5e2fdbe2f05238d4d708a95b9958bec2cc025ae233c5a679217118a",
+      "bbox": [
+        245.4422788605697,
+        932.167372881356,
+        1704.4602698650674,
+        1345.1011652542375
+      ],
+      "reference_characters": 238,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 238,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 238,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 238,
+          "edit_distance": 1,
+          "cer": 0.004201680672268907,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p11-q38",
+      "physical_page": 11,
+      "reference_image_sha256": "92e138cedab4c4a73225ce0011bc9685daa6f46581303c3df454ddc9c34993c1",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "fcb3b4154513ca07b0a9f1141fb4e171d8959d5e791e0789fbfbec752df1e7ef",
+      "bbox": [
+        245.4422788605697,
+        1349.1896186440679,
+        1704.4602698650674,
+        1550.886652542373
+      ],
+      "reference_characters": 123,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 123,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 123,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 123,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p11-q39",
+      "physical_page": 11,
+      "reference_image_sha256": "92e138cedab4c4a73225ce0011bc9685daa6f46581303c3df454ddc9c34993c1",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "70ae39a3f9abe304e866541667006399ba76b24e72814c2167167b51772c4fad",
+      "bbox": [
+        238.62443778110944,
+        1557.7007415254238,
+        1704.4602698650674,
+        2025.147245762712
+      ],
+      "reference_characters": 314,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 314,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 314,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 314,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p11-q40",
+      "physical_page": 11,
+      "reference_image_sha256": "92e138cedab4c4a73225ce0011bc9685daa6f46581303c3df454ddc9c34993c1",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "690e1b5657377fb57488fa31bc6561b232d731f919353ecad1f7baf458f0709c",
+      "bbox": [
+        238.62443778110944,
+        2030.5985169491526,
+        1704.4602698650674,
+        2391.7452330508477
+      ],
+      "reference_characters": 256,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 256,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 256,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 256,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p13-q47",
+      "physical_page": 13,
+      "reference_image_sha256": "9523055da6c698d418d6ee9aac1de81cb61710fdf3273cbfb539d8184c356cb6",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "8c2d385caba7ad5c46b302acef3026fcb45f9a58d4d861ec3136bcdc5f47ca02",
+      "bbox": [
+        245.4422788605697,
+        193.52012711864407,
+        1690.8245877061468,
+        342.06726694915255
+      ],
+      "reference_characters": 78,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 78,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 78,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 78,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p13-q48",
+      "physical_page": 13,
+      "reference_image_sha256": "9523055da6c698d418d6ee9aac1de81cb61710fdf3273cbfb539d8184c356cb6",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "2ec2f0e0b8f7043577cf0a6518dce2889bf3886f1f0ccb680a9f29bcae72fe17",
+      "bbox": [
+        245.4422788605697,
+        351.6069915254237,
+        1690.8245877061468,
+        659.603813559322
+      ],
+      "reference_characters": 211,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 211,
+          "edit_distance": 1,
+          "cer": 0.004739336492890996,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 211,
+          "edit_distance": 2,
+          "cer": 0.009478672985781991,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 211,
+          "edit_distance": 2,
+          "cer": 0.009478672985781991,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p13-q49",
+      "physical_page": 13,
+      "reference_image_sha256": "9523055da6c698d418d6ee9aac1de81cb61710fdf3273cbfb539d8184c356cb6",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "04560e4c7f4a30d3a5e4e236b249e245fc500f133c2ccc4ad102e686b390992a",
+      "bbox": [
+        245.4422788605697,
+        666.4179025423729,
+        1690.8245877061468,
+        869.4777542372882
+      ],
+      "reference_characters": 136,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 136,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 136,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 136,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p13-q50",
+      "physical_page": 13,
+      "reference_image_sha256": "9523055da6c698d418d6ee9aac1de81cb61710fdf3273cbfb539d8184c356cb6",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "9d4828c95528b2c5181d314d9f21f154311a4e73f60b641082da73c0fa958988",
+      "bbox": [
+        245.4422788605697,
+        874.9290254237288,
+        1690.8245877061468,
+        1073.9004237288136
+      ],
+      "reference_characters": 152,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 152,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 152,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 152,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p13-q51",
+      "physical_page": 13,
+      "reference_image_sha256": "9523055da6c698d418d6ee9aac1de81cb61710fdf3273cbfb539d8184c356cb6",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "6e8872c8bf6d2090814022762bed1efcda95493339a5751cf94b544edd28d837",
+      "bbox": [
+        245.4422788605697,
+        1080.7145127118645,
+        1690.8245877061468,
+        1436.4099576271187
+      ],
+      "reference_characters": 198,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 198,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 198,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 198,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p13-q52",
+      "physical_page": 13,
+      "reference_image_sha256": "9523055da6c698d418d6ee9aac1de81cb61710fdf3273cbfb539d8184c356cb6",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "a3047ec32dbc23329aaf75d8da4446058eff443000e67702a06f8a0a83ed2cb1",
+      "bbox": [
+        245.4422788605697,
+        1444.5868644067798,
+        1690.8245877061468,
+        1595.8596398305085
+      ],
+      "reference_characters": 86,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 86,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 86,
+          "edit_distance": 1,
+          "cer": 0.011627906976744186,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 86,
+          "edit_distance": 1,
+          "cer": 0.011627906976744186,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p13-q53",
+      "physical_page": 13,
+      "reference_image_sha256": "9523055da6c698d418d6ee9aac1de81cb61710fdf3273cbfb539d8184c356cb6",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "bf237bb65976a86836383a769388c3db0ecbbdb650849d0e6ea8beb1d9e19cc5",
+      "bbox": [
+        245.4422788605697,
+        1601.3109110169491,
+        1690.8245877061468,
+        1864.334745762712
+      ],
+      "reference_characters": 104,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 104,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 104,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 104,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p13-q54",
+      "physical_page": 13,
+      "reference_image_sha256": "9523055da6c698d418d6ee9aac1de81cb61710fdf3273cbfb539d8184c356cb6",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "0ca0f7488dd3dac8e017053c2944b5bb12bf8cd151a541826d69107714871f30",
+      "bbox": [
+        245.4422788605697,
+        1869.7860169491526,
+        1690.8245877061468,
+        2175.0572033898306
+      ],
+      "reference_characters": 204,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 204,
+          "edit_distance": 3,
+          "cer": 0.014705882352941176,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 204,
+          "edit_distance": 3,
+          "cer": 0.014705882352941176,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 204,
+          "edit_distance": 3,
+          "cer": 0.014705882352941176,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p23-q126",
+      "physical_page": 23,
+      "reference_image_sha256": "10eca256252fed33100c29c5ad5163555a01cf3b6c1f0e3d2be6c87bb1422742",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "7ec0d107cbf04ee4348733f540d16e4397c36474670ea9b52709b1e68204f765",
+      "bbox": [
+        252.26011994002997,
+        981.2288135593221,
+        1704.4602698650674,
+        1240.1641949152543
+      ],
+      "reference_characters": 112,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 112,
+          "edit_distance": 17,
+          "cer": 0.15178571428571427,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 112,
+          "edit_distance": 17,
+          "cer": 0.15178571428571427,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 112,
+          "edit_distance": 17,
+          "cer": 0.15178571428571427,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "ambiguous_prefix_excluded": true
+    },
+    {
+      "id": "p23-q130",
+      "physical_page": 23,
+      "reference_image_sha256": "10eca256252fed33100c29c5ad5163555a01cf3b6c1f0e3d2be6c87bb1422742",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "d3c153b84e54f8dc2a46eace5ffbc5a91b7c135967f10999ace0f7317bae6f12",
+      "bbox": [
+        252.26011994002997,
+        2139.6239406779664,
+        1704.4602698650674,
+        2398.5593220338983
+      ],
+      "reference_characters": 171,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 171,
+          "edit_distance": 14,
+          "cer": 0.08187134502923976,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "contrast125": {
+          "reference_characters": 171,
+          "edit_distance": 14,
+          "cer": 0.08187134502923976,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        },
+        "median3-contrast125": {
+          "reference_characters": 171,
+          "edit_distance": 17,
+          "cer": 0.09941520467836257,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p127-q108",
+      "physical_page": 127,
+      "reference_image_sha256": "24b7b0a3b1732e87b62b59c6d031afe16e5339633f924b20cf020f72e2c16c9a",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "d3275f17c5b42714579b0f4fad5d5946503ec0c04c2fa7d7d0a702eedc8f2bf0",
+      "bbox": [
+        245.4422788605697,
+        926.7161016949153,
+        1636.2818590704646,
+        1193.8283898305085
+      ],
+      "reference_characters": 157,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 157,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p127-q109",
+      "physical_page": 127,
+      "reference_image_sha256": "24b7b0a3b1732e87b62b59c6d031afe16e5339633f924b20cf020f72e2c16c9a",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "90ac13c95234301e36fd4987d4e16dc3baf71aab792ba84c8c30b5f417740087",
+      "bbox": [
+        245.4422788605697,
+        1192.4655720338983,
+        1636.2818590704646,
+        1452.7637711864406
+      ],
+      "reference_characters": 96,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 96,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        22,
+        23,
+        24,
+        25,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p127-q111",
+      "physical_page": 127,
+      "reference_image_sha256": "24b7b0a3b1732e87b62b59c6d031afe16e5339633f924b20cf020f72e2c16c9a",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "c0c4342eeb8244527dfb2f3c8b6eb7c3126910b24ca7d3f22641c58d020aaca6",
+      "bbox": [
+        245.4422788605697,
+        1819.3617584745764,
+        1636.2818590704646,
+        2026.5100635593221
+      ],
+      "reference_characters": 123,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 123,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        40,
+        41,
+        42,
+        43,
+        44,
+        45
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p127-q112",
+      "physical_page": 127,
+      "reference_image_sha256": "24b7b0a3b1732e87b62b59c6d031afe16e5339633f924b20cf020f72e2c16c9a",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "955e28505dfaba3a146e457d272b5d97ea140202567ee3f46d85ffbddecedc6b",
+      "bbox": [
+        245.4422788605697,
+        2030.5985169491526,
+        1636.2818590704646,
+        2244.5609110169494
+      ],
+      "reference_characters": 136,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 136,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p131-q4",
+      "physical_page": 131,
+      "reference_image_sha256": "60aebbc69acbf5e28cefd3cdfe18db8a567a4777e83b0de8d1c064cf1bda796b",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "600cdf36a90a30f2e7cac0fdf88278835cdfa4b7ed37b21541bd22a8a0055178",
+      "bbox": [
+        190.89955022488755,
+        393.854343220339,
+        1718.0959520239878,
+        769.9920550847457
+      ],
+      "reference_characters": 249,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 249,
+          "edit_distance": 7,
+          "cer": 0.028112449799196786,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "ambiguous_prefix_excluded": false
+    },
+    {
+      "id": "p131-q5",
+      "physical_page": 131,
+      "reference_image_sha256": "60aebbc69acbf5e28cefd3cdfe18db8a567a4777e83b0de8d1c064cf1bda796b",
+      "review_method": "开发侧看图核对，未经用户确认；直接读取220dpi原图，未以模型输出代替参考",
+      "reference_sha256": "ef89a093385be8d1fe1eaba979b757bede66192a02bf48fe86688a8b610b1406",
+      "bbox": [
+        190.89955022488755,
+        775.4433262711865,
+        1718.0959520239878,
+        981.2288135593221
+      ],
+      "reference_characters": 121,
+      "scores": {
+        "baseline_raw": {
+          "reference_characters": 121,
+          "edit_distance": 0,
+          "cer": 0.0,
+          "normalization": "whitespace only; all other Unicode characters significant"
+        }
+      },
+      "raw_indices": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "ambiguous_prefix_excluded": false
+    }
+  ],
+  "regression_pages": [
+    {
+      "physical_page": 6,
+      "image_sha256": "0ba4119c9b88c6410bc78c6974eaa90744ac3cd7d739903509883e1c48a61876",
+      "native_sha256": "84388af31fa9e4eef940805aafa8e99595b2f33fbd18673d39677063ad43f33d",
+      "original_markdown_sha256": "f910bb8bb151bed564a353a39b1da0e4f93580dcf194c8dff5fc50c9f95c6a24",
+      "repaired_markdown_sha256": "c42bf530c80647d1337b5a731d81a2feb330e7c3d3f75c9804d4f877406cac39",
+      "covered_before": 44,
+      "covered_after": 44,
+      "raw_lines": 44,
+      "recovered_lines": 0,
+      "pending_lines": 0,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 0,
+      "duplicate_regions": 0,
+      "low_score_regions": 0,
+      "review_status": "需复核",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.02130802907049656
+    },
+    {
+      "physical_page": 10,
+      "image_sha256": "713179b41b1a1673f3306055bc6781c6899035b1a6ca9d9ac8f972c07f9418cc",
+      "native_sha256": "28d03f73eeb211d725b4b49d9931ea3f1b20b01dcb48c7cc2fc695c00740726a",
+      "original_markdown_sha256": "9e024a06bb0434aadaf8e7c51a7238810931adf25225eb969072d81512e7d0dd",
+      "repaired_markdown_sha256": "9a8850973fb6b61287453c72a87bf319825761b5da21608f9b2b20dbc63d8293",
+      "covered_before": 50,
+      "covered_after": 50,
+      "raw_lines": 51,
+      "recovered_lines": 0,
+      "pending_lines": 1,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 0,
+      "duplicate_regions": 0,
+      "low_score_regions": 1,
+      "review_status": "无法确定",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.013408328988589346
+    },
+    {
+      "physical_page": 30,
+      "image_sha256": "6e3066f049f4adc52728f132e4d8ab1995c7ef5a3937864bd8f0d2f126f54b88",
+      "native_sha256": "95931e5146f24d755258d7c26539af6349079ad5a42ee8a31bea1af3eb0619eb",
+      "original_markdown_sha256": "d5fe2e4dcfa6d7318ec452f9b5063aade06405139298a5170412f8adda2f5fef",
+      "repaired_markdown_sha256": "12a23951883949a0319c6a4b3a62161eb4b1f758a9857a4812546bf6bcc51a6e",
+      "covered_before": 50,
+      "covered_after": 50,
+      "raw_lines": 50,
+      "recovered_lines": 0,
+      "pending_lines": 0,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 1,
+      "duplicate_regions": 0,
+      "low_score_regions": 0,
+      "review_status": "需复核",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.009223264059983194
+    },
+    {
+      "physical_page": 11,
+      "image_sha256": "92e138cedab4c4a73225ce0011bc9685daa6f46581303c3df454ddc9c34993c1",
+      "native_sha256": "5d84b25bf150418df30355c8ad74829c923977da123b661a58440996c9041288",
+      "original_markdown_sha256": "5de5ca7c50121c7604f689448b4aca52e9f32d9cfca09d4378f2d38965d101c4",
+      "repaired_markdown_sha256": "8acf62975607d4bf4fc20b60d86b08286c6c88490970620637f15ea12ecd4a59",
+      "covered_before": 55,
+      "covered_after": 55,
+      "raw_lines": 57,
+      "recovered_lines": 0,
+      "pending_lines": 2,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 1,
+      "duplicate_regions": 0,
+      "low_score_regions": 1,
+      "review_status": "无法确定",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.03436352498829365
+    },
+    {
+      "physical_page": 23,
+      "image_sha256": "10eca256252fed33100c29c5ad5163555a01cf3b6c1f0e3d2be6c87bb1422742",
+      "native_sha256": "75d529b737b79669bf18eb16e3ba22936bdf59a1514515c516eb37d501b2b77f",
+      "original_markdown_sha256": "917917add7a93f9feb9574a9f7c7ef695e69b3ea21cdb0434b7e0cc22b329eb4",
+      "repaired_markdown_sha256": "44f18853fb62ad799e7387c41be13c6811d2b32d371eeb43307a503a21d4e595",
+      "covered_before": 57,
+      "covered_after": 57,
+      "raw_lines": 57,
+      "recovered_lines": 0,
+      "pending_lines": 0,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 7,
+      "duplicate_regions": 0,
+      "low_score_regions": 42,
+      "review_status": "需复核",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.028269881033338606
+    },
+    {
+      "physical_page": 132,
+      "image_sha256": "0791a7dfcdfc7f1e453b794703329eebf567c562c427d0c32ae2b85991b91e4a",
+      "native_sha256": "9a7d33414c0623ef01df3af3838d653a78096a99ae7405d31a15690d7a42695d",
+      "original_markdown_sha256": "bd64d89218b50620280d9f86ebffd07cfd57e695493f4b9c58eb3d66074be3a0",
+      "repaired_markdown_sha256": "77fbf9bdf26312e3c730a2489b010f8ee81eef4bc7108e343a262deaf7074dbc",
+      "covered_before": 51,
+      "covered_after": 51,
+      "raw_lines": 53,
+      "recovered_lines": 0,
+      "pending_lines": 2,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 0,
+      "duplicate_regions": 0,
+      "low_score_regions": 2,
+      "review_status": "无法确定",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.018338232999667525
+    },
+    {
+      "physical_page": 127,
+      "image_sha256": "24b7b0a3b1732e87b62b59c6d031afe16e5339633f924b20cf020f72e2c16c9a",
+      "native_sha256": "c4c005f6e758ab7b0da0a173c0677fdcbe96c94fbbb9d8d41dd1781f82e1b9a2",
+      "original_markdown_sha256": "0f62c4bdd9d77297d9a56c5d80c33f6d07354dd78baf7a22e0cd5724f60e694a",
+      "repaired_markdown_sha256": "bd3dd3354a2ee0609ec1f1f52ce4b3c692e8514585d858df26fa6d7f9b06bf23",
+      "covered_before": 43,
+      "covered_after": 58,
+      "raw_lines": 58,
+      "recovered_lines": 15,
+      "pending_lines": 0,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 1,
+      "duplicate_regions": 0,
+      "low_score_regions": 0,
+      "review_status": "需复核",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.021804907941259444
+    },
+    {
+      "physical_page": 168,
+      "image_sha256": "ec3577d2fbd4ec9c207a56b9f8f4aa5a08f092583e610a4230e8496e10b2d738",
+      "native_sha256": "cb781723f9c301ce72a46a88f7895a24e8404faeba6d261035ba4d0ee6e3788d",
+      "original_markdown_sha256": "a9f291e536cb4225b4675832c3ce4a884c1339f6b22ffe35e6c1c86579d9bca8",
+      "repaired_markdown_sha256": "5b30569b9e41bcd6606387887b2a25935c93d33017e86de936b00aa43c81a57a",
+      "covered_before": 65,
+      "covered_after": 65,
+      "raw_lines": 66,
+      "recovered_lines": 0,
+      "pending_lines": 0,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 0,
+      "duplicate_regions": 0,
+      "low_score_regions": 0,
+      "review_status": "需复核",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.020239131059497595
+    },
+    {
+      "physical_page": 131,
+      "image_sha256": "60aebbc69acbf5e28cefd3cdfe18db8a567a4777e83b0de8d1c064cf1bda796b",
+      "native_sha256": "59669de7a5a7f62680e759b1288705dafb4905bb6fb9052662b0522f569be495",
+      "original_markdown_sha256": "dce7f1bf37cf9b1bbbd08887d3a7ea21b991d0639491e824a65936fdc2b00e68",
+      "repaired_markdown_sha256": "ba2939e6c071db3c7249408d9722aa5a768da3478fa739f1e8bb2b3f840b0c38",
+      "covered_before": 39,
+      "covered_after": 55,
+      "raw_lines": 57,
+      "recovered_lines": 16,
+      "pending_lines": 1,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 1,
+      "duplicate_regions": 0,
+      "low_score_regions": 1,
+      "review_status": "无法确定",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.023439961951225996
+    },
+    {
+      "physical_page": 18,
+      "image_sha256": "5fbff116ccbeddf63662b35b5f46d0c20a213f8a71f1279ab077585388986c9a",
+      "native_sha256": "f412edbe265ecb66debce2b88bf296cb1a81b9f4c8784ab899ade34ce94f9e17",
+      "original_markdown_sha256": "564e28e8d2c5814bd4b9a1499f029db64cdbda5cd1ce1a0a2a78263b016e534b",
+      "repaired_markdown_sha256": "173f414bbb9e6f739b40ddcca1c4789eef767925fce050c48175e1cfc828d4da",
+      "covered_before": 56,
+      "covered_after": 60,
+      "raw_lines": 61,
+      "recovered_lines": 4,
+      "pending_lines": 1,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 1,
+      "duplicate_regions": 0,
+      "low_score_regions": 0,
+      "review_status": "无法确定",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.031093186931684613
+    },
+    {
+      "physical_page": 114,
+      "image_sha256": "ea8c3e52def820defc1f67839c4ddb47421f1259e24cbe2c596e44682f64a56f",
+      "native_sha256": "550f7f82cb87cea9ff8a7794d59b00e66fc839e5863294f41ec520d2d0ee3dfa",
+      "original_markdown_sha256": "e5db444dc2e7729ae2ceb6b6649ec5827bc16f18d7dc9568b7a0e082f89544b3",
+      "repaired_markdown_sha256": "513c2a4372b5dde52b74d1424ccee8255e041efe20f90fe1bc55422b8de1247e",
+      "covered_before": 65,
+      "covered_after": 65,
+      "raw_lines": 67,
+      "recovered_lines": 0,
+      "pending_lines": 0,
+      "native_order_candidates_retained": 1,
+      "question_option_candidates": 4,
+      "duplicate_regions": 0,
+      "low_score_regions": 3,
+      "review_status": "需复核",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.030511965975165367
+    },
+    {
+      "physical_page": 75,
+      "image_sha256": "372ebe66549cc670499e8dc36416da52bee837b4f906f71743dd5821b59d80e3",
+      "native_sha256": "51c4c544f82674673269af42dab4f8c776c80e09ced55413d5c6df400582f399",
+      "original_markdown_sha256": "7446bbac50b1937e369b9d53601225835f471bd41cf15d42d6911c17a22bb984",
+      "repaired_markdown_sha256": "da70990a4ac04957451c77c378fac61600444685cc305d05f6708d2a174db3c2",
+      "covered_before": 59,
+      "covered_after": 59,
+      "raw_lines": 59,
+      "recovered_lines": 0,
+      "pending_lines": 0,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 0,
+      "duplicate_regions": 0,
+      "low_score_regions": 0,
+      "review_status": "需复核",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.021216501016169786
+    },
+    {
+      "physical_page": 61,
+      "image_sha256": "c2a52918229344323159d15f78dfdfc8791163d15e98e7faf6f3e4a4126f15e3",
+      "native_sha256": "50fcba0002fddc654cb21d97ac464532b60a830cddb19b18d6b6c19691122db1",
+      "original_markdown_sha256": "ec115a1a42586d4df5b9d710c9f48973eac4edb3fc05dbd44df13189d8b3844c",
+      "repaired_markdown_sha256": "c95b1ded967bb0e1eda5edfab708553ba186abc5ed0f834afdac0c4e50fdfbbc",
+      "covered_before": 49,
+      "covered_after": 49,
+      "raw_lines": 50,
+      "recovered_lines": 0,
+      "pending_lines": 1,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 1,
+      "duplicate_regions": 0,
+      "low_score_regions": 0,
+      "review_status": "无法确定",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.02550734195392579
+    },
+    {
+      "physical_page": 33,
+      "image_sha256": "d585317dfec5c677d4bf1e393ffc8cded4f6fa4001cc5b3c21833da69e501867",
+      "native_sha256": "ec8516259d4fc0c0d67df1c4476cc71e98e81223ab4509bf0e0923d7a4b07d6d",
+      "original_markdown_sha256": "7958635a359a445c6801f7d75af646b35ec0e61028e597f3d717d00a83740058",
+      "repaired_markdown_sha256": "708053a9ad15cf1b77515f9628be95e92fe4daf8445d2a3571619d5b3082c09d",
+      "covered_before": 49,
+      "covered_after": 49,
+      "raw_lines": 49,
+      "recovered_lines": 0,
+      "pending_lines": 0,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 1,
+      "duplicate_regions": 0,
+      "low_score_regions": 0,
+      "review_status": "需复核",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.02287106798030436
+    },
+    {
+      "physical_page": 146,
+      "image_sha256": "a22964bd40173a3e12ad2264adeaf2092eac0b5576d9d678a016cedd47e0e34d",
+      "native_sha256": "94216b9d55a039b99b1282e019e65dc65586e6ba5aae0630708ff972b9b378cc",
+      "original_markdown_sha256": "1d4c2f451d5515493615ddf6f7bba88a45d4d5ebc169754547117f9ad3b4fbb3",
+      "repaired_markdown_sha256": "0260286642f7d9f19f67849d8384ce684f0b41dff5617f168a1c5d0e43f70ae2",
+      "covered_before": 44,
+      "covered_after": 45,
+      "raw_lines": 46,
+      "recovered_lines": 1,
+      "pending_lines": 1,
+      "native_order_candidates_retained": 1,
+      "question_option_candidates": 2,
+      "duplicate_regions": 0,
+      "low_score_regions": 0,
+      "review_status": "无法确定",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.017524602939374745
+    },
+    {
+      "physical_page": 13,
+      "image_sha256": "9523055da6c698d418d6ee9aac1de81cb61710fdf3273cbfb539d8184c356cb6",
+      "native_sha256": "a925db2db192e3c14d7fb2ebb15daa99251df14d80fc925671de1ffa4ed0adf8",
+      "original_markdown_sha256": "9b36e22a482c23e8c130cc914d5d09511cd20fe7121b00e9c5166a195e8d85e5",
+      "repaired_markdown_sha256": "187696e9c2c19d231ffc441ebf458632e52a381e0325c40b5ba6eeaa7f1b65fb",
+      "covered_before": 62,
+      "covered_after": 63,
+      "raw_lines": 64,
+      "recovered_lines": 1,
+      "pending_lines": 0,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 1,
+      "duplicate_regions": 0,
+      "low_score_regions": 1,
+      "review_status": "需复核",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.026435601990669966
+    },
+    {
+      "physical_page": 54,
+      "image_sha256": "5fa6d993b55adb12344750d2138f99cfe262f2a67797518c4ca0e29b36367199",
+      "native_sha256": "9a15761c4de192d808f5696dbd7a2aa0b3280dc8dc8f6741b7401b630ec5dcef",
+      "original_markdown_sha256": "a6374720ed6fab5b3a9476de99da9d964cc704774c3d121ad32d5e8a18335863",
+      "repaired_markdown_sha256": "8cebafec854ba6aabb93e174068fdf34ed563a7cabf98b0dfaafc83ef054a23c",
+      "covered_before": 56,
+      "covered_after": 56,
+      "raw_lines": 56,
+      "recovered_lines": 0,
+      "pending_lines": 0,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 0,
+      "duplicate_regions": 0,
+      "low_score_regions": 0,
+      "review_status": "需复核",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.0254305669805035
+    },
+    {
+      "physical_page": 63,
+      "image_sha256": "580cb127b88ef3cb74128ae524a901a39a37e763dfcf6ed65c403a66dac1eee2",
+      "native_sha256": "d96252ec0e5ed6d26b1feed00d52048a07ca58a0b8d0558c6fc91a4e9abf861f",
+      "original_markdown_sha256": "c12284f7cbfe9ba674ce8f82feb7957be92715a053dc256e2ba0c02c371dc448",
+      "repaired_markdown_sha256": "41d094e656d887717b0d049d7d22e067c9c38db525be065aa194f0175019e48b",
+      "covered_before": 46,
+      "covered_after": 46,
+      "raw_lines": 46,
+      "recovered_lines": 0,
+      "pending_lines": 0,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 1,
+      "duplicate_regions": 0,
+      "low_score_regions": 0,
+      "review_status": "需复核",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.01488256303127855
+    },
+    {
+      "physical_page": 16,
+      "image_sha256": "b6f32e6feb099c2876c46b4088a88111b097d9438effe0d7091c8d1abfcbc333",
+      "native_sha256": "2b324df37cc20fd31a80c05031b015710c0a216dee9f95ef10ab7c9273909dbc",
+      "original_markdown_sha256": "33bb201b82632f2c1c02c5162695d2050a3bf013fc2f4a306930709ae422bd24",
+      "repaired_markdown_sha256": "bceee84a0dd5d83cb6e9cb5e387be2de38447633865f1086ac15eba2bbcfb4cb",
+      "covered_before": 47,
+      "covered_after": 47,
+      "raw_lines": 47,
+      "recovered_lines": 0,
+      "pending_lines": 0,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 1,
+      "duplicate_regions": 0,
+      "low_score_regions": 0,
+      "review_status": "需复核",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.020668049925006926
+    },
+    {
+      "physical_page": 17,
+      "image_sha256": "0ea7e3a0750a287ee57db2754c34db5e3fb2a96c96e7c8a9f2d216327e69d271",
+      "native_sha256": "6ec42eb212eb03c1312077a2c27e97d24d267c4a25fd56e53ce294dade1dc59e",
+      "original_markdown_sha256": "c1714c987ccb0da6e3f328eb933402f77bec8ccf229f2eefa9edb23941253cc8",
+      "repaired_markdown_sha256": "57204e09b293005ea254dd16c03659f53bf948163cf2b2655bdf2fca310d1643",
+      "covered_before": 53,
+      "covered_after": 53,
+      "raw_lines": 54,
+      "recovered_lines": 0,
+      "pending_lines": 0,
+      "native_order_candidates_retained": 0,
+      "question_option_candidates": 0,
+      "duplicate_regions": 0,
+      "low_score_regions": 0,
+      "review_status": "需复核",
+      "original_blocks_preserved_in_order": true,
+      "elapsed_seconds": 0.020571821951307356
+    }
+  ],
+  "preprocessing_comparison": [
+    {
+      "physical_page": 23,
+      "variant": "contrast125",
+      "native_sha256": "da213a0813f074082b567505bd8d2a8d107521657807e988b2b86036be924650",
+      "matched_groups": 57,
+      "changed_groups": 35,
+      "critical_disagreement_groups": 8,
+      "original_unmatched": 0,
+      "processed_unmatched": 1,
+      "split_merge_groups": 2,
+      "winner": null
+    },
+    {
+      "physical_page": 23,
+      "variant": "median3-contrast125",
+      "native_sha256": "c61e366b5c3c6a3e512d9f88d7fac4488bae95c9842e73bb4273c16127cec6db",
+      "matched_groups": 55,
+      "changed_groups": 48,
+      "critical_disagreement_groups": 14,
+      "original_unmatched": 2,
+      "processed_unmatched": 0,
+      "split_merge_groups": 1,
+      "winner": null
+    },
+    {
+      "physical_page": 11,
+      "variant": "contrast125",
+      "native_sha256": "84e822cf64406a4a95fedf643f671c1699edfa83ec60db6fe4a27c592ac95925",
+      "matched_groups": 57,
+      "changed_groups": 4,
+      "critical_disagreement_groups": 3,
+      "original_unmatched": 0,
+      "processed_unmatched": 0,
+      "split_merge_groups": 0,
+      "winner": null
+    },
+    {
+      "physical_page": 11,
+      "variant": "median3-contrast125",
+      "native_sha256": "9739226a27f04d31243f9da4999366997eac6838ba1b6a4d8adc4f4eedb619c5",
+      "matched_groups": 57,
+      "changed_groups": 5,
+      "critical_disagreement_groups": 2,
+      "original_unmatched": 0,
+      "processed_unmatched": 0,
+      "split_merge_groups": 0,
+      "winner": null
+    },
+    {
+      "physical_page": 13,
+      "variant": "contrast125",
+      "native_sha256": "568c93c226cbcd27c3a40b138bc5f66d902ebdd37cca2bde35bc8193394fffab",
+      "matched_groups": 63,
+      "changed_groups": 4,
+      "critical_disagreement_groups": 2,
+      "original_unmatched": 1,
+      "processed_unmatched": 0,
+      "split_merge_groups": 0,
+      "winner": null
+    },
+    {
+      "physical_page": 13,
+      "variant": "median3-contrast125",
+      "native_sha256": "7942990e53f27f3b4a728b108f49d6866ea8dbd6c086f14a2c04dbb999488b16",
+      "matched_groups": 64,
+      "changed_groups": 6,
+      "critical_disagreement_groups": 4,
+      "original_unmatched": 0,
+      "processed_unmatched": 0,
+      "split_merge_groups": 0,
+      "winner": null
+    }
+  ],
+  "preprocessing_images": [
+    {
+      "physical_page": 23,
+      "variant": "contrast125",
+      "parameters": {
+        "grayscale": true,
+        "contrast": 1.25,
+        "median_size": null
+      },
+      "source_sha256": "10eca256252fed33100c29c5ad5163555a01cf3b6c1f0e3d2be6c87bb1422742",
+      "image_sha256": "98c4c1e90751aeb09987e5b11444e1f9c17e7d313b0439309ac1b4242f8362ac",
+      "size": [
+        1819,
+        2573
+      ],
+      "bytes": 1607022,
+      "processed_to_original": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "coordinate_basis": "unchanged original pixels; no crop/resize/rotation"
+    },
+    {
+      "physical_page": 23,
+      "variant": "median3-contrast125",
+      "parameters": {
+        "grayscale": true,
+        "contrast": 1.25,
+        "median_size": 3
+      },
+      "source_sha256": "10eca256252fed33100c29c5ad5163555a01cf3b6c1f0e3d2be6c87bb1422742",
+      "image_sha256": "a861cb0a6ea32bdfdb5725b1801cc08976ba938492a8f9e44543888f7adf6d32",
+      "size": [
+        1819,
+        2573
+      ],
+      "bytes": 1411962,
+      "processed_to_original": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "coordinate_basis": "unchanged original pixels; no crop/resize/rotation"
+    },
+    {
+      "physical_page": 11,
+      "variant": "contrast125",
+      "parameters": {
+        "grayscale": true,
+        "contrast": 1.25,
+        "median_size": null
+      },
+      "source_sha256": "92e138cedab4c4a73225ce0011bc9685daa6f46581303c3df454ddc9c34993c1",
+      "image_sha256": "081d2b8ae00d11458be52b05b27ab6dc37f177e03d567972147ffb224f4b4c94",
+      "size": [
+        1819,
+        2573
+      ],
+      "bytes": 2064397,
+      "processed_to_original": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "coordinate_basis": "unchanged original pixels; no crop/resize/rotation"
+    },
+    {
+      "physical_page": 11,
+      "variant": "median3-contrast125",
+      "parameters": {
+        "grayscale": true,
+        "contrast": 1.25,
+        "median_size": 3
+      },
+      "source_sha256": "92e138cedab4c4a73225ce0011bc9685daa6f46581303c3df454ddc9c34993c1",
+      "image_sha256": "f933e29841ea94ce7ae26e94f182b0507dcd4bdeb8e5ac4b112172bd947d8159",
+      "size": [
+        1819,
+        2573
+      ],
+      "bytes": 1810121,
+      "processed_to_original": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "coordinate_basis": "unchanged original pixels; no crop/resize/rotation"
+    },
+    {
+      "physical_page": 13,
+      "variant": "contrast125",
+      "parameters": {
+        "grayscale": true,
+        "contrast": 1.25,
+        "median_size": null
+      },
+      "source_sha256": "9523055da6c698d418d6ee9aac1de81cb61710fdf3273cbfb539d8184c356cb6",
+      "image_sha256": "7f9f5b32a70898258f9102176c38afaf2623af14a09206387649d1eea6ac587e",
+      "size": [
+        1819,
+        2573
+      ],
+      "bytes": 2006695,
+      "processed_to_original": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "coordinate_basis": "unchanged original pixels; no crop/resize/rotation"
+    },
+    {
+      "physical_page": 13,
+      "variant": "median3-contrast125",
+      "parameters": {
+        "grayscale": true,
+        "contrast": 1.25,
+        "median_size": 3
+      },
+      "source_sha256": "9523055da6c698d418d6ee9aac1de81cb61710fdf3273cbfb539d8184c356cb6",
+      "image_sha256": "e67986d22fa1d20b7f40b71d2c02f7ddf27f3bd4e0839443416a724beca8ecd8",
+      "size": [
+        1819,
+        2573
+      ],
+      "bytes": 1781967,
+      "processed_to_original": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "coordinate_basis": "unchanged original pixels; no crop/resize/rotation"
+    }
+  ],
+  "runtime_runs": [
+    {
+      "physical_page": 23,
+      "variant": "contrast125",
+      "image_id": "sha256:dc202cf886fa3e3d239765f27df55b9b1c4b11885d11f8252dd8a4631860ae93",
+      "memory_bytes": 17179869184,
+      "memory_swap_bytes": 17179869184,
+      "nano_cpus": 2000000000,
+      "network": "none",
+      "metrics": {
+        "engine": "ppstructurev3",
+        "pipeline_config_sha256": "ab10c67c5698b9de90a51329bb091c219c09e8b0a51a955bd84985b1d4ec1051",
+        "package_import_seconds": 2.1122695250669494,
+        "package_import_process_cpu_seconds": 2.261304,
+        "device": "cpu",
+        "cpu_threads": 2,
+        "gpu_peak_vram_bytes": null,
+        "gpu_status": "no CUDA device exposed",
+        "pages": [
+          {
+            "physical_page": 23,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 22.109684939030558,
+            "process_cpu_seconds": 43.821825,
+            "inference_seconds": 22.09501650801394,
+            "export_seconds": 0.014675504062324762,
+            "inference_order": 1,
+            "cold_first_inference": true,
+            "process_peak_rss_kib_cumulative": 6769880,
+            "page_results": 1,
+            "input_image_sha256": "98c4c1e90751aeb09987e5b11444e1f9c17e7d313b0439309ac1b4242f8362ac"
+          }
+        ],
+        "model_load_seconds": 15.974052228033543,
+        "model_load_process_cpu_seconds": 24.620697,
+        "process_peak_rss_after_load_kib": 6769880
+      },
+      "receipt": {
+        "status": "SUCCEEDED",
+        "wall_seconds": 41.1194067139877,
+        "exit_code": 0,
+        "monitored_process_peak_rss_kib": 6769880,
+        "timeout": null,
+        "model_load_limit_seconds": 180,
+        "page_limit_seconds": 300,
+        "engine": "ppstructurev3",
+        "pages_requested": [
+          23
+        ],
+        "offline": true,
+        "identity": "independent evaluation, not FileTools production",
+        "container_memory_peak_bytes": 6705840128,
+        "container_cpu_stat": {
+          "usage_usec": "71919486",
+          "user_usec": "63727632",
+          "system_usec": "8191854",
+          "nice_usec": "0",
+          "core_sched.force_idle_usec": "0",
+          "nr_periods": "412",
+          "nr_throttled": "206",
+          "throttled_usec": "423902",
+          "nr_bursts": "0",
+          "burst_usec": "0"
+        }
+      },
+      "OOMKilled": false
+    },
+    {
+      "physical_page": 23,
+      "variant": "median3-contrast125",
+      "image_id": "sha256:dc202cf886fa3e3d239765f27df55b9b1c4b11885d11f8252dd8a4631860ae93",
+      "memory_bytes": 17179869184,
+      "memory_swap_bytes": 17179869184,
+      "nano_cpus": 2000000000,
+      "network": "none",
+      "metrics": {
+        "engine": "ppstructurev3",
+        "pipeline_config_sha256": "ab10c67c5698b9de90a51329bb091c219c09e8b0a51a955bd84985b1d4ec1051",
+        "package_import_seconds": 2.0997776860604063,
+        "package_import_process_cpu_seconds": 2.24881,
+        "device": "cpu",
+        "cpu_threads": 2,
+        "gpu_peak_vram_bytes": null,
+        "gpu_status": "no CUDA device exposed",
+        "pages": [
+          {
+            "physical_page": 23,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 21.948617129935883,
+            "process_cpu_seconds": 43.489731000000006,
+            "inference_seconds": 21.934683128958568,
+            "export_seconds": 0.013941382989287376,
+            "inference_order": 1,
+            "cold_first_inference": true,
+            "process_peak_rss_kib_cumulative": 6756344,
+            "page_results": 1,
+            "input_image_sha256": "a861cb0a6ea32bdfdb5725b1801cc08976ba938492a8f9e44543888f7adf6d32"
+          }
+        ],
+        "model_load_seconds": 15.95760499406606,
+        "model_load_process_cpu_seconds": 24.648393000000002,
+        "process_peak_rss_after_load_kib": 6756344
+      },
+      "receipt": {
+        "status": "SUCCEEDED",
+        "wall_seconds": 41.122332702972926,
+        "exit_code": 0,
+        "monitored_process_peak_rss_kib": 6756344,
+        "timeout": null,
+        "model_load_limit_seconds": 180,
+        "page_limit_seconds": 300,
+        "engine": "ppstructurev3",
+        "pages_requested": [
+          23
+        ],
+        "offline": true,
+        "identity": "independent evaluation, not FileTools production",
+        "container_memory_peak_bytes": 6691852288,
+        "container_cpu_stat": {
+          "usage_usec": "71634495",
+          "user_usec": "63624603",
+          "system_usec": "8009892",
+          "nice_usec": "0",
+          "core_sched.force_idle_usec": "0",
+          "nr_periods": "412",
+          "nr_throttled": "217",
+          "throttled_usec": "413527",
+          "nr_bursts": "0",
+          "burst_usec": "0"
+        }
+      },
+      "OOMKilled": false
+    },
+    {
+      "physical_page": 11,
+      "variant": "contrast125",
+      "image_id": "sha256:dc202cf886fa3e3d239765f27df55b9b1c4b11885d11f8252dd8a4631860ae93",
+      "memory_bytes": 17179869184,
+      "memory_swap_bytes": 17179869184,
+      "nano_cpus": 2000000000,
+      "network": "none",
+      "metrics": {
+        "engine": "ppstructurev3",
+        "pipeline_config_sha256": "ab10c67c5698b9de90a51329bb091c219c09e8b0a51a955bd84985b1d4ec1051",
+        "package_import_seconds": 2.070667478023097,
+        "package_import_process_cpu_seconds": 2.219697,
+        "device": "cpu",
+        "cpu_threads": 2,
+        "gpu_peak_vram_bytes": null,
+        "gpu_status": "no CUDA device exposed",
+        "pages": [
+          {
+            "physical_page": 11,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 24.194568946026266,
+            "process_cpu_seconds": 47.86260300000001,
+            "inference_seconds": 24.181544046034105,
+            "export_seconds": 0.013031956041231751,
+            "inference_order": 1,
+            "cold_first_inference": true,
+            "process_peak_rss_kib_cumulative": 6785028,
+            "page_results": 1,
+            "input_image_sha256": "081d2b8ae00d11458be52b05b27ab6dc37f177e03d567972147ffb224f4b4c94"
+          }
+        ],
+        "model_load_seconds": 16.114204718032852,
+        "model_load_process_cpu_seconds": 24.847719,
+        "process_peak_rss_after_load_kib": 6785028
+      },
+      "receipt": {
+        "status": "SUCCEEDED",
+        "wall_seconds": 43.529368821997195,
+        "exit_code": 0,
+        "monitored_process_peak_rss_kib": 6785028,
+        "timeout": null,
+        "model_load_limit_seconds": 180,
+        "page_limit_seconds": 300,
+        "engine": "ppstructurev3",
+        "pages_requested": [
+          11
+        ],
+        "offline": true,
+        "identity": "independent evaluation, not FileTools production",
+        "container_memory_peak_bytes": 6720835584,
+        "container_cpu_stat": {
+          "usage_usec": "76135221",
+          "user_usec": "67237885",
+          "system_usec": "8897336",
+          "nice_usec": "0",
+          "core_sched.force_idle_usec": "0",
+          "nr_periods": "436",
+          "nr_throttled": "179",
+          "throttled_usec": "544379",
+          "nr_bursts": "0",
+          "burst_usec": "0"
+        }
+      },
+      "OOMKilled": false
+    },
+    {
+      "physical_page": 11,
+      "variant": "median3-contrast125",
+      "image_id": "sha256:dc202cf886fa3e3d239765f27df55b9b1c4b11885d11f8252dd8a4631860ae93",
+      "memory_bytes": 17179869184,
+      "memory_swap_bytes": 17179869184,
+      "nano_cpus": 2000000000,
+      "network": "none",
+      "metrics": {
+        "engine": "ppstructurev3",
+        "pipeline_config_sha256": "ab10c67c5698b9de90a51329bb091c219c09e8b0a51a955bd84985b1d4ec1051",
+        "package_import_seconds": 2.076784976059571,
+        "package_import_process_cpu_seconds": 2.225658,
+        "device": "cpu",
+        "cpu_threads": 2,
+        "gpu_peak_vram_bytes": null,
+        "gpu_status": "no CUDA device exposed",
+        "pages": [
+          {
+            "physical_page": 11,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 24.40273371094372,
+            "process_cpu_seconds": 48.37337000000001,
+            "inference_seconds": 24.38993307191413,
+            "export_seconds": 0.01280770602170378,
+            "inference_order": 1,
+            "cold_first_inference": true,
+            "process_peak_rss_kib_cumulative": 6784272,
+            "page_results": 1,
+            "input_image_sha256": "f933e29841ea94ce7ae26e94f182b0507dcd4bdeb8e5ac4b112172bd947d8159"
+          }
+        ],
+        "model_load_seconds": 15.969271376961842,
+        "model_load_process_cpu_seconds": 24.616327000000002,
+        "process_peak_rss_after_load_kib": 6784272
+      },
+      "receipt": {
+        "status": "SUCCEEDED",
+        "wall_seconds": 43.53380732308142,
+        "exit_code": 0,
+        "monitored_process_peak_rss_kib": 6784272,
+        "timeout": null,
+        "model_load_limit_seconds": 180,
+        "page_limit_seconds": 300,
+        "engine": "ppstructurev3",
+        "pages_requested": [
+          11
+        ],
+        "offline": true,
+        "identity": "independent evaluation, not FileTools production",
+        "container_memory_peak_bytes": 6721155072,
+        "container_cpu_stat": {
+          "usage_usec": "76537074",
+          "user_usec": "67458604",
+          "system_usec": "9078470",
+          "nice_usec": "0",
+          "core_sched.force_idle_usec": "0",
+          "nr_periods": "436",
+          "nr_throttled": "221",
+          "throttled_usec": "437915",
+          "nr_bursts": "0",
+          "burst_usec": "0"
+        }
+      },
+      "OOMKilled": false
+    },
+    {
+      "physical_page": 13,
+      "variant": "contrast125",
+      "image_id": "sha256:dc202cf886fa3e3d239765f27df55b9b1c4b11885d11f8252dd8a4631860ae93",
+      "memory_bytes": 17179869184,
+      "memory_swap_bytes": 17179869184,
+      "nano_cpus": 2000000000,
+      "network": "none",
+      "metrics": {
+        "engine": "ppstructurev3",
+        "pipeline_config_sha256": "ab10c67c5698b9de90a51329bb091c219c09e8b0a51a955bd84985b1d4ec1051",
+        "package_import_seconds": 2.128005239996128,
+        "package_import_process_cpu_seconds": 2.276986,
+        "device": "cpu",
+        "cpu_threads": 2,
+        "gpu_peak_vram_bytes": null,
+        "gpu_status": "no CUDA device exposed",
+        "pages": [
+          {
+            "physical_page": 13,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 24.442268862971105,
+            "process_cpu_seconds": 48.46399099999999,
+            "inference_seconds": 24.427597247064114,
+            "export_seconds": 0.014678653911687434,
+            "inference_order": 1,
+            "cold_first_inference": true,
+            "process_peak_rss_kib_cumulative": 6770548,
+            "page_results": 1,
+            "input_image_sha256": "7f9f5b32a70898258f9102176c38afaf2623af14a09206387649d1eea6ac587e"
+          }
+        ],
+        "model_load_seconds": 16.01767797593493,
+        "model_load_process_cpu_seconds": 24.604758,
+        "process_peak_rss_after_load_kib": 6770548
+      },
+      "receipt": {
+        "status": "SUCCEEDED",
+        "wall_seconds": 43.74170224298723,
+        "exit_code": 0,
+        "monitored_process_peak_rss_kib": 6770548,
+        "timeout": null,
+        "model_load_limit_seconds": 180,
+        "page_limit_seconds": 300,
+        "engine": "ppstructurev3",
+        "pages_requested": [
+          13
+        ],
+        "offline": true,
+        "identity": "independent evaluation, not FileTools production",
+        "container_memory_peak_bytes": 6706606080,
+        "container_cpu_stat": {
+          "usage_usec": "76685342",
+          "user_usec": "67759312",
+          "system_usec": "8926029",
+          "nice_usec": "0",
+          "core_sched.force_idle_usec": "0",
+          "nr_periods": "439",
+          "nr_throttled": "215",
+          "throttled_usec": "469626",
+          "nr_bursts": "0",
+          "burst_usec": "0"
+        }
+      },
+      "OOMKilled": false
+    },
+    {
+      "physical_page": 13,
+      "variant": "median3-contrast125",
+      "image_id": "sha256:dc202cf886fa3e3d239765f27df55b9b1c4b11885d11f8252dd8a4631860ae93",
+      "memory_bytes": 17179869184,
+      "memory_swap_bytes": 17179869184,
+      "nano_cpus": 2000000000,
+      "network": "none",
+      "metrics": {
+        "engine": "ppstructurev3",
+        "pipeline_config_sha256": "ab10c67c5698b9de90a51329bb091c219c09e8b0a51a955bd84985b1d4ec1051",
+        "package_import_seconds": 2.105632512946613,
+        "package_import_process_cpu_seconds": 2.2546939999999998,
+        "device": "cpu",
+        "cpu_threads": 2,
+        "gpu_peak_vram_bytes": null,
+        "gpu_status": "no CUDA device exposed",
+        "pages": [
+          {
+            "physical_page": 13,
+            "status": "SUCCEEDED",
+            "elapsed_seconds": 24.515013461001217,
+            "process_cpu_seconds": 48.615444,
+            "inference_seconds": 24.499329227022827,
+            "export_seconds": 0.015691314009018242,
+            "inference_order": 1,
+            "cold_first_inference": true,
+            "process_peak_rss_kib_cumulative": 6789812,
+            "page_results": 1,
+            "input_image_sha256": "e67986d22fa1d20b7f40b71d2c02f7ddf27f3bd4e0839443416a724beca8ecd8"
+          }
+        ],
+        "model_load_seconds": 15.99170192296151,
+        "model_load_process_cpu_seconds": 24.588868,
+        "process_peak_rss_after_load_kib": 6789812
+      },
+      "receipt": {
+        "status": "SUCCEEDED",
+        "wall_seconds": 43.63512423296925,
+        "exit_code": 0,
+        "monitored_process_peak_rss_kib": 6789812,
+        "timeout": null,
+        "model_load_limit_seconds": 180,
+        "page_limit_seconds": 300,
+        "engine": "ppstructurev3",
+        "pages_requested": [
+          13
+        ],
+        "offline": true,
+        "identity": "independent evaluation, not FileTools production",
+        "container_memory_peak_bytes": 6726508544,
+        "container_cpu_stat": {
+          "usage_usec": "76808620",
+          "user_usec": "68164525",
+          "system_usec": "8644095",
+          "nice_usec": "0",
+          "core_sched.force_idle_usec": "0",
+          "nr_periods": "438",
+          "nr_throttled": "274",
+          "throttled_usec": "429954",
+          "nr_bursts": "0",
+          "burst_usec": "0"
+        }
+      },
+      "OOMKilled": false
+    }
+  ],
+  "result_analysis_seconds": 0.9875658469973132,
+  "result_analysis_peak_rss_kib": 28828,
+  "cer_basis": "native raw OCR lines whose center is in manually selected ROI; row-major within question; whitespace only normalization",
+  "review_certification": "开发侧看图核对，未经用户确认",
+  "raw_cer_boundary": "recognition metric; layout retention measured separately; all layer originals retained"
+}

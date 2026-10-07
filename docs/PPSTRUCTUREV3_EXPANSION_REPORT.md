@@ -2,11 +2,13 @@
 
 Date: 2026-10-07. Branch: `eval/filetools-paddleocr-vl-20261006`. This report evaluates 20 physical pages from one authorized exam PDF. It does not establish whole-book accuracy or production readiness.
 
+Follow-up: [spatial reconciliation, expanded CER and preprocessing experiment](OCR_SPATIAL_REVIEW_REPORT.md) completes the missing selected-block reference/CER item and reports separate repaired results. Original runs below remain historical evidence. Source-image errata: p127 is single-choice, q113 only begins there, and the adjacent pair is 131/132.
+
 ## Outcome
 
 All 17 new pages completed PP-StructureV3 inference in separate, serial, offline CPU containers. The three earlier pages (physical 6, 10, 30) were reused only after matching the 220 dpi input-image hashes and prior successful receipts. There were no OOM kills, page timeouts, inference failures, or export failures in this run.
 
-This does **not** pass the suitability gate for automatically producing a reliable structured question book. The original image, raw OCR lines, parsed layout blocks, and Markdown differ materially on two multi-choice pages: physical pages 127 and 131 have 15 and 17 raw OCR lines respectively that are not represented in parsed blocks. The page 127 Markdown lacks visible answer choices for several questions; page 131 Markdown omits parts of visible questions/options. These are layout assembly losses, not proof the recognizer never saw the text. In addition, the visibly degraded physical page 23 has substantial character/number/option-label errors. The test therefore supports continued experimental use for text extraction with mandatory source-page review, but not unattended question-structure generation.
+This does **not** pass the suitability gate for automatically producing a reliable structured question book. The original image, raw OCR lines, parsed layout blocks, and Markdown differ materially on physical pages 127 (single-choice) and 131 (multiple-choice); 15 and 17 raw OCR lines respectively are not represented in parsed blocks. The page 127 Markdown lacks visible answer choices for several questions; page 131 Markdown omits parts of visible questions/options. These are layout assembly losses, not proof the recognizer never saw the text. In addition, the visibly degraded physical page 23 has substantial character/number/option-label errors. The test therefore supports continued experimental use for text extraction with mandatory source-page review, but not unattended question-structure generation.
 
 The requested new-sample reference corpus of at least 3,000 non-whitespace characters was **not completed**. Consequently, no CER is reported for the 17 new pages. This is an explicit incomplete acceptance item; it is not replaced with model confidence, OCR-to-OCR agreement, or a fabricated zero. Existing selected-block CER for the prior 6/10/30 problem sample is reported separately below and is not representative of the 17 new pages.
 
@@ -22,7 +24,7 @@ Source PDF SHA-256: `0007677dc510b01ffed36bd1250fafd8a7b0101f383e3603257b45e379a
 | 11 | 6 | Long stems, compact two-column choices, sidebar |
 | 23 | 18 | Visibly degraded/noisy scan challenge page |
 | 132 | 136 | Dense single-choice page and context for q10 continuation from p131 |
-| 127 | 131 | Dense multi-choice, degraded left edge/scan artifacts |
+| 127 | 131 | Dense single-choice, degraded left edge/scan artifacts |
 | 168 | 175 | Dense multi-choice late-book page; starts with a prior question continuation |
 | 131 | 135 | Multi-choice page, questions 3–10, chapter title and page furniture |
 | 18 | 13 | Single-to-multiple-choice transition and chapter context |
@@ -37,7 +39,7 @@ Source PDF SHA-256: `0007677dc510b01ffed36bd1250fafd8a7b0101f383e3603257b45e379a
 | 16 | 11 | q74 begins at page bottom; paired with adjacent p17 |
 | 17 | 12 | q74 continuation at top; paired with adjacent p16 |
 
-The adjacent pages 16–17 confirm the q74 cross-page boundary. Physical pages 127/132 also expose question continuation and layout loss across a selected adjacent boundary. No table, formula, or standalone illustration content was identified in these selected question pages; the sidebar/page furniture and circled numerals were included. The sample does not establish support for tables, formulas, or arbitrary figures.
+The adjacent pages 16–17 confirm the q74 cross-page boundary. Physical pages 131/132 also expose question continuation and layout loss across a selected adjacent boundary. No table, formula, or standalone illustration content was identified in these selected question pages; the sidebar/page furniture and circled numerals were included. The sample does not establish support for tables, formulas, or arbitrary figures.
 
 Sample manifest SHA-256: `c33b545adb5e52d96b3bc2c2f7ce5b4c157cf8acee09c6472f8bb0aaf705cabf`. Private original page images and sample details remain under the ignored runtime directory.
 
@@ -77,8 +79,8 @@ All 20 selected source page images were visually inspected at page resolution. N
 
 Largest observed losses:
 
-- **p127 / print131:** Original image shows complete questions 106–113. The recognizer's raw OCR includes text that the parser does not assemble (15 raw strings absent from parsed blocks). Markdown has several visible questions whose answer choices or statement lists are missing, including q108/q111 and later material. This is predominantly layout assembly loss where raw recognition exists; remaining glyph errors are OCR errors.
-- **p131 / print135:** Original image shows q3–9 and the start of q10, with a chapter heading between q9 and q10. The parser omits 17 raw recognized strings. Markdown loses substantial parts of visible q4/q5 and their choices. The page has two-column choice placement and a narrow noisy left edge; the output does not preserve the structure reliably.
+- **p127 / print131:** Original image shows complete questions 106–112 and the beginning of q113. The recognizer's raw OCR includes text that the parser does not assemble (15 raw strings absent from parsed blocks). Markdown has several visible questions whose answer choices or statement lists are missing, including q108/q111 and later material. This is predominantly layout assembly loss where raw recognition exists; remaining glyph errors are OCR errors.
+- **p131 / print135:** Original image shows q3–9 and the start of q10, with a chapter heading between q9 and q10. The parser omits 17 raw recognized strings. Markdown loses visible choices for q4–7; their stems remain, with recognition errors. The page has two-column choice placement and a narrow noisy left edge; the output does not preserve the structure reliably.
 - **p23 / print18:** Original scan is visibly low quality. Markdown includes major character and numeral substitutions and option-label confusion; the raw/parser/export layers largely agree, so the primary problem is image recognition rather than Markdown filtering. This page is not an acceptable source for automatic question transcription.
 - **p11 / print6:** Original q33 is emitted as q93. Dense two-column options are sometimes concatenated, although most A–D labels remain present.
 - **p132 / print136:** Markdown begins with the visible C/D tail of q10 from p131, then q11–18. Several adjacent options are concatenated and punctuation/labels vary. This requires page-boundary reconstruction and cannot be counted as standalone complete questions.
