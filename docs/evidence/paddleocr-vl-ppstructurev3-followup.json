@@ -1,0 +1,130 @@
+{
+  "evaluation_date": "2026-10-07",
+  "scope_physical_pages": [6, 10, 30],
+  "inputs": {
+    "dpi": 220,
+    "pages": {
+      "6": "0ba4119c9b88c6410bc78c6974eaa90744ac3cd7d739903509883e1c48a61876",
+      "10": "713179b41b1a1673f3306055bc6781c6899035b1a6ca9d9ac8f972c07f9418cc",
+      "30": "6e3066f049f4adc52728f132e4d8ab1995c7ef5a3937864bd8f0d2f126f54b88"
+    },
+    "third_page_selection": "existing preflight multiple-choice candidate, visually confirmed",
+    "prior_ocr_used_as_model_input": false
+  },
+  "hardware_snapshot_before_pp_run": {
+    "host_available_mib": 26222,
+    "load_average": [0.46, 1.2, 0.81],
+    "gpu": "GT218 GeForce 210; no CUDA device exposed; VRAM unavailable",
+    "production_worker_memory_limit_bytes": 4294967296
+  },
+  "container_limits_each_run": {
+    "cpus": 2,
+    "memory_bytes": 17179869184,
+    "memory_plus_swap_bytes": 17179869184,
+    "pids": 96,
+    "network": "none",
+    "production_changed": false
+  },
+  "paddleocr_vl": {
+    "image_id": "sha256:2b423d1a39d0a064e35fdef74f88bf2b34837b9eba8b36d85329bf18941f3cb3",
+    "versions": {
+      "python": "3.12.10",
+      "paddleocr": "3.4.0",
+      "paddlex": "3.4.0",
+      "paddlepaddle_cpu": "3.2.2"
+    },
+    "prior_8gib_oom_evidence_retained": true,
+    "result": {
+      "status": "FAILED_RUNTIME_TYPEERROR",
+      "wall_seconds": 43.3272990839323,
+      "timeout": false,
+      "oom": false,
+      "exit_code": 1,
+      "package_import_seconds": 2.099157131044194,
+      "package_import_process_cpu_seconds": 2.248106,
+      "model_load_seconds": 37.062162181013264,
+      "model_load_process_cpu_seconds": 37.131004,
+      "model_load_average_of_two_allocated_cpus_percent": 50.1,
+      "process_peak_rss_kib": 9340936,
+      "container_peak_bytes": 9350508544,
+      "first_page": {
+        "physical_page": 6,
+        "status": "FAILED",
+        "elapsed_seconds": 3.05233220604714,
+        "process_cpu_seconds": 5.3230020000000025,
+        "average_of_two_allocated_cpus_percent": 87.2,
+        "error_type": "TypeError",
+        "error_summary": "only 0-dimensional arrays can be converted to Python scalars"
+      },
+      "pages_10_30": "not run",
+      "recognized_pages": 0,
+      "cer": "unavailable: no successful OCR output",
+      "question_option_completeness": "not evaluated"
+    }
+  },
+  "pp_structure_v3": {
+    "image_tag": "filetools-ppstructurev3-eval:cpu-3.4.0-paddle3.2.2",
+    "image_id": "sha256:dc202cf886fa3e3d239765f27df55b9b1c4b11885d11f8252dd8a4631860ae93",
+    "versions": {
+      "python": "3.12.10",
+      "paddleocr": "3.4.0",
+      "paddlex": "3.4.0",
+      "paddlepaddle_cpu": "3.2.2"
+    },
+    "api": "paddleocr.PPStructureV3 device=cpu cpu_threads=2",
+    "models_configured": ["PP-DocLayout-L", "PP-OCRv5_server_det", "PP-OCRv5_server_rec"],
+    "modules_requested_disabled": ["table", "formula", "seal", "chart", "region"],
+    "full_module_pipeline": false,
+    "lock_sha256": "9e76546b8c5d7df3aa139d5dd6ebfcfa126757d9bf42d4a5cea57f4d43302609",
+    "archive_hashes_verified": true,
+    "attempted_config_sha256": "99ad1bcfc66e0436cbcdccc912f2afab9ca783ff3240ca5b13c07b5ac929b286",
+    "guarded_config_sha256": "ad26b7518a1949aecb278392e4bb16473c9474fbe8e38ee68836efc81d901377",
+    "result": {
+      "status": "BLOCKED_MODEL_INITIALIZATION",
+      "wall_seconds": 85.1621827710187,
+      "timeout": false,
+      "oom": false,
+      "process_peak_rss_kib": 876324,
+      "container_peak_bytes": 702722048,
+      "package_import_seconds": 2.0816329129738733,
+      "package_import_process_cpu_seconds": 2.230345,
+      "package_import_average_of_two_allocated_cpus_percent": 53.6,
+      "model_load_attempt_seconds": null,
+      "model_load_attempt_process_cpu_seconds": null,
+      "model_load_attempt_timing_note": "first-run metrics writer did not retain failed-phase duration; total process wall time is recorded",
+      "page_inference": "not started",
+      "error_summary": "offline model-source failure while initializing PP-Chart2Table",
+      "cause_evidence": "Pinned PaddleX 3.4.0 pipeline_v2.py unconditionally calls create_model(ChartRecognition), even with use_chart_recognition=False",
+      "cer": "unavailable: no successful OCR output",
+      "question_option_completeness": "not evaluated",
+      "implicit_chart_model_download_prevented_in_future_runs": true
+    },
+    "model_archives": [
+      {"name": "PP-DocLayout-L", "bytes": 130109440, "sha256": "889e95bb31bbfd268b5a43fb9e7efe3e74afcdc2f039a5a64927f8317382661c"},
+      {"name": "PP-OCRv5_server_det", "bytes": 88340480, "sha256": "22a33e0ba6a21425ea4192da03bf4395c9a0c67902bd924b7328fc859073045d"},
+      {"name": "PP-OCRv5_server_rec", "bytes": 84869120, "sha256": "d99be2ffd348943ab52876179168be4fb5b14f5f0812f2ae4c76d89ec2ea750a"}
+    ]
+  },
+  "reference_comparison": {
+    "reference_source": "same four image-checked blocks from annotations hash 56dc7972ad44cada87c5dbe597820087bcb69d6a7612ec85d09f1bd84d665bbb",
+    "characters": 517,
+    "rapidocr_edit_distance": 90,
+    "rapidocr_cer": 0.17408123791102515,
+    "reference_review": "Agent transcribed from original images; no user second-human verification",
+    "paddleocr_vl_cer": null,
+    "pp_structure_v3_cer": null,
+    "new_engine_content_or_completeness": "not assessable without successful recognition output"
+  },
+  "outputs": {
+    "native_ocr_results_produced": false,
+    "raw_pages_or_text_committed": false,
+    "logs_containing_business_text_committed": false,
+    "production_services_or_limits_changed": false
+  },
+  "automated_checks": {
+    "full_non_ocr_suite": "142 passed, 15 skipped",
+    "focused_after_final_runner_change": "5 passed",
+    "ruff_changed_files": "passed",
+    "validation_note": "full-suite tests run before the final failed-model-load timing fields were added; focused suite and Ruff rerun after that change"
+  }
+}

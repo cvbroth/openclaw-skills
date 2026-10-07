@@ -14,7 +14,7 @@ def test_stalled_test_child_is_stopped_without_extending_limit(tmp_path,monkeypa
     fake.write_text('import time\ntime.sleep(20)\n')
     monkeypatch.setattr(module,'__file__',str(fake))
     output=tmp_path/'results'
-    module.monitor(tmp_path,tmp_path,output,[6],1,1)
+    module.monitor(tmp_path,tmp_path,output,[6],1,1,'paddleocr-vl-1.5')
     result=json.loads((output/'run-receipt.json').read_text())
     assert result['status']=='TIMED_OUT'
     assert result['timeout']['limit_seconds']==1

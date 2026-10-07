@@ -117,5 +117,12 @@
     "Two installed OpenCV distributions; actual cv2 import 4.10.0. pip check does not prove binary compatibility",
     "Locked rebuild recipe was produced from measured image freeze; revised recipe not rebuilt",
     "Reported CER baseline deliberately targets known suspect blocks; not whole-page/book accuracy"
-  ]
+  ],
+  "follow_up": {
+    "evidence_file": "paddleocr-vl-ppstructurev3-followup.json",
+    "paddleocr_vl_16gib": "model loaded; first page failed with runtime TypeError; no recognition result",
+    "pp_structure_v3": "blocked during model initialization because PaddleX 3.4.0 initializes disabled ChartRecognition",
+    "shared_reference_cer": "RapidOCR baseline retained; CER for both new engines unavailable",
+    "production_changes": false
+  }
 }

@@ -16,11 +16,15 @@
           "normalization": "whitespace only; all other Unicode characters significant"
         },
         "paddleocr-vl-1.5": {
-          "status": "no completed recognition; CER unavailable"
+          "status": "no completed recognition; 16GiB load succeeded but first-page TypeError; CER unavailable"
+        },
+        "ppstructurev3": {
+          "status": "not evaluated; blocked during model initialization before page inference; CER unavailable"
         }
       },
       "completeness": {
-        "paddleocr-vl": "not assessed: shared model loading OOM before first page; no recognition result"
+        "paddleocr-vl": "not assessed: 16GiB model load succeeded; first page failed with runtime TypeError",
+        "ppstructurev3": "not assessed: pipeline initialization failed before page inference"
       }
     },
     {
@@ -37,11 +41,15 @@
           "normalization": "whitespace only; all other Unicode characters significant"
         },
         "paddleocr-vl-1.5": {
-          "status": "no completed recognition; CER unavailable"
+          "status": "no completed recognition; 16GiB load succeeded but first-page TypeError; CER unavailable"
+        },
+        "ppstructurev3": {
+          "status": "not evaluated; blocked during model initialization before page inference; CER unavailable"
         }
       },
       "completeness": {
-        "paddleocr-vl": "not assessed: shared model loading OOM before first page; no recognition result"
+        "paddleocr-vl": "not assessed: 16GiB model load succeeded; first page failed with runtime TypeError",
+        "ppstructurev3": "not assessed: pipeline initialization failed before page inference"
       }
     },
     {
@@ -58,11 +66,15 @@
           "normalization": "whitespace only; all other Unicode characters significant"
         },
         "paddleocr-vl-1.5": {
-          "status": "no completed recognition; CER unavailable"
+          "status": "no completed recognition; 16GiB load succeeded but first-page TypeError; CER unavailable"
+        },
+        "ppstructurev3": {
+          "status": "not evaluated; blocked during model initialization before page inference; CER unavailable"
         }
       },
       "completeness": {
-        "paddleocr-vl": "not assessed: shared model loading OOM before first page; no recognition result"
+        "paddleocr-vl": "not assessed: 16GiB model load succeeded; first page failed with runtime TypeError",
+        "ppstructurev3": "not assessed: pipeline initialization failed before page inference"
       }
     },
     {
@@ -79,11 +91,15 @@
           "normalization": "whitespace only; all other Unicode characters significant"
         },
         "paddleocr-vl-1.5": {
-          "status": "no completed recognition; CER unavailable"
+          "status": "no completed recognition; 16GiB load succeeded but first-page TypeError; CER unavailable"
+        },
+        "ppstructurev3": {
+          "status": "not evaluated; blocked during model initialization before page inference; CER unavailable"
         }
       },
       "completeness": {
-        "paddleocr-vl": "not assessed: shared model loading OOM before first page; no recognition result"
+        "paddleocr-vl": "not assessed: 16GiB model load succeeded; first page failed with runtime TypeError",
+        "ppstructurev3": "not assessed: pipeline initialization failed before page inference"
       }
     }
   ]

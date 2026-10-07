@@ -1,4 +1,4 @@
-# PaddleOCR-VL 独立三页评估
+# PaddleOCR-VL 与 PP-StructureV3 独立三页评估
 
 本评估与整册文档开发隔离。原分支868c25dc及其未提交结构/模板/Skill成果保留，不把评估镜像用作生产Worker，不改变RapidOCR、Gateway、挂载或限额。不重新识别整册，不上传原页到外部服务，不永久保存或导入知识库。
 
@@ -97,6 +97,32 @@ docker run --rm --network none --read-only --user 1000:1000 \
 
 **建议**：当前本机2CPU/8GiB CPU方案不适合继续识别，优先考虑兼容GPU或自托管远端的独立评估。本轮未完成准确率对比，不能认定比RapidOCR更好或收益不足。8GiB是主动设置的测试上限，并非宿主机物理极限；不能据此断言本机CPU绝对跑不了。若继续更高内存CPU尝试，需先确认新的资源边界和服务负载，本轮不自动扩大。未测出足够加载内存的具体值，只能证明此次8GiB不足。
 
-真实验证：硬件/当前负载、3张原图及旧OCR选段、官方文件校验、离线加载OOM与进程/容器峰值。合成验证：6项回归覆盖计分、超时终止、退出进程内存字段、版本和文件哈希门控；Ruff通过。未验证：三页新OCR、成功加载耗时、逐页/热推理、人工二次参考核验、GPU性能及准确率收益。
+真实验证：硬件/当前负载、3张原图及旧OCR选段、官方文件校验、VL两种资源额度的加载/运行结果、PP离线初始化失败及进程/容器峰值。自动验证：非OCR仓库套件142 passed、15 skipped；更新后聚焦的OCR watchdog/PP配置/CER计分测试5 passed；变更脚本及测试的Ruff检查通过。首次全套检查在错误的2GiB容器tmpfs下有10项因项目DISK_RESERVE失败，随后将容器/tmp绑定到开发宿主临时目录后全套通过；未提高生产或OCR容器限制。未验证：两种新方案成功识别、逐页/热推理、人工二次参考核验、GPU性能及识别收益。
 
 整册开发分支及未提交成果保留；本评估独立分支，不替换生产OCR、不修改生产限额/配置、不重启服务。源图、OCR正文和参考转录、日志及模型缓存均不提交；只提交代码、锁文件、无正文报告及计数/哈希证据。
+
+## 2026-10-07 补充：16GiB复测与PP-StructureV3
+
+本节补充并更正上文的8GiB时点结论，不覆盖首次OOM记录。两种引擎按顺序、各自独立容器运行；测试前查看主机可用内存/负载和运行服务。PP启动前记录主机内存可用26222MiB、load average `0.46, 1.20, 0.81`；Gateway健康、FileTools Worker约29MiB，其他运行服务也有采样。每个推理容器设2CPU、16GiB内存且memory-swap同为16GiB（容器不使用swap）、pids 96、`network:none`。GT218无CUDA设备节点，GPU显存不可读取。生产容器、4GiB Worker额度、RapidOCR和配置均未修改。
+
+### PaddleOCR-VL 16GiB复测
+
+沿用原固定镜像`sha256:2b423d1a39d0a064e35fdef74f88bf2b34837b9eba8b36d85329bf18941f3cb3`、模型和配置，仅把容器内存与memory-swap从8GiB同步提高到16GiB。原8GiB OOM证据仍在先前运行记录中。此次离线运行总计43.327秒，包导入2.099秒（进程CPU 2.248秒，约占分配双核能力53.5%），模型加载37.062秒（进程CPU 37.131秒，约50.1%）；进程RSS峰值9,340,936KiB，容器memory peak 9,350,508,544字节。第6页第一次推理运行3.052秒（进程CPU 5.323秒，约占双核能力87.2%）后返回`TypeError: only 0-dimensional arrays can be converted to Python scalars`。进程退出码1，未超时、未OOM。第10、30页没有运行。失败属于运行期类型/兼容性异常；具体根因未定位。
+
+此轮证明模型能在16GiB限额内完成初始化，但未完成页面识别。没有成功输出，三页新模型CER、题目/选项完整性、漏行恢复或新增误读均不可评估；上述失败运行不构成OCR准确率结果。没有成功页面，首张有效推理和后续推理时间均未取得。进程峰值RSS与容器cgroup峰值是不同口径。未取得GPU显存峰值。
+
+### PP-StructureV3独立CPU尝试
+
+采用[官方PP-StructureV3 Python/CPU接口](https://www.paddleocr.ai/v3.4.1/en/version3.x/pipeline_usage/PP-StructureV3.html)，固定Python 3.12.10、PaddleOCR 3.4.0、PaddleX 3.4.0、PaddlePaddle CPU 3.2.2，独立模型锁`deploy/ppstructurev3-models.lock.json`，配置SHA-256 `99ad1bcfc66e0436cbcdccc912f2afab9ca783ff3240ca5b13c07b5ac929b286`。计划启用PP-DocLayout-L版面、PP-OCRv5 server文字检测/识别及其版面顺序结果；表格、公式、印章、图表和区域识别参数设为关闭。这是有意裁剪的文本试题配置，不是完整PP-StructureV3模块集。三个已锁定模型档案分别为130,109,440、88,340,480和84,869,120字节，SHA见模型锁文件。
+
+首次配置尝试实际镜像ID为`sha256:dc202cf886fa3e3d239765f27df55b9b1c4b11885d11f8252dd8a4631860ae93`，离线运行总计85.162秒后在模型加载阶段失败，进程RSS峰值876,324KiB、容器峰值702,722,048字节；没有超时或OOM，没有处理任何页面。实际模型加载阶段耗时未被首次运行指标单独保存，不能用总时长减包导入时间冒充精确加载耗时。错误显示本地`PP-Chart2Table`未挂载时“No model source is available”。对固定安装包源码的独立检查定位到`paddlex/inference/pipelines/layout_parsing/pipeline_v2.py`：即使`use_chart_recognition=False`，初始化仍无条件执行`create_model(ChartRecognition)`；官方内置`PP-StructureV3.yaml`也含ChartRecognition模型配置。因此该选项只关闭后续图表推理分支，未阻止模型预测器初始化。这个实现行为与本次文本-only约束不兼容。上游也有关于该开关仍触发模型下载的[问题记录](https://github.com/PaddlePaddle/PaddleOCR/issues/16552)；本报告依据是固定安装包源码和本次离线错误，而非单凭问题帖推断。
+
+本轮不下载或加载未请求的PP-Chart2Table模型，也不把关闭参数误报为“图表模型未加载”。在这组固定版本下，PP-StructureV3按约束**阻塞于模型初始化**，没有原生JSON/Markdown页面结果。现有预装模块探测和包导入成功不代表管线可运行。评估脚本新增显式兼容性门控，阻止后续运行发生隐式在线模型下载。若未来官方修复可选模型初始化，或另行批准改变模型集/配置，再单独评估；本次不作变更。
+
+### 同口径比较与建议
+
+原图220dpi SHA、看图选段参考和旧RapidOCR结果继续沿用`docs/evidence/paddleocr-vl-block-scores.json`，不重新转录、不把旧OCR作为输入。旧RapidOCR四个选段共517字符、编辑距离合计90，针对已知疑点的暂定CER为17.41%；参考由Agent看图转录，未经用户第二人逐字复核，不代表全页或全册。VL 16GiB复测及PP尝试均无成功识别输出，故对相同517字符均标为**CER不可计算**，不是0，也不能报告比RapidOCR更准确或更差。整题/选项完整性相应为不可评估。
+
+本机当前可用GPU路线不可用。VL在16GiB/2CPU完成模型加载但首张页面失败，CPU运行兼容性仍未解决；PP固定配置被可选图表模型初始化行为阻塞。建议目前先解决VL兼容异常或等待PP官方配置修复，再复用相同三张图测试；现有证据不足以说两者在本机适用，也不足以断言识别收益不足。没有从三页推算整册速度、准确率或内存需求。以上两个失败是本次有效实测；前述8GiB OOM仍是历史实测；PP门控和单元测试属合成/静态验证。
+
+原页、旧OCR正文、独立参考文字、两引擎失败日志和模型缓存均留在ignored runtime，不上传。仅共享评估脚本、锁文件、无正文报告和非私密回执计数/哈希。

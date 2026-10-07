@@ -1,0 +1,36 @@
+# PP-StructureV3 text exam evaluation. PaddleOCR 3.4.0/PaddleX 3.4.0 API names.
+# This is a deliberately partial module set, not the full PP-StructureV3 pipeline.
+engine: paddleocr.PPStructureV3
+paddlex_version: 3.4.0
+paddleocr_version: 3.4.0
+paddlepaddle_version: 3.2.2
+# PaddleX 3.4.0 unconditionally constructs ChartRecognition during pipeline
+# initialization even when use_chart_recognition is false. The fixed config
+# intentionally does not provide this unused model; evaluation must stop with
+# a compatibility block instead of triggering an implicit network download.
+compatibility_constraints:
+  disabled_chart_predictor_still_initialized: true
+  status: blocked-until-upstream-configurable-or-explicitly-authorized
+device: cpu
+cpu_threads: 2
+runtime: {}
+models:
+  layout_detection_model_name: PP-DocLayout-L
+  layout_detection_model_dir: ppstructure/layout
+  text_detection_model_name: PP-OCRv5_server_det
+  text_detection_model_dir: ppstructure/text-detection
+  text_recognition_model_name: PP-OCRv5_server_rec
+  text_recognition_model_dir: ppstructure/text-recognition
+options:
+  use_doc_orientation_classify: false
+  use_doc_unwarping: false
+  use_textline_orientation: false
+  use_seal_recognition: false
+  use_table_recognition: false
+  use_formula_recognition: false
+  use_chart_recognition: false
+  use_region_detection: false
+  format_block_content: false
+  markdown_ignore_labels: []
+  text_det_limit_side_len: 1600
+  text_det_limit_type: max

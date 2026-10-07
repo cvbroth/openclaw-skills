@@ -1,0 +1,5 @@
+# Independent PP-StructureV3 CPU evaluation; shares only frozen PaddleOCR deps.
+FROM filetools-paddleocr-vl-eval:cpu-3.4.0-paddle3.2.2
+LABEL org.openclaw-filetools.eval-engine="PP-StructureV3" \
+      org.openclaw-filetools.eval-config="ppstructurev3-text-only-v1"
+ENTRYPOINT ["/opt/paddle-vl/bin/python"]

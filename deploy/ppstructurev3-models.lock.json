@@ -1,0 +1,31 @@
+{
+  "paddleocr_release": "3.4.1 documentation; package 3.4.0",
+  "paddlex_version": "3.4.0",
+  "paddlepaddle_cpu_version": "3.2.2",
+  "models": [
+    {
+      "name": "PP-DocLayout-L",
+      "url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-DocLayout-L_infer.tar",
+      "archive": "PP-DocLayout-L.tar",
+      "archive_bytes": 130109440,
+      "archive_sha256": "889e95bb31bbfd268b5a43fb9e7efe3e74afcdc2f039a5a64927f8317382661c",
+      "directory": "ppstructure/layout"
+    },
+    {
+      "name": "PP-OCRv5_server_det",
+      "url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv5_server_det_infer.tar",
+      "archive": "PP-OCRv5_server_det.tar",
+      "archive_bytes": 88340480,
+      "archive_sha256": "22a33e0ba6a21425ea4192da03bf4395c9a0c67902bd924b7328fc859073045d",
+      "directory": "ppstructure/text-detection"
+    },
+    {
+      "name": "PP-OCRv5_server_rec",
+      "url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv5_server_rec_infer.tar",
+      "archive": "PP-OCRv5_server_rec.tar",
+      "archive_bytes": 84869120,
+      "archive_sha256": "d99be2ffd348943ab52876179168be4fb5b14f5f0812f2ae4c76d89ec2ea750a",
+      "directory": "ppstructure/text-recognition"
+    }
+  ]
+}
