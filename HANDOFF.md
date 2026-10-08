@@ -259,3 +259,9 @@ cat HANDOFF.md
 GLM停止后，现有M3原PNG连接以种子2026100802固定50页（含12/23/136），相对旧50页仅重合这三页。3页小批次后串行47页，共50次/0重试：49页返回可分离原始转写；36页质量JSON合规（good29/usable7），13页质量格式失败仍保留正文和原始质量段；136HTTP500无usage/质量，不归因图像。客户端图像逐字节一致，服务内部处理和账单未知；无新账户/充值/额外服务。全部模型自评，不是人类验收或准确率。正文与质量独立适配v2、原parse记录保留，未改任何模型正文。
 
 51项相关合成测试、50页真实离线浏览器与实际请求/响应审计通过，仅展示/传输机制验收。最终M3报告docs/M3_QUALITY50_REPORT.md、入口docs/M3_TRANSCRIPTION_QUALITY50.md、脱敏证据及共享两ZIP的路径/SHA见docs/evidence/glm-m3-round-delivery.json。业务图文、响应、权重留忽略目录；生产/Skill/模板/原OCR未修改，不生成正式题册、不入库。到此停止，等待用户查看，不继续修GLM、扩页或接生产。
+
+## 独立任务项目与通用产物评审（2026-10-08）
+
+基于6125db0保留GLM/M3全部真实结果，当前轮无新模型调用/OCR/文档转换，不改生产。新增标准库artifact_project、轻量静态评审和旧50页适配，两个独立项目分别展示M3历史结果与真实6–10页Word/PDF小样；不混造衍生关系。原件reference不复制，模板快照实际SHA核对，旧包不变。左右独立选择产物/位置与滚动、固定工具栏/评论区、窄屏切换、当前资源按需加载，技术信息默认折叠。Word用明确标注的历史渲染，评论文档级；输出页与原页不猜配。
+
+评论按项目/产物及参考版本哈希/定位隔离，导入校验并追加历史，初始无人工评论；不替代OCR修订账本或用户验收。43项相关合成回归、新模块最终9项、真实Chromium50页文本/懒加载/切换/目录移动等验证通过；缺预览回退为隔离模拟。完整报告docs/ARTIFACT_PROJECT_REVIEW_REPORT.md、使用docs/ARTIFACT_PROJECT_REVIEW.md、公开证据docs/evidence/artifact-project-validation.json。私有资源runtime/artifact-review-final，共享包位置/SHA见docs/evidence/artifact-project-delivery.json。Skill增量只说明开发边界，未部署；等待用户查看，不继续模型、生产或全册。

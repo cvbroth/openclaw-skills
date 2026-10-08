@@ -1,0 +1,63 @@
+{
+  "browser": {
+    "browser": "140.0.7339.16",
+    "checks": [
+      "initial load: exactly one source preview requested, no all-page decoding",
+      "independent pane scroll, fixed toolbar, visible comment footer",
+      "50 page texts match historical output; per-page lazy scripts",
+      "quality/comments/errors filters combine; unprovided quality is distinct",
+      "export receipt and cross-project import rejected",
+      "real Word/PDF artifact isolation; 10 vs 9 output pages, independent source positions",
+      "missing preview and external reference explicitly explained",
+      "narrow-screen pane toggle preserves draft",
+      "relocated directory loads source and PDF preview by relative links",
+      "synthetic missing Word preview: document comment; PDF object plus file fallback"
+    ],
+    "js_errors": [],
+    "external_requests": [],
+    "scope": "real browser mechanics with synthetic comments; not human validation of content or Word fonts"
+  },
+  "integrity": {
+    "projects": [
+      {
+        "project_id": "656ff0c6-00f0-4a47-9e87-9615ef827461",
+        "artifact_count": 3,
+        "formats": [
+          "reference",
+          "markdown",
+          "json"
+        ],
+        "comments_initially_empty": true
+      },
+      {
+        "project_id": "4880ebb4-9194-48b5-ab7c-f39c3c58aad1",
+        "artifact_count": 5,
+        "formats": [
+          "reference",
+          "markdown",
+          "json",
+          "pdf",
+          "docx"
+        ],
+        "comments_initially_empty": true
+      }
+    ],
+    "legacy_content_and_structure_byte_equal": true,
+    "raw_responses": 50,
+    "source_preview_pages": 55,
+    "word_preview_pages": 10,
+    "pdf_preview_pages": 9,
+    "template_snapshot_matches_historical_metrics": true,
+    "external_original_followed": false,
+    "new_model_calls": 0,
+    "new_ocr_runs": 0,
+    "new_document_conversions": 0,
+    "production_deployment": false
+  },
+  "synthetic_tests": {
+    "new": 9,
+    "relevant_total": 43,
+    "status": "passed"
+  },
+  "static_checks": "ruff and git diff --check passed"
+}

@@ -20,7 +20,7 @@ nas-filetools = "nas_filetools.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-nas_filetools = ["templates/*.json", "templates/published/*/*.json", "review_assets/*.html"]
+nas_filetools = ["templates/*.json", "templates/published/*/*.json", "review_assets/*.html", "project_assets/*.html", "project_assets/*.js", "project_assets/*.css"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

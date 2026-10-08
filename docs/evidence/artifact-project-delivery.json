@@ -1,0 +1,13 @@
+{
+  "server_directory": "/srv/storage/users/chen/FileTools-Deliveries/artifact-review-projects-20261008",
+  "server_file": "/srv/storage/users/chen/FileTools-Deliveries/artifact-review-projects-20261008/filetools-artifact-review-projects-20261008.zip",
+  "windows_path": "\\\\myserver\\Chen\\FileTools-Deliveries\\artifact-review-projects-20261008\\filetools-artifact-review-projects-20261008.zip",
+  "bytes": 109461168,
+  "sha256": "01e10aca3cc2cfe06a373984045067b4320738b10a35a777252a8dd7c3120e95",
+  "zip_crc": "passed",
+  "source_destination_bytes_sha_equal": true,
+  "directory_under_production_source_mount": false,
+  "old_deliveries_overwritten": false,
+  "qq_delivery": "not claimed",
+  "user_download": "unverified"
+}
