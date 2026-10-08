@@ -1,0 +1,30 @@
+{
+  "schema": "ocr-experiment-delivery-v1",
+  "branch": "eval/filetools-paddleocr-vl-20261006",
+  "physical_pages": [
+    12,
+    23
+  ],
+  "server_path": "/srv/storage/users/chen/FileTools-Deliveries/mineru-standard-two-pages-20261008/filetools-mineru-standard-two-pages-20261008.zip",
+  "windows_path": "\\\\myserver\\Chen\\FileTools-Deliveries\\mineru-standard-two-pages-20261008\\filetools-mineru-standard-two-pages-20261008.zip",
+  "bytes": 27795295,
+  "sha256": "2e756c8d430b92fe8abb0dc1f97bbf83bcb538eae202f62a5a3b9222ce859f4d",
+  "copy_sha256_equal": true,
+  "zip_crc": "passed",
+  "shared_delivery_directory_not_mounted_to_gateway_or_worker": true,
+  "incoming_read_only": true,
+  "filetools_saved": false,
+  "knowledge_import": false,
+  "qq_formal_delivery": false,
+  "user_download_verified": false,
+  "new_cloud_calls": 0,
+  "native_standard_pages_completed": 2,
+  "historical_candidates_reused": [
+    "mineru-basic",
+    "paddle-vl16",
+    "monkey (23 partial)",
+    "m3"
+  ],
+  "production_worker_image_id": "sha256:dc7bb036ba656c50c0bb4e6732eb6a81d688b3bd938a73e45c212fcd519c04cd",
+  "production_gateway_image_id": "sha256:817c7c3a8bf9ec233c97875de7d35e00d61862886e884bd09d69946aadd54819"
+}

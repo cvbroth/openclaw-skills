@@ -144,6 +144,7 @@ def test_resume_archives_partial_raw_output_preserves_completed_pages(tmp_path):
     assert (target / 'page-10/raw.log').read_text() == 'partial synthetic'
     assert not (tmp_path / 'page-10').exists()
     assert json.loads((target / 'run-receipt.json').read_text())['status'] == 'TIMED_OUT'
+    assert not (tmp_path / 'run-receipt.json').exists()
 
 
 def test_shape_observer_handles_native_list_without_altering_feed():

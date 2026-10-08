@@ -99,3 +99,22 @@ docker run -d --name filetools-monkey-new-page12 \
 只对有完整原生jsons/markdowns的成功页使用`ocr_backend_comparison.py adapt-monkey --folder <原生页目录> --page 12`。同目录保存blocks.json/raw.md；原生markdowns与images相对路径保留。raw.md是原生MD逐字节副本，图片相对路径仍以原生markdowns位置解释，不静默改写。bbox坐标属于官方warp后的页，未提供逆映射则不假称原图坐标。原生导出的strip/标题格式及替换符过滤属于工具行为，原始逐调用文字仍保留，不用原生MD冒充无格式处理的模型响应。
 
 复用原bundle入口组合monkey/paddle-vl16/m3-history（MinerU可选）；不重新请求M3。现有`summarize_paddle_vl_trial.py`扩展白名单兼容Monkey阶段，仅输出不带query/raw_text的测量。合成测试检查观察器输入/返回值恒等、并发不被日志锁串行化、ID隔离、脱敏白名单及预处理坐标系；不代表OCR准确或生产能力通过。
+
+## MinerU Standard本地CPU两页（2026-10-08）
+
+沿用同一MinerU4.0.10镜像与ONNX小模型，新增官方registry指定的`jinzhenj/MinerU2.5-Pro-2605-1.2B-GGUF`，revision `9185688a0495e1577d521a757c7c0b62dd38ca48`，主模型与mmproj的Q8_0文件；详见`docs/evidence/mineru-standard-fixed.json`。不是Basic改名，不是远程HTTP客户端，也不是Paddle/Monkey权重复用。
+
+准备阶段允许网络：既有流式下载脚本逐文件验证固定HF元数据；再由官方ModelRepo.ensure下载/验证快照并生成完成标记，不手造`.mineru_complete`。官方snapshot_download在本次准备中显式固定revision；完成后再次核对两个大文件SHA。模型站访问使用既有开发网络设置，禁止记录代理值/密钥；推理不继承任何代理、认证或服务端点。
+
+沿用上面的隔离docker run，修改且仅修改实验参数：
+
+- 模型根含`MinerU2.5-Pro-2605-1.2B-GGUF`；既有`MinerU-4_models_onnx`作为其子目录只读挂载（可复用历史模型根，不复制或下载小模型）。模型锁仍独立tmpfs。
+- 只读挂载`deploy/ocr-comparison-mineru-standard.yaml`到`/config.yaml`；本地engine=llama-cpp，server_url为空，source=local，max_concurrency=1，LLM辅助关闭。
+- 入口增加`--mineru-tier standard --cpu-threads 2 --observe-shapes --page-timeout 1800`；仍2CPU、16g memory和memory-swap，network none、nonroot、只读根、安全限制不变。
+- 先`--pages 12`，确认原生完整终态后再用独立`trials/page-23`目录运行`--pages 23`。使用detached Docker；失败尝试保留，`--resume`归档旧日志、终态及未完成页；成功SHA相同才跳过。新版本归档后移走旧终态回执，避免后台运行期间误读上一轮失败为当前结果。
+
+`mineru_standard_observer.py`仅在研究进程包装官方Engine，显式传其支持的`n_threads=2,n_gpu_layers=0,n_parallel=1,verbosity=3`。安装版配置没有这些Engine字段，因此不伪造YAML参数；不修改安装包文件或换识别管线。记录真实prepare_for_extract输入布局/内部页尺寸、Engine实际data-URI图像字节、原始messages/采样参数/GenerateResult/token/引擎timings，业务内容仅留私有目录。原函数入参/返回不改，不调用第二次prepare或生成。首次将Helper方法错误定位到Client的初始化失败保留，最终使用真实`MinerUClientHelper`，通过合成回归及真实调用。
+
+`standard-phases.jsonl`记录VLM加载、含布局/渲染/ONNX加载的window_prepare、包含视觉与生成的各次Engine.generate、原生save导出；不能将嵌套计时相加，prompt_ms不等于独立视觉编码耗时。未提供的算子耗时/内部视觉张量缩放写未知。`summarize_mineru_standard_trial.py --folder <trial> --output <sanitized.json>`只输出测量白名单，不输出原请求/正文；合成测试覆盖脱敏。
+
+成功后沿用`adapt-mineru`、`bundle`和实际浏览器检查。默认MD可能过滤页边文字，`full-mode.md`和原生JSON独立保留；原始逐区域响应才是视觉模型原文，不以格式适配后的Markdown替代。不得将JSON字段齐全/程序零异常当逐字正确或题目结构验收。

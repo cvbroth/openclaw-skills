@@ -1,0 +1,105 @@
+{
+  "scope": [
+    12,
+    23
+  ],
+  "files": [
+    {
+      "physical_page": 12,
+      "file": "raw.md",
+      "bytes": 3821,
+      "sha256": "534f97df9c3d82c11b674e8f2711d695a23078e8a0713803c844f5e17604d119"
+    },
+    {
+      "physical_page": 12,
+      "file": "markdown.md",
+      "bytes": 3821,
+      "sha256": "534f97df9c3d82c11b674e8f2711d695a23078e8a0713803c844f5e17604d119"
+    },
+    {
+      "physical_page": 12,
+      "file": "full-mode.md",
+      "bytes": 3899,
+      "sha256": "8701358ff28c4c1fdf0afd0aef5b05d9bf297bb5304133a9e33e8b8de1304ef7"
+    },
+    {
+      "physical_page": 12,
+      "file": "middle_json.json",
+      "bytes": 7533,
+      "sha256": "32e6a61117de0d7a90336fdbce12f88b44e1319947a8aad1a22608740129c7e3"
+    },
+    {
+      "physical_page": 12,
+      "file": "model_output.json",
+      "bytes": 13254,
+      "sha256": "6d861c5799810428d0bb195268b58569a50a336d3d1174eabc1eec083624a7ba"
+    },
+    {
+      "physical_page": 12,
+      "file": "structured_content.json",
+      "bytes": 6284,
+      "sha256": "32f451d2f79cb08a095c70475f98d88614b40ff3d09e2ed80974b10041076846"
+    },
+    {
+      "physical_page": 12,
+      "file": "blocks.json",
+      "bytes": 7086,
+      "sha256": "95da8c16451032c291b0340d91e9c49135aa4fefa277e6fa8bab572ee31056a8"
+    },
+    {
+      "physical_page": 12,
+      "file": "receipt.json",
+      "bytes": 559,
+      "sha256": "a67a188e18d028a72671650daa91c16ba890deac23d72c45ae7e5c2a809fac5d"
+    },
+    {
+      "physical_page": 23,
+      "file": "raw.md",
+      "bytes": 3392,
+      "sha256": "e45d1f73fb6832654ec97184e13e1464dad65600c88e88e5b7afbbec3bb75c49"
+    },
+    {
+      "physical_page": 23,
+      "file": "markdown.md",
+      "bytes": 3392,
+      "sha256": "e45d1f73fb6832654ec97184e13e1464dad65600c88e88e5b7afbbec3bb75c49"
+    },
+    {
+      "physical_page": 23,
+      "file": "full-mode.md",
+      "bytes": 3514,
+      "sha256": "9247bc3064ef1ba5750d0abffe30e21c6b675f1a132c1436286992a0ed38d4f7"
+    },
+    {
+      "physical_page": 23,
+      "file": "middle_json.json",
+      "bytes": 8021,
+      "sha256": "bda78096a1bc023820583ea14fdf4ea872125264b20c62fd2e647a7198f758f3"
+    },
+    {
+      "physical_page": 23,
+      "file": "model_output.json",
+      "bytes": 13958,
+      "sha256": "0eca60dbd49fdb1258e42fd35e060d232790a3dacacdcd9f7cc10848a98e7dd2"
+    },
+    {
+      "physical_page": 23,
+      "file": "structured_content.json",
+      "bytes": 6412,
+      "sha256": "56cdb21b2131a484c778e3bb109a307ef1032c8a7ce4cc3d78606be88ddedcb6"
+    },
+    {
+      "physical_page": 23,
+      "file": "blocks.json",
+      "bytes": 7650,
+      "sha256": "ebc9dbb32ec65c6036c6ea525c993f0195e9e1b0bca227fd78e195a866afb243"
+    },
+    {
+      "physical_page": 23,
+      "file": "receipt.json",
+      "bytes": 558,
+      "sha256": "e5134384904d3917bf5b51153a6efd6c3cd0b650b5c791459cd46e71cec85032"
+    }
+  ],
+  "interpretation": "hashes and sizes only; not accuracy evidence"
+}

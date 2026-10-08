@@ -235,3 +235,11 @@ cat HANDOFF.md
 12页439.681秒页面处理、11原生块、无生成上限、约6.49GiB RSS，两个指定短语匹配原图。23页布局与12文字调用完成，但最后340×62页脚达到1536个语言步骤仍未返回；按明确异常授权主动止损，总进程746.296秒，FAILED/-15/timeout=null、无OOM/swap，分类ABORTED_EXCESSIVE_GENERATION，不声称具体重复或完整页成功。无最终原生JSON/Markdown；保留原始调用/布局坐标/实际图像与有标识部分展示，未验证的坐标关联为null，未编造产物。
 
 24项合成回归、静态检查及真实离线浏览器两页四路对照通过（不代表文字准确率）；局部错字/题号/遗漏与受损源图边界见[报告](docs/MONKEY_CPU_TWO_PAGE_REPORT.md)。私有根runtime/paddleocr-vl-evaluation/monkey-two-pages-r1；共享新包及SHA见docs/evidence/monkey-two-page-delivery.json。新增云调用0、不重试/扩页、不部署、无Word/PDF/保存/入库。当前路线不宜直接扩大，等待用户查看。
+
+## MinerU Standard本地CPU两页实验（2026-10-08）
+
+基于8cf887d保留Basic、VL1.6、Monkey和历史M3及外层整册改动。复用MinerU4.0.10镜像，官方Standard/high＋ONNX小模型＋MinerU2.5-Pro-2605-1.2B Q8_0 GGUF（固定9185688a），嵌入式mineru-llama-cpp0.1.2/9a3bf2b。显式官方参数2线程/0GPU层/单槽，2CPU/16GiB无额外swap、network none、原图模型只读、单页1800秒；不修改安装包源码或生产。
+
+同字节220dpi物理12先完成，再23独立进程，页面346.878/289.061秒，均完整原生成功，swap/OOM/截断0，约2.36/2.31GiB峰值RSS。较Basic题干/选项组织及可读性有收益，但仍有专名、困难字形、基础→范围等关键误读，不证明优于M3或全页准确。首次Helper方法定位错误的观察器初始化失败完整保留；开发网络准备失败/停止记录独立保留，未混入识别性能。已纠正历史“原126→128”证据不足表述：源23该字形接近128，不凭正常题序猜改。
+
+通用Standard入口、实际data-URI/响应捕获、脱敏阶段摘要、26项合成回归及真实file://五路对照通过；正文/图片/响应/模型不入Git。两页原生JSON/MD、完整模式/原始响应/实际裁片、阶段资源日志和共享ZIP见[本轮报告](docs/MINERU_STANDARD_TWO_PAGE_REPORT.md)、docs/evidence/mineru-standard-delivery.json与runbook增量。私有根runtime/paddleocr-vl-evaluation/mineru-standard-two-pages-r1。无新M3/云调用、无生产/Skill/模板变更，无整册/WordPDF/永久保存/入库。客户端实际下载/看版、源字形歧义和逐字准确仍待用户；不自动优化速度、扩页或转测新模型，等待查看。

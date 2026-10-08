@@ -73,8 +73,9 @@ def archive_attempt(output):
         source = output / name
         if source.exists():
             shutil.copy2(source, target / name)
-            if name in ('resource-samples.jsonl','phase-events.jsonl','activity.json'):
-                source.unlink()
+            # Archived terminal receipts must not masquerade as the current
+            # attempt while a resumed background process is still running.
+            source.unlink()
     for folder in output.glob('page-*'):
         receipt = folder / 'page-receipt.json'
         successful = receipt.exists() and json.loads(receipt.read_bytes()).get('status') == 'SUCCEEDED'
@@ -130,8 +131,12 @@ def child(args):
             observer = Observer(output).install(pipeline)
     elif args.backend == 'mineru':
         import onnxruntime as ort
-        pipeline = MinerUParser(tier='basic', parse_mode='ocr', image_analysis=True)
-        metrics['model_load_scope'] = 'parser constructor only; ONNX weights are lazy-loaded in first inference'
+        if args.mineru_tier == 'standard':
+            from mineru_standard_observer import install
+            install(output, lambda: active_page, args.cpu_threads)
+        pipeline = MinerUParser(tier=args.mineru_tier, parse_mode='ocr', image_analysis=True)
+        metrics['mineru_tier'] = args.mineru_tier
+        metrics['model_load_scope'] = 'parser constructor only; ONNX/VLM weights are lazy-loaded in first inference; inspect initialization events'
         metrics['onnx_initializations'] = []
         original_session = ort.InferenceSession
 
@@ -230,6 +235,7 @@ def monitor(args):
                '--images', str(args.images), '--models', str(args.models), '--output', str(args.output),
                '--source', str(args.source), '--pages', *map(str, args.pages)]
     command.extend(['--paddle-version', args.paddle_version, '--cpu-threads', str(args.cpu_threads)])
+    command.extend(['--mineru-tier', args.mineru_tier])
     if args.instrument_paddle:
         command.append('--instrument-paddle')
     command.extend(['--monkey-max-inflight', str(args.monkey_max_inflight)])
@@ -300,6 +306,7 @@ if __name__ == '__main__':
     parser.add_argument('--page-timeout', type=int, default=300)
     parser.add_argument('--child', action='store_true')
     parser.add_argument('--paddle-version', choices=['1.5','1.6'], default='1.5')
+    parser.add_argument('--mineru-tier', choices=['basic', 'standard'], default='basic')
     parser.add_argument('--cpu-threads', type=int, default=2)
     parser.add_argument('--instrument-paddle', action='store_true')
     parser.add_argument('--instrument-monkey', action='store_true')

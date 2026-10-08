@@ -1,0 +1,15 @@
+# Development experiment only: no remote endpoint, credentials or LLM helper.
+# Engine n_threads=2/n_gpu_layers=0/n_parallel=1 are explicit supported
+# constructor arguments applied by the scoped runner adapter (not YAML fields).
+model:
+  base_dir: /models
+  source: local
+  small_backend: onnx
+  vlm:
+    engine: llama-cpp
+    server_url: ""
+    max_concurrency: 1
+llm_aided:
+  features:
+    title_leveling: false
+    cross_page_table_cell_merge: false
