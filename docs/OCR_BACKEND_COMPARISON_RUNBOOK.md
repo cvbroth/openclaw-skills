@@ -1,5 +1,19 @@
 # 十页CPU横向实验入口（仅开发）
 
+## GLM-OCR官方Ollama CPU两页增量
+
+**当前固定组合未通过完整调用终态。** 第12页原生重复保护报错，有原始部分文字；唯一字符串stop诊断被主动停止，第23页未运行。此入口用于可追溯复现，不能写成可用生产能力。官方配置EOS [59246,59253]与本次原生EOG仅59246存在差异；`--diagnostic-stop-strings`只是保存的诊断开关，不能注册原生EOG，不能作为修复方案。原因及边界见[GLM两页报告](GLM_OCR_TWO_PAGE_REPORT.md)。本轮不继续改权重/编译未合并补丁/回退旧引擎。
+
+独立入口为`run_glm_ocr_cpu.py`及`launch_glm_ocr_cpu.sh`，不接入生产FileTools。只做整页识别模型，不声称运行SDK的PP-DocLayout-V3布局＋区域识别。官方Ollama原生`/api/generate`接口在**同一断网容器的loopback**上使用；`OLLAMA_NO_CLOUD=1`、不提供API key、不暴露端口。请求只含实际PNG字节base64及官方`Text Recognition:`任务提示，不提供历史OCR或参考。客户端解码后的SHA/尺寸单独记录；内部视觉缩放另见运行日志，不能以base64证明内部不缩放。
+
+先按本轮报告固定官方Ollama发行资产、完整官方SHA、模型分发manifest及全部blob SHA。`inspect_gguf_metadata.py`仅读取公开权重元数据/张量计数，不加载模型，不输出tokenizer词表。准备阶段可下载官方文件，推理阶段不可下载。`deploy/Dockerfile.glm-ocr-cpu`使用既有非生产Python研究镜像及私有build/engine中的官方CPU文件，不向宿主或Gateway/Worker安装。重建前核对基础镜像完整ID，并记录最终实际镜像ID；tag不代替校验。GPU目录不提取，上游二进制/安装包不打补丁。官方运行时可能生成兼容转换缓存，仅允许写入独立实验models，保留原始blob/manifest副本、转换后清单和各自哈希。
+
+使用显式manifest中的单页输入；脚本核对图片SHA，拒绝已有输出目录，避免无声覆盖或断联重跑。`bash scripts/launch_glm_ocr_cpu.sh <独立实验目录> <已核实镜像完整ID> 12`启动detached容器，随后读取持久receipt/资源及docker终态。第23页须等第12页SUCCEEDED才显式启动。launcher检查实际MemAvailable，而非宿主总内存；此外仍须人工检查服务负载。容器2CPU/16GiB、memory-swap总16GiB、network none、只读根/源码/输入、nonroot、cap-drop/no-new-privileges，1800秒整次硬上限。源图片与模型/历史产物不位于生产cache，不能冒充正式发布附件。
+
+逐响应块保存response.raw.jsonl及原样partial文字；完整stop、空输出、长度终止、无终态、异常和超时分别记载。HTTP错误正文/堆栈保留，不从超时推断质量差；1800秒硬截止的timeout.json与Docker退出状态、部分文件共同判定。退出码0/stop仅代表调用结束，不代表整页无遗漏。进程采样RSS、子进程getrusage、cgroup memory.peak/CPU/swap口径分别保留，不能相加；独立视觉编码/布局耗时不提供时写未知，prompt_eval不是自动等同视觉编码。
+
+原生API JSON/流不覆盖，raw.md为响应文本原样存储；blocks.json/content.md/structure.json属于明确标识的最小格式适配，一个未分段文字块、坐标null、无布局模型。复用现有bundle生成离线对照，不改写文字或声称题目结构已核实。历史候选仅复制并标明复用，不发起M3请求。私有原件、完整响应、模型、图片、带正文日志不提交；Git仅保留通用代码/合成测试/白名单脱敏指标及报告。
+
 结果与限制见[报告](OCR_BACKEND_COMPARISON10_REPORT.md)。不自动选择后端、不改生产Skill；保留已安装试题模板。所有私有工作目录应在忽略的runtime下。模型准备允许联网，推理不联网；脚本没有云推理客户端。
 
 ## 环境与准备

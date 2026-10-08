@@ -1,0 +1,15 @@
+# Research only. CPU files extracted from the SHA-verified official Ollama
+# release archive into the private build context's engine/ directory.
+# Expected existing Python research base: sha256:710f47d0fbe3b059394bc7e5f0b1429723459a007f37b12d53c6626443fa4039.
+ARG PYTHON_IMAGE=filetools-ocr-compare:mineru4010
+FROM ${PYTHON_IMAGE}
+USER root
+COPY engine/bin/ollama /bin/ollama
+COPY engine/lib/ollama /usr/lib/ollama
+RUN /usr/local/bin/python --version && /bin/ollama --version
+ENV OLLAMA_MODELS=/models OLLAMA_HOST=127.0.0.1:11434 \
+    OLLAMA_NUM_PARALLEL=1 OLLAMA_MAX_LOADED_MODELS=1 \
+    OLLAMA_NO_CLOUD=1 OLLAMA_CONTEXT_LENGTH=8192 \
+    OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 HOME=/tmp
+USER 1000:1000
+ENTRYPOINT ["/usr/local/bin/python"]

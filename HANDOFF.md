@@ -243,3 +243,10 @@ cat HANDOFF.md
 同字节220dpi物理12先完成，再23独立进程，页面346.878/289.061秒，均完整原生成功，swap/OOM/截断0，约2.36/2.31GiB峰值RSS。较Basic题干/选项组织及可读性有收益，但仍有专名、困难字形、基础→范围等关键误读，不证明优于M3或全页准确。首次Helper方法定位错误的观察器初始化失败完整保留；开发网络准备失败/停止记录独立保留，未混入识别性能。已纠正历史“原126→128”证据不足表述：源23该字形接近128，不凭正常题序猜改。
 
 通用Standard入口、实际data-URI/响应捕获、脱敏阶段摘要、26项合成回归及真实file://五路对照通过；正文/图片/响应/模型不入Git。两页原生JSON/MD、完整模式/原始响应/实际裁片、阶段资源日志和共享ZIP见[本轮报告](docs/MINERU_STANDARD_TWO_PAGE_REPORT.md)、docs/evidence/mineru-standard-delivery.json与runbook增量。私有根runtime/paddleocr-vl-evaluation/mineru-standard-two-pages-r1。无新M3/云调用、无生产/Skill/模板变更，无整册/WordPDF/永久保存/入库。客户端实际下载/看版、源字形歧义和逐字准确仍待用户；不自动优化速度、扩页或转测新模型，等待查看。
+
+
+## GLM-OCR CPU两页选型收尾（2026-10-08）
+
+保留f4c85ad及全部历史结果。官方Ollama0.40.1＋GLM-OCR Q8_0整图CPU路线，固定同字节物理12/23 PNG、2CPU/16GiB无swap断网。12页605.368秒原生token-repeat失败，1365字符部分输出；4.81GiB cgroup峰值，无OOM。结束ID/EOG注册差异及官方上游问题已定位，字符串stop诊断被证据否定后主动中止（exit137非OOM）；未用未发布补丁。23页未运行，不把部分文字当整页成功。
+
+32项合成回归、静态检查和六路离线展示验证；无新云调用、不改生产/Skill/模板、不扩大候选。原始/派生权重均核验，业务图文仅忽略目录。完整失败口径、固定身份、六路阶段表及交付见docs/GLM_OCR_TWO_PAGE_REPORT.md与docs/evidence/glm-ocr-delivery.json。当前GLM路线不可作为已验收整页后端；等待用户查看，不自动转测其他模型或生成正式题册。

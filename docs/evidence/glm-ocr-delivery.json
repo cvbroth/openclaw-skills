@@ -1,0 +1,18 @@
+{
+  "server_path": "/srv/storage/users/chen/FileTools-Deliveries/glm-ocr-two-pages-20261008/filetools-glm-ocr-two-pages-20261008.zip",
+  "windows_path": "\\\\myserver\\Chen\\FileTools-Deliveries\\glm-ocr-two-pages-20261008\\filetools-glm-ocr-two-pages-20261008.zip",
+  "bytes": 25884617,
+  "sha256": "50ae8c5083ee33ce25bd040f7ae676759aa029dcf135e6f3161ccb86abd7af51",
+  "pages": [
+    12,
+    23
+  ],
+  "glm_status": {
+    "12": "FAILED_WITH_PARTIAL_OUTPUT",
+    "23": "NOT_RUN_FIRST_PAGE_NOT_COMPLETED"
+  },
+  "historical_methods_reused": 5,
+  "new_cloud_calls": 0,
+  "delivery_not_mounted_to_gateway_or_worker": true,
+  "client_download_verified": false
+}

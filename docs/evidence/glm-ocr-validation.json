@@ -1,0 +1,42 @@
+{
+  "status": "FAILED",
+  "elapsed_seconds": 605.3681118099485,
+  "elapsed_seconds_including_shutdown": 605.6332241819473,
+  "request_seconds": 605.2331541900057,
+  "output_characters": 1365,
+  "native_timing_ns_and_counts": {},
+  "cgroup_peak_bytes": 5164376064,
+  "cgroup_swap_peak_bytes": 0,
+  "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n",
+  "cgroup_cpu_seconds": 1210.19882,
+  "average_cpu_cores": 1.998237170087,
+  "sampled_process_high_water_max_kib": 3464592,
+  "child_maxrss_kib": 3463684,
+  "child_cpu_seconds": 1209.4867940000001,
+  "scope": "native API intervals are nested; prompt_eval is not independently measured visual encoder; process high-water sampling and cgroup peak have different scopes",
+  "browser": {
+    "engine": "Playwright Chromium",
+    "version": "140.0.7339.16",
+    "development_screenshot_font_injected": true,
+    "physical_pages_checked": [
+      12,
+      23
+    ],
+    "raw_text_dom_byte_equality": "passed for every available output",
+    "original_image_dimensions": "passed",
+    "js_errors": [],
+    "external_requests": [],
+    "horizontal_overflow": false,
+    "scope": "UI mechanics only; no transcription accuracy or human visual acceptance"
+  },
+  "synthetic_tests_passed": 32,
+  "page23": "NOT_RUN_FIRST_PAGE_NOT_COMPLETED",
+  "diagnostic_retry": {
+    "status": "ABORTED_INEFFECTIVE_STRING_STOP",
+    "container_wall_seconds": 367.049080666,
+    "exit_code": 137,
+    "oom_killed": false,
+    "new_terminal_model_error_observed": false,
+    "model_output_received": false
+  }
+}
