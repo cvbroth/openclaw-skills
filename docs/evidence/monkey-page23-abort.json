@@ -1,0 +1,18 @@
+{
+  "classification": "ABORTED_EXCESSIVE_GENERATION",
+  "actor": "development-agent",
+  "scope": "isolated Monkey page23 only",
+  "reason": "340x62 short footer region exceeded 1024 observed language forward steps without returning; actual last observation attached; not a timeout/OOM assertion",
+  "evidence": {
+    "page": 23,
+    "call": 14,
+    "name": "language_generation",
+    "state": "progress",
+    "monotonic": 871318.002384517,
+    "process_cpu_seconds": 1465.5817710000001,
+    "steps": 1536
+  },
+  "repetition": "not verified; intermediate decoded text unavailable in this observer",
+  "new_cloud_calls": 0,
+  "timestamp_utc": "2026-10-08T03:07:52Z"
+}

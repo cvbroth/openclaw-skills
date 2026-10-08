@@ -226,3 +226,12 @@ cat HANDOFF.md
 基于01a7a406727f89ad72fdf46c1aab58b0b554c133测评分支，保留外层整册工作区和既有十页证据。本轮真实PaddleOCR-VL1.6固定权重c5630aba、native Paddle CPU、同220dpi1819×2573 PNG，2CPU/16GiB无额外swap、推理断网、加载180/单页1800秒；先12后23均整页完成，识别+导出1015.088/713.368秒，约9GiB RSS，无OOM/重复早停/生成上限。实际CPU仍近一核，官方其他CPU引擎未测，不把已完成说成逐字准确或生产适用。旧1.5诊断区分观察器故障与部分输出，历史M3仅复制，无新云调用。
 
 新增通用阶段观察、资源采样、真1.6入口、原生适配和下载流式校验，20项合成回归及Ruff通过。两页离线原图/原文对照包已在Chen独立交付目录，文件大小/哈希、真实/合成/未验证、固定身份及资源详见[本轮报告](docs/PADDLEOCR_VL16_TWO_PAGE_REPORT.md)、docs/evidence/vl16-two-page-delivery.json和既有runbook增量。私有根runtime/paddleocr-vl-evaluation/vl16-two-pages-r1，业务图文/响应/权重未入Git。等待用户看两页原文；不自动扩跑原十页/整册，不测试更多新项目、不部署、不修改Skill/Word模板、不保存/入库。
+
+
+## MonkeyOCRv2 CPU两页实验（2026-10-08）
+
+基于86c3a28测评分支，原有MinerU/VL1.6/M3及外层整册成果保持。只用同字节220dpi物理12/23页，复核已有模型全部SHA与官方CPU源码6cc0c0bb，复用固定Torch2.5.1+cpu/Transformers4.57.1镜像。2CPU/16GiB无额外swap、断网；官方server_max_inflight显式1避免32区域worker争2CPU，观察器本身不串行化计算、不重复prepare或改输入，实际线程2/1、float32。
+
+12页439.681秒页面处理、11原生块、无生成上限、约6.49GiB RSS，两个指定短语匹配原图。23页布局与12文字调用完成，但最后340×62页脚达到1536个语言步骤仍未返回；按明确异常授权主动止损，总进程746.296秒，FAILED/-15/timeout=null、无OOM/swap，分类ABORTED_EXCESSIVE_GENERATION，不声称具体重复或完整页成功。无最终原生JSON/Markdown；保留原始调用/布局坐标/实际图像与有标识部分展示，未验证的坐标关联为null，未编造产物。
+
+24项合成回归、静态检查及真实离线浏览器两页四路对照通过（不代表文字准确率）；局部错字/题号/遗漏与受损源图边界见[报告](docs/MONKEY_CPU_TWO_PAGE_REPORT.md)。私有根runtime/paddleocr-vl-evaluation/monkey-two-pages-r1；共享新包及SHA见docs/evidence/monkey-two-page-delivery.json。新增云调用0、不重试/扩页、不部署、无Word/PDF/保存/入库。当前路线不宜直接扩大，等待用户查看。

@@ -1,0 +1,78 @@
+[
+  {
+    "id": "4a64f5ddbd9eb15af36d5893b212134a63c70f8207314d7db321985eba9ec299",
+    "image": "sha256:4e1dab1610ca1cfccb77809e72c9fa70122c0b859d9f2d4ec6281c339595b599",
+    "user": "1000:1000",
+    "status": "exited",
+    "container_exit_code": 0,
+    "network": "none",
+    "nano_cpus": 2000000000,
+    "memory": 17179869184,
+    "memory_swap": 17179869184,
+    "readonly_root": true,
+    "security": [
+      "no-new-privileges"
+    ],
+    "mounts": [
+      {
+        "destination": "/source",
+        "rw": false
+      },
+      {
+        "destination": "/results",
+        "rw": true
+      },
+      {
+        "destination": "/repo",
+        "rw": false
+      },
+      {
+        "destination": "/images",
+        "rw": false
+      },
+      {
+        "destination": "/models",
+        "rw": false
+      }
+    ],
+    "name": "filetools-monkey-page12-1800-r1"
+  },
+  {
+    "id": "4df5d28d349b35c619d8c57869484f4cfbac78749927662d2713fcf4ed42b7f6",
+    "image": "sha256:4e1dab1610ca1cfccb77809e72c9fa70122c0b859d9f2d4ec6281c339595b599",
+    "user": "1000:1000",
+    "status": "exited",
+    "container_exit_code": 2,
+    "network": "none",
+    "nano_cpus": 2000000000,
+    "memory": 17179869184,
+    "memory_swap": 17179869184,
+    "readonly_root": true,
+    "security": [
+      "no-new-privileges"
+    ],
+    "mounts": [
+      {
+        "destination": "/models",
+        "rw": false
+      },
+      {
+        "destination": "/source",
+        "rw": false
+      },
+      {
+        "destination": "/results",
+        "rw": true
+      },
+      {
+        "destination": "/repo",
+        "rw": false
+      },
+      {
+        "destination": "/images",
+        "rw": false
+      }
+    ],
+    "name": "filetools-monkey-page23-1800-r1"
+  }
+]

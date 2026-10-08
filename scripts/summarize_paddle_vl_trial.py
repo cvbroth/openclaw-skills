@@ -10,8 +10,8 @@ def summarize(folder):
     events = [json.loads(line) for line in (folder/'phase-events.jsonl').read_text().splitlines()] if (folder/'phase-events.jsonl').exists() else []
     phases = []
     for event in events:
-        if event['name'] in ('layout_analysis','vision_encoding','generate','region','language_generation'):
-            phases.append({key:event[key] for key in ('page','region','name','state','monotonic','process_cpu_seconds','wall_seconds','cpu_seconds','batch_box_counts','language_steps','language_wall','language_cpu','generated_token_shape','reached_configured_token_limit') if key in event})
+        if event['name'] in ('layout_analysis','vision_encoding','generate','region','language_generation','page_preprocessing','request','prepared_image','markdown_export'):
+            phases.append({key:event[key] for key in ('page','region','call','steps','generated_tokens','effective_use_cache','max_new_tokens','do_sample','capture_seconds','name','state','monotonic','process_cpu_seconds','wall_seconds','cpu_seconds','batch_box_counts','language_steps','language_wall','language_cpu','generated_token_shape','reached_configured_token_limit') if key in event})
     return {'metrics':metrics,'receipt':receipt,'phases':phases,
             'interpretation':'nested timings are not additive; language forward omits sampling/projector overhead; absence is unknown, not zero; no OCR accuracy claim'}
 

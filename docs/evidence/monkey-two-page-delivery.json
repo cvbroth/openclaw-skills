@@ -1,0 +1,23 @@
+{
+  "server_path": "/srv/storage/users/chen/FileTools-Deliveries/monkey-cpu-two-pages-20261008/filetools-monkey-cpu-two-pages-20261008.zip",
+  "windows_path": "\\\\myserver\\Chen\\FileTools-Deliveries\\monkey-cpu-two-pages-20261008\\filetools-monkey-cpu-two-pages-20261008.zip",
+  "bytes": 30855065,
+  "sha256": "8f8df0779be9735d18bd657766b65768307d202b63e2940b22c4f0cfd228977a",
+  "uid": 1000,
+  "gid": 1000,
+  "mode": "0o640",
+  "zip_crc_check": "passed",
+  "source_and_shared_sha_match": true,
+  "gateway_worker_mount_check": "delivery directory not mounted; Incoming remains readonly",
+  "new_cloud_calls": 0,
+  "pages": [
+    12,
+    23
+  ],
+  "results": {
+    "12": "complete native page",
+    "23": "aborted excessive footer generation; partial only"
+  },
+  "user_download_verified": false,
+  "delivery": "shared development experiment, not FileTools publication/QQ receipt"
+}

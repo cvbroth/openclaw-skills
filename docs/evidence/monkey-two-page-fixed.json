@@ -1,0 +1,42 @@
+{
+  "schema": "monkey-two-page-fixed-v1",
+  "baseline_commit": "86c3a28c16b0ba97672e13e75e6cb0d1c1369cc9",
+  "source_pdf_sha256": "0007677dc510b01ffed36bd1250fafd8a7b0101f383e3603257b45e379a6f28b",
+  "physical_pages": [
+    12,
+    23
+  ],
+  "model": "zenosai/MonkeyOCRv2-B-Parsing",
+  "model_revision": "e8871a0057c98378219b369f924a25ba10f392bf",
+  "checkpoint_tensor_elements": 877939456,
+  "checkpoint_dtype_counts": [
+    "BF16"
+  ],
+  "source_revision": "6cc0c0bb4864f2541fa6bc3a8f976cffaac8f359",
+  "image_id": "sha256:4e1dab1610ca1cfccb77809e72c9fa70122c0b859d9f2d4ec6281c339595b599",
+  "engine": "official CPU Transformers two-stage parsing",
+  "precision": "float32/eager; CPU vision bf16=False official wrapper",
+  "cpu_quota": 2,
+  "torch_threads": {
+    "intra": 2,
+    "inter": 1
+  },
+  "memory_bytes": 17179869184,
+  "memory_swap_total_bytes": 17179869184,
+  "load_limit_seconds": 180,
+  "page_limit_seconds": 1800,
+  "max_pixels": 1003520,
+  "server_max_inflight": 1,
+  "page_max_inflight": 1,
+  "preprocess_batch_size": 1,
+  "skip_preprocess": false,
+  "retry_repeat": false,
+  "network": "none",
+  "new_cloud_calls": 0,
+  "changes_from_prior_300s_pilot": [
+    "page limit1800 instead300",
+    "official server_max_inflight1 instead1024 (recognition workers1 instead32)",
+    "new observer captures actual load_image result once, thread-local call IDs, no computation lock/no repeated resize; low-compression PNG capture"
+  ],
+  "quality_policy": "same source PNG hashes; official preprocessing/internal resize disclosed, no manual corrections"
+}

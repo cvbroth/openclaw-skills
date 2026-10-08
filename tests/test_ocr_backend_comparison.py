@@ -170,3 +170,38 @@ def test_paddle_adapter_requires_completed_page_keeps_raw_coordinates(tmp_path):
     assert result[0]['native_order']==1
     assert comparison.sha(tmp_path/'raw.md')==before
     assert json.loads((tmp_path/'page-12_res.json').read_bytes())==native
+
+
+def test_monkey_native_coordinates_remain_in_preprocessed_frame(tmp_path):
+    write(tmp_path/'jsons/page.json',{'layouts':[{'content':'A. 不改写','label':'Text','bbox':[1,2,3,4]}, {'content':'![image](../images/native.jpg)','label':'Picture','bbox':[5,6,7,8]}]})
+    (tmp_path/'markdowns').mkdir()
+    (tmp_path/'markdowns/page.md').write_text('A. 不改写\n')
+    blocks=comparison.adapt_monkey(tmp_path,23)
+    assert blocks[0]['text']=='A. 不改写'
+    assert blocks[0]['native_coordinates']==[1,2,3,4]
+    assert 'preprocessed-page' in blocks[0]['coordinate_system']
+    assert blocks[1]['image_references']==['../images/native.jpg']
+    assert (tmp_path/'raw.md').read_bytes()==(tmp_path/'markdowns/page.md').read_bytes()
+
+
+def test_monkey_partial_is_labelled_verbatim_and_does_not_invent_coordinates(tmp_path):
+    folder=tmp_path/'page-23'
+    raw=folder/'raw-generations'
+    raw.mkdir(parents=True)
+    (raw/'0001-text.txt').write_text('layout raw')
+    (raw/'0002-text.txt').write_text('A. 仍是原始字\nB. 不改写')
+    events=[{'name':'request','state':'started','call':1,'query':'categories and coordinates'},
+            {'name':'request','state':'completed','call':1},
+            {'name':'request','state':'started','call':2,'query':'text'},
+            {'name':'request','state':'completed','call':2},
+            {'name':'request','state':'started','call':3,'query':'text'}]
+    (tmp_path/'phase-events.jsonl').write_text('\n'.join(map(json.dumps,events)))
+    blocks=comparison.adapt_monkey_partial(folder,tmp_path,23)
+    assert len(blocks)==1 and blocks[0]['native_coordinates'] is None
+    assert blocks[0]['text']==(raw/'0002-text.txt').read_text()
+    assert '部分输出' in (folder/'raw.md').read_text()
+    assert 'layout raw' not in (folder/'raw.md').read_text()
+    assert (raw/'0001-text.txt').read_text()=='layout raw'
+    (raw/'0003-text.txt').write_text('not matched to completed call')
+    with pytest.raises(ValueError,match='UNMATCHED_PARTIAL_CALL'):
+        comparison.adapt_monkey_partial(folder,tmp_path,23)

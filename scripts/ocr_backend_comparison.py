@@ -84,6 +84,51 @@ def adapt_paddle(folder, page):
     return blocks
 
 
+def adapt_monkey(folder, page):
+    """Preserve native completed page export, including warped-page coordinates."""
+    files=list((folder/'jsons').glob('*.json'))
+    if len(files)!=1:
+        raise ValueError('ONE_COMPLETED_MONKEY_PAGE_REQUIRED')
+    native=json.loads(files[0].read_bytes())
+    rows=[{**item, 'image_references': re.findall(r'!\[[^\]]*\]\(([^)]+)\)',item.get('content','')) if item.get('label')=='Picture' else []}
+          for item in native['layouts']]
+    blocks=normalize_blocks(rows,page,'native preprocessed-page pixel xyxy, origin top-left; warp to original not exported')
+    (folder/'blocks.json').write_text(json.dumps(blocks,ensure_ascii=False,indent=2))
+    markdown=list((folder/'markdowns').glob('*.md'))
+    if len(markdown)!=1:
+        raise ValueError('ONE_NATIVE_MONKEY_MARKDOWN_REQUIRED')
+    shutil.copy2(markdown[0],folder/'raw.md')
+    return blocks
+
+
+def adapt_monkey_partial(folder, trial, page):
+    """Expose completed calls with an explicit partial banner; no page reconstruction."""
+    if list((folder/'jsons').glob('*.json')):
+        raise ValueError('COMPLETE_NATIVE_EXPORT_EXISTS')
+    events=[json.loads(line) for line in (trial/'phase-events.jsonl').read_text().splitlines()]
+    requests={x['call']:x for x in events if x['name']=='request' and x['state']=='started'}
+    completed={x['call'] for x in events if x['name']=='request' and x['state']=='completed'}
+    blocks=[]
+    chunks=['<!-- 部分输出：不是完整整页；仅展示已完成调用，未经重建或修订。 -->']
+    for path in sorted((folder/'raw-generations').glob('*-text.txt')):
+        identity=int(path.name.split('-')[0])
+        if identity not in completed or identity not in requests:
+            raise ValueError('UNMATCHED_PARTIAL_CALL')
+        if 'categories and coordinates' in requests[identity]['query']:
+            continue  # layout raw response stays in raw-generations, not body
+        text=path.read_text()
+        block=normalize_blocks([{'text':text}],page)[0]
+        block.update(id=f'p{page:03}-call{identity:04}', reading_order=len(blocks),
+                     source_artifact=str(path.relative_to(folder)), order_basis='actual completed call order; page reading order unverified')
+        blocks.append(block)
+        chunks.append(f'<!-- completed model call {identity}; partial -->\n'+text)
+    (folder/'blocks.json').write_text(json.dumps(blocks,ensure_ascii=False,indent=2))
+    # This is a labelled display adaptation, not an invented native Markdown export.
+    (folder/'partial-display.md').write_text('\n\n'.join(chunks))
+    shutil.copy2(folder/'partial-display.md',folder/'raw.md')
+    return blocks
+
+
 def import_m3(experiment, manifest, output):
     output.mkdir(parents=True, exist_ok=True)
     source_manifest = json.loads((experiment / 'manifest.json').read_bytes())
@@ -179,7 +224,7 @@ def bundle(manifest_path, candidates, output):
 <h1>OCR后端小规模对照</h1><p>原始文字未纠错。缺失、失败及未运行均不填正常；程序提示不代表人工验收。点击原图可放大。</p>
 <nav>物理页 <select id="page">OPTIONS</select></nav><main><section><h2 id="source-title"></h2><a id="full" target="_blank"><img id="image"></a><p id="dimensions"></p></section><section id="methods"></section></main>
 <script>const DATA=PAYLOAD;const select=document.getElementById('page');
-function show(){const p=Number(select.value),im=DATA.manifest.images.find(x=>x.physical_page===p);document.getElementById('source-title').textContent='物理 '+p+' / 印刷 '+im.printed_page;document.getElementById('image').src=im.image;document.getElementById('full').href=im.image;document.getElementById('dimensions').textContent=im.width+'×'+im.height+' PNG / 220dpi / '+im.sha256;const parent=document.getElementById('methods');parent.replaceChildren();for(const method of DATA.methods){const item=method.pages.find(x=>x.physical_page===p),box=document.createElement('article'),h=document.createElement('h2'),status=document.createElement('pre'),pre=document.createElement('pre'),a=document.createElement('a');h.textContent=method.method;status.textContent=JSON.stringify(item.receipt,null,2);pre.textContent=item.display_raw_markdown??'无转写输出；请查看状态/日志';a.href=method.method+'/page-'+p+'/raw.md';a.textContent='原始Markdown（如有）；原生JSON/日志见同目录';const label=document.createElement('p'),details=document.createElement('details'),summary=document.createElement('summary');label.textContent='状态：'+item.receipt.status+' / 源输入 '+im.width+'×'+im.height+' PNG（内部处理见报告）';summary.textContent='展开原始回执';details.append(summary,status);box.append(h,label,details,pre);if(item.display_raw_markdown!==null){box.append(a);}const info=document.createElement('a');info.href=method.method+'/structure.json';info.textContent='统一结构JSON（含状态与原生坐标）';box.append(document.createElement('br'),info);parent.append(box);}}select.addEventListener('change',show);show();</script></html>'''
+function show(){const p=Number(select.value),im=DATA.manifest.images.find(x=>x.physical_page===p);document.getElementById('source-title').textContent='物理 '+p+' / 印刷 '+im.printed_page;document.getElementById('image').src=im.image;document.getElementById('full').href=im.image;document.getElementById('dimensions').textContent=im.width+'×'+im.height+' PNG / 220dpi / '+im.sha256;const parent=document.getElementById('methods');parent.replaceChildren();for(const method of DATA.methods){const item=method.pages.find(x=>x.physical_page===p),box=document.createElement('article'),h=document.createElement('h2'),status=document.createElement('pre'),pre=document.createElement('pre'),a=document.createElement('a');h.textContent=method.method;status.textContent=JSON.stringify(item.receipt,null,2);pre.textContent=item.display_raw_markdown??'无转写输出；请查看状态/日志';a.href=method.method+'/page-'+p+'/raw.md';a.textContent='展示文本（完整性及适配见回执）；原生JSON/日志见同目录';const label=document.createElement('p'),details=document.createElement('details'),summary=document.createElement('summary');label.textContent='状态：'+item.receipt.status+' / 源输入 '+im.width+'×'+im.height+' PNG（内部处理见报告）';summary.textContent='展开原始回执';details.append(summary,status);box.append(h,label,details,pre);if(item.display_raw_markdown!==null){box.append(a);}const info=document.createElement('a');info.href=method.method+'/structure.json';info.textContent='统一结构JSON（含状态与原生坐标）';box.append(document.createElement('br'),info);parent.append(box);}}select.addEventListener('change',show);show();</script></html>'''
     (output / 'index.html').write_text(source.replace('OPTIONS', page_links).replace('PAYLOAD', payload))
     (output / 'README.md').write_text('解压后离线打开index.html，选择物理页，点击原图放大。各候选目录含原始文件与structure.json/content.md。未提供坐标时为null；未运行不等于空识别。没有新增M3调用，没有人工审核状态或准确率声明。\n')
 
@@ -191,6 +236,13 @@ if __name__ == '__main__':
     m3.add_argument('--experiment', type=Path, required=True)
     m3.add_argument('--manifest', type=Path, required=True)
     m3.add_argument('--output', type=Path, required=True)
+    monkey = sub.add_parser('adapt-monkey')
+    monkey.add_argument('--folder',type=Path,required=True)
+    monkey.add_argument('--page',type=int,required=True)
+    partial = sub.add_parser('adapt-monkey-partial')
+    partial.add_argument('--folder',type=Path,required=True)
+    partial.add_argument('--trial',type=Path,required=True)
+    partial.add_argument('--page',type=int,required=True)
     build = sub.add_parser('bundle')
     build.add_argument('--manifest', type=Path, required=True)
     build.add_argument('--candidate', action='append', required=True, help='safe-name=directory')
@@ -204,6 +256,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if args.action == 'import-m3':
         import_m3(args.experiment, json.loads(args.manifest.read_bytes()), args.output)
+    elif args.action == 'adapt-monkey-partial':
+        adapt_monkey_partial(args.folder,args.trial,args.page)
+    elif args.action == 'adapt-monkey':
+        adapt_monkey(args.folder,args.page)
     elif args.action == 'adapt-mineru':
         adapt_mineru(args.folder, args.page)
     elif args.action == 'adapt-paddle':

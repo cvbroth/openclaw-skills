@@ -84,6 +84,7 @@ def archive_attempt(output):
 
 
 def child(args):
+    active_page = None
     output = args.output
     stage = output / 'stage.json'
     started = time.monotonic()
@@ -165,9 +166,17 @@ def child(args):
         manager = BackendManager()
         config = BackendConfig(model_path=str(args.models), backend='transformers', device='cpu',
                                dtype='float32', attn_implementation='eager', max_pixels=1003520,
-                               preprocess_batch_size=1, skip_preprocess=False)
-        _, model = manager.get(config)
-        model._generate_one = generation_capture(model._generate_one, load_image, output, lambda: active_page)
+                               preprocess_batch_size=1, skip_preprocess=False, server_max_inflight=args.monkey_max_inflight)
+        preprocessor, model = manager.get(config)
+        if args.instrument_monkey:
+            import cpu.core_runner as core
+            from monkey_cpu_observer import Observer
+            Observer(output, lambda: active_page).install(core, preprocessor, model)
+        else:
+            model._generate_one = generation_capture(model._generate_one, load_image, output, lambda: active_page)
+        metrics["torch_threads"] = {"intra_op": torch.get_num_threads(), "inter_op": torch.get_num_interop_threads()}
+        metrics["monkey_max_inflight"] = args.monkey_max_inflight
+        metrics["actual_model_dtype"] = str(next(model.model.parameters()).dtype)
     metrics['cpu_threads'] = args.cpu_threads
     metrics['model_load_seconds'] = time.monotonic() - loading
     record(output / 'metrics.json', metrics)
@@ -223,6 +232,9 @@ def monitor(args):
     command.extend(['--paddle-version', args.paddle_version, '--cpu-threads', str(args.cpu_threads)])
     if args.instrument_paddle:
         command.append('--instrument-paddle')
+    command.extend(['--monkey-max-inflight', str(args.monkey_max_inflight)])
+    if args.instrument_monkey:
+        command.append('--instrument-monkey')
     if args.observe_shapes:
         command.append('--observe-shapes')
     start, peak, timeout = time.monotonic(), 0, None
@@ -290,9 +302,13 @@ if __name__ == '__main__':
     parser.add_argument('--paddle-version', choices=['1.5','1.6'], default='1.5')
     parser.add_argument('--cpu-threads', type=int, default=2)
     parser.add_argument('--instrument-paddle', action='store_true')
+    parser.add_argument('--instrument-monkey', action='store_true')
+    parser.add_argument('--monkey-max-inflight', type=int, default=1024)
     parser.add_argument('--resume', action='store_true', help='archive prior run logs; skip only successful pages with identical input SHA')
     parser.add_argument('--observe-shapes', action='store_true', help='separate diagnostic: record actual ONNX input shapes, never tensor contents')
     args = parser.parse_args()
+    if args.monkey_max_inflight < 1:
+        parser.error("monkey max inflight must be positive")
     if args.cpu_threads < 1:
         parser.error('cpu threads must be positive')
     if len(set(args.pages)) != len(args.pages) or min(args.pages) < 1:

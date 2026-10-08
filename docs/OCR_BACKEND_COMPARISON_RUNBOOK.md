@@ -72,3 +72,30 @@ docker run -d --name filetools-vl16-new-page12 \
 线程flag由实际get_flags确认，CPU用量仍需监测，不能从参数推出两核满载。`phase-events.jsonl`、`activity.json`、`resource-samples.jsonl`记录布局、区域裁切、模型tensor形状、视觉及生成嵌套阶段；这些是研究观察器，不改安装包源码/识别结果，也不构成生产能力。`raw-regions`保留原生区域响应（含数组），`raw-generations`保存生成token；部分区域不能当整页。
 
 只有原生整页导出完成才用`ocr_backend_comparison.py adapt-paddle --folder <原生单页目录> --page 12`。它保留原生MD字节和坐标。历史M3仍通过`import-m3`复用，无新云请求。`summarize_paddle_vl_trial.py --folder <尝试目录> --output <脱敏摘要.json>`仅汇总已记录测量，不补未知时间或推定准确率。
+
+## MonkeyOCRv2两页CPU有界实验（2026-10-08增量）
+
+[两页报告](MONKEY_CPU_TWO_PAGE_REPORT.md)保留原300秒pilot，新的单页目录最多1800秒；12完整原生输出后才启动23，不自动扩页。复用已校验的Monkey模型目录与固定官方源码目录；不是正式FileTools工具，不绕过生产沙箱交付。
+
+```bash
+# REPO_DIR/EXP_DIR/MONKEY_MODEL_DIR/MONKEY_SOURCE_DIR需指向已核对的独立开发资源。
+docker run -d --name filetools-monkey-new-page12 \
+  --network none --read-only --user 1000:1000 --cap-drop ALL \
+  --security-opt no-new-privileges --cpus 2 --memory 16g --memory-swap 16g \
+  --pids-limit 128 --tmpfs /tmp:rw,size=2g \
+  -e HOME=/tmp -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 \
+  -e HF_HUB_OFFLINE=1 -e TRANSFORMERS_OFFLINE=1 \
+  -v "$REPO_DIR:/repo:ro" -v "$EXP_DIR/images:/images:ro" \
+  -v "$MONKEY_MODEL_DIR:/models:ro" -v "$MONKEY_SOURCE_DIR:/source:ro" \
+  -v "$EXP_DIR/results/new-page12:/results:rw" \
+  sha256:4e1dab1610ca1cfccb77809e72c9fa70122c0b859d9f2d4ec6281c339595b599 \
+  /repo/scripts/run_ocr_backend_comparison.py --backend monkey \
+  --images /images --models /models --source /source --output /results --pages 12 \
+  --load-timeout 180 --page-timeout 1800 --instrument-monkey --monkey-max-inflight 1
+```
+
+`--monkey-max-inflight`默认1024保留旧基线，新的CPU实验显式用官方参数1，避免32个区域worker争抢2CPU；观察器本身不锁模型计算。Torch实际intra-op2/inter-op1在metrics记录。`--instrument-monkey`代替旧双重prepare捕获，记录实际load_image返回一次，不改模型输入/提示词/采样参数，原生文字与token另存。进度、日志、每次完整区域结果即时落盘；续跑仍须显式--resume，不覆盖成功页。
+
+只对有完整原生jsons/markdowns的成功页使用`ocr_backend_comparison.py adapt-monkey --folder <原生页目录> --page 12`。同目录保存blocks.json/raw.md；原生markdowns与images相对路径保留。raw.md是原生MD逐字节副本，图片相对路径仍以原生markdowns位置解释，不静默改写。bbox坐标属于官方warp后的页，未提供逆映射则不假称原图坐标。原生导出的strip/标题格式及替换符过滤属于工具行为，原始逐调用文字仍保留，不用原生MD冒充无格式处理的模型响应。
+
+复用原bundle入口组合monkey/paddle-vl16/m3-history（MinerU可选）；不重新请求M3。现有`summarize_paddle_vl_trial.py`扩展白名单兼容Monkey阶段，仅输出不带query/raw_text的测量。合成测试检查观察器输入/返回值恒等、并发不被日志锁串行化、ID隔离、脱敏白名单及预处理坐标系；不代表OCR准确或生产能力通过。
