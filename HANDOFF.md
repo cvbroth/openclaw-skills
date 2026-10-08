@@ -219,3 +219,10 @@ cat HANDOFF.md
 ## OCR后端十页横向对比（2026-10-08）
 
 保留760105f测评分支和外层整册开发成果。只测试物理9/10/12/16/23/75/81/136/150/168，220dpi同原件；MinerU4.0.10 Basic/ONNX CPU十页完成，PaddleOCR3.7.0+VL1.5及官方MonkeyOCRv2 CPU首张均300秒超时、无OOM，不扩跑。M3仅复用历史7成功/136两次失败/9和10缺失，新云调用0。有限同区域CER不代表整页准确率；困难23页仍有错误。通用适配、完整原生/默认及完整模式MD、结构JSON和离线对照包已准备，详见[横向报告](docs/OCR_BACKEND_COMPARISON10_REPORT.md)、[开发入口](docs/OCR_BACKEND_COMPARISON_RUNBOOK.md)及共享交付清单。未改生产/Skill/模板，无整册OCR或正式文档生成、保存/入库。等待用户查看，不自动扩大50页或确定最终后端。
+
+
+## VL1.6真实CPU整页两页实验（2026-10-08）
+
+基于01a7a406727f89ad72fdf46c1aab58b0b554c133测评分支，保留外层整册工作区和既有十页证据。本轮真实PaddleOCR-VL1.6固定权重c5630aba、native Paddle CPU、同220dpi1819×2573 PNG，2CPU/16GiB无额外swap、推理断网、加载180/单页1800秒；先12后23均整页完成，识别+导出1015.088/713.368秒，约9GiB RSS，无OOM/重复早停/生成上限。实际CPU仍近一核，官方其他CPU引擎未测，不把已完成说成逐字准确或生产适用。旧1.5诊断区分观察器故障与部分输出，历史M3仅复制，无新云调用。
+
+新增通用阶段观察、资源采样、真1.6入口、原生适配和下载流式校验，20项合成回归及Ruff通过。两页离线原图/原文对照包已在Chen独立交付目录，文件大小/哈希、真实/合成/未验证、固定身份及资源详见[本轮报告](docs/PADDLEOCR_VL16_TWO_PAGE_REPORT.md)、docs/evidence/vl16-two-page-delivery.json和既有runbook增量。私有根runtime/paddleocr-vl-evaluation/vl16-two-pages-r1，业务图文/响应/权重未入Git。等待用户看两页原文；不自动扩跑原十页/整册，不测试更多新项目、不部署、不修改Skill/Word模板、不保存/入库。

@@ -26,7 +26,7 @@ def check(root, output, screenshot=None, font=None):
             page.select_option('#page', str(physical))
             page.wait_for_function('document.querySelector("#image").complete && document.querySelector("#image").naturalWidth > 0')
             assert page.locator('#image').evaluate('(im)=>[im.naturalWidth,im.naturalHeight]') == [image['width'], image['height']]
-            assert page.locator('article').count() == 4
+            assert page.locator('article').count() == len(list(root.glob('*/structure.json')))
             for article in page.locator('article').all():
                 method = article.locator('h2').inner_text()
                 raw = root / method / f'page-{physical}' / 'raw.md'

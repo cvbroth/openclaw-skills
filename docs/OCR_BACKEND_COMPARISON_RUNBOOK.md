@@ -48,3 +48,27 @@ Paddle调用`--backend paddle --models <已有固定VL1.5模型根>`并保留原
 `browser_smoke_ocr_comparison.py`依赖开发Playwright，逐页验证图像尺寸、原始文字DOM字节一致、无外部请求、无水平溢出；可选`--font`仅注入开发截图字体，不改变交付。该工具不评价识别正确性。
 
 合成测试覆盖原文/坐标保留、页重置告警、历史来源校验、安全HTML、非文字/页眉块、并发捕获、续跑保留、shape观察。不得把这些测试称真实模型识别通过。私有资料只放runtime/共享交付，Git只收代码、配置、脱敏测量和报告。
+
+## VL1.6整页有界实验（2026-10-08增量）
+
+实测见[PaddleOCR-VL1.6两页报告](PADDLEOCR_VL16_TWO_PAGE_REPORT.md)。沿用paddle370镜像的软件包，另行下载并校验真实1.6权重；不能把1.5模型目录直接改名。模型根必须含固定`vl`、`layout`；VL的verified-assets.json记录官方版本校验，既有布局文件的实际哈希另存layout-assets-used.json。当前输入为同一220dpi PNG，先12页完成后才启动23页。下例只运行显式一页；下一页另建结果目录、核对实际空闲资源再启动。
+
+```bash
+# EXP_DIR/REPO_DIR须指向已准备并校验的隔离实验目录，不挂生产配置或凭据。
+docker run -d --name filetools-vl16-new-page12 \
+  --network none --read-only --user 1000:1000 --cap-drop ALL \
+  --security-opt no-new-privileges --cpus 2 --memory 16g --memory-swap 16g \
+  --pids-limit 128 --tmpfs /tmp:rw,size=2g \
+  -e HOME=/tmp -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 \
+  -e FLAGS_paddle_num_threads=2 -e HF_HUB_OFFLINE=1 -e TRANSFORMERS_OFFLINE=1 \
+  -v "$REPO_DIR:/repo:ro" -v "$EXP_DIR/images:/images:ro" \
+  -v "$EXP_DIR/models:/models:ro" -v "$EXP_DIR/results/new-page12:/results:rw" \
+  sha256:cb90de65a52f53707a05e26e0e8cfb09622e9001adde93f0359f15eaf8e23f56 \
+  /repo/scripts/run_ocr_backend_comparison.py --backend paddle --paddle-version 1.6 \
+  --cpu-threads 2 --instrument-paddle --images /images --models /models \
+  --output /results --pages 12 --load-timeout 180 --page-timeout 1800
+```
+
+线程flag由实际get_flags确认，CPU用量仍需监测，不能从参数推出两核满载。`phase-events.jsonl`、`activity.json`、`resource-samples.jsonl`记录布局、区域裁切、模型tensor形状、视觉及生成嵌套阶段；这些是研究观察器，不改安装包源码/识别结果，也不构成生产能力。`raw-regions`保留原生区域响应（含数组），`raw-generations`保存生成token；部分区域不能当整页。
+
+只有原生整页导出完成才用`ocr_backend_comparison.py adapt-paddle --folder <原生单页目录> --page 12`。它保留原生MD字节和坐标。历史M3仍通过`import-m3`复用，无新云请求。`summarize_paddle_vl_trial.py --folder <尝试目录> --output <脱敏摘要.json>`仅汇总已记录测量，不补未知时间或推定准确率。

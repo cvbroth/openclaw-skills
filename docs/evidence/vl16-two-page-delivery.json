@@ -1,0 +1,19 @@
+{
+  "server_path": "/srv/storage/users/chen/FileTools-Deliveries/paddleocr-vl16-two-pages-20261008/filetools-vl16-two-pages-20261008.zip",
+  "windows_path": "\\\\myserver\\Chen\\FileTools-Deliveries\\paddleocr-vl16-two-pages-20261008\\filetools-vl16-two-pages-20261008.zip",
+  "bytes": 18629359,
+  "sha256": "ae001d5daa9b5cf83279157423c981140544913718255c1e4f917ae54c0d6245",
+  "uid": 1000,
+  "gid": 1000,
+  "mode": "0o640",
+  "zip_crc_check": "passed",
+  "new_cloud_calls": 0,
+  "pages": [
+    12,
+    23
+  ],
+  "user_download_verified": false,
+  "delivery": "shared development package, outside Incoming; not formal FileTools publication",
+  "delivery_mount_checked": "actual Gateway/Worker mounts exclude FileTools-Deliveries; Incoming still readonly",
+  "production_changes": false
+}

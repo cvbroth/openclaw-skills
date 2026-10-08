@@ -154,3 +154,19 @@ def test_shape_observer_handles_native_list_without_altering_feed():
     assert feed == [[1, 2], [3, 4]]
     tensor = np.zeros((1, 3, 800, 800), dtype=np.float32)
     assert tensor_description(tensor) == {'shape': [1, 3, 800, 800], 'dtype': 'float32'}
+
+
+def test_paddle_adapter_requires_completed_page_keeps_raw_coordinates(tmp_path):
+    with pytest.raises(ValueError, match='ONE_COMPLETED_NATIVE_PAGE_REQUIRED'):
+        comparison.adapt_paddle(tmp_path,12)
+    native={'res':{'width':1819,'height':2573,'parsing_res_list':[
+        {'block_label':'text','block_content':'合成 A. 不改字','block_bbox':[20,30,400,200],'block_order':1}]}}
+    write(tmp_path/'page-12_res.json',native)
+    (tmp_path/'page-12.md').write_text('原始 **合成** A. 不改字\n')
+    before=comparison.sha(tmp_path/'page-12.md')
+    result=comparison.adapt_paddle(tmp_path,12)
+    assert result[0]['text']=='合成 A. 不改字'
+    assert result[0]['native_coordinates']==[20,30,400,200]
+    assert result[0]['native_order']==1
+    assert comparison.sha(tmp_path/'raw.md')==before
+    assert json.loads((tmp_path/'page-12_res.json').read_bytes())==native

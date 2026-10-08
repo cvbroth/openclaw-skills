@@ -7,18 +7,40 @@ import argparse
 import base64
 import hashlib
 import json
+import shutil
 import subprocess
+import time
 import urllib.request
 from pathlib import Path
 
 
 def verify(path, item):
-    data = path.read_bytes()
-    if len(data) != item['size']:
+    if path.stat().st_size != item['size']:
         return False
     expected = item.get('lfs', {}).get('sha256')
-    return (hashlib.sha256(data).hexdigest() == expected if expected else
-            hashlib.sha1(f'blob {len(data)}\0'.encode() + data).hexdigest() == item['blobId'])
+    digest = hashlib.sha256() if expected else hashlib.sha1()
+    if not expected:
+        digest.update(f"blob {item['size']}\0".encode())
+    with path.open('rb') as incoming:
+        while chunk := incoming.read(4 * 1024 * 1024):
+            digest.update(chunk)
+    return digest.hexdigest() == (expected or item['blobId'])
+
+
+def download(url, partial):
+    if shutil.which('curl'):
+        subprocess.run(['curl', '--http1.1', '--fail', '--location', '--silent', '--show-error',
+                        '--connect-timeout', '20', '--max-time', '600', '--retry', '1',
+                        '-o', str(partial), url], check=True, timeout=1250)
+        return
+    # Minimal preparation containers need no extra curl installation. Only
+    # public assets are fetched; inference containers still have no network.
+    deadline = time.monotonic() + 600
+    with urllib.request.urlopen(url, timeout=30) as incoming, partial.open('wb') as outgoing:
+        while chunk := incoming.read(1024 * 1024):
+            if time.monotonic() > deadline:
+                raise TimeoutError('PUBLIC_ASSET_DOWNLOAD_EXCEEDED_600_SECONDS')
+            outgoing.write(chunk)
 
 
 def models(metadata, target, mirror=False):
@@ -40,14 +62,13 @@ def models(metadata, target, mirror=False):
             if mirror and item.get('lfs'):
                 url = f"https://modelscope.cn/models/{info['id']}/resolve/master/{name}"
             partial = dest.with_name(dest.name + '.partial')
-            subprocess.run(['curl', '--http1.1', '--fail', '--location', '--silent', '--show-error',
-                            '--connect-timeout', '20', '--max-time', '600', '--retry', '1',
-                            '-o', str(partial), url], check=True, timeout=1250)
+            download(url, partial)
             if not verify(partial, item):
                 raise ValueError(f'ASSET_HASH_MISMATCH: {name}')
             partial.replace(dest)
-        records.append({'file': name, 'bytes': dest.stat().st_size,
-                        'sha256': hashlib.sha256(dest.read_bytes()).hexdigest()})
+        with dest.open('rb') as incoming:
+            digest = hashlib.file_digest(incoming, 'sha256').hexdigest()
+        records.append({'file': name, 'bytes': dest.stat().st_size, 'sha256': digest})
         print(json.dumps(records[-1]), flush=True)
     (target / 'verified-assets.json').write_text(json.dumps(
         {'repository': info['id'], 'revision': info['sha'], 'files': records}, indent=2))

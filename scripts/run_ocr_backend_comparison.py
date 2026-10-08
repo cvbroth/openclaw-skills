@@ -69,10 +69,12 @@ def archive_attempt(output):
     number = len(list(history.glob('attempt-*'))) + 1
     target = history / f'attempt-{number}'
     target.mkdir(parents=True)
-    for name in ('run-receipt.json', 'metrics.json', 'stdout.log', 'stderr.log', 'stage.json', 'progress.json'):
+    for name in ('run-receipt.json', 'metrics.json', 'stdout.log', 'stderr.log', 'stage.json', 'progress.json', 'resource-samples.jsonl', 'phase-events.jsonl', 'activity.json'):
         source = output / name
         if source.exists():
             shutil.copy2(source, target / name)
+            if name in ('resource-samples.jsonl','phase-events.jsonl','activity.json'):
+                source.unlink()
     for folder in output.glob('page-*'):
         receipt = folder / 'page-receipt.json'
         successful = receipt.exists() and json.loads(receipt.read_bytes()).get('status') == 'SUCCEEDED'
@@ -110,7 +112,21 @@ def child(args):
     loading = time.monotonic()
     record(stage, {'phase': 'model_load', 'started': loading})
     if args.backend == 'paddle':
-        pipeline = build_pipeline('paddleocr-vl-1.5', args.models)
+        if args.paddle_version == '1.5':
+            pipeline = build_pipeline('paddleocr-vl-1.5', args.models, cpu_threads=args.cpu_threads)
+        else:
+            from paddleocr import PaddleOCRVL
+            pipeline = PaddleOCRVL(paddlex_config=str(Path(__file__).resolve().parents[1] / 'deploy/paddleocr-vl16-cpu-eval.yaml'),
+                pipeline_version='v1.6', device='cpu', cpu_threads=args.cpu_threads,
+                layout_detection_model_name='PP-DocLayoutV3', layout_detection_model_dir=str(args.models/'layout'),
+                vl_rec_model_name='PaddleOCR-VL-1.6-0.9B', vl_rec_model_dir=str(args.models/'vl'),
+                use_doc_orientation_classify=False, use_doc_unwarping=False, use_layout_detection=True)
+        import paddle
+        metrics['paddle_flags'] = paddle.get_flags(['FLAGS_paddle_num_threads'])
+        metrics['paddle_version'] = args.paddle_version
+        if args.instrument_paddle:
+            from paddle_vl_observer import Observer
+            observer = Observer(output).install(pipeline)
     elif args.backend == 'mineru':
         import onnxruntime as ort
         pipeline = MinerUParser(tier='basic', parse_mode='ocr', image_analysis=True)
@@ -152,6 +168,7 @@ def child(args):
                                preprocess_batch_size=1, skip_preprocess=False)
         _, model = manager.get(config)
         model._generate_one = generation_capture(model._generate_one, load_image, output, lambda: active_page)
+    metrics['cpu_threads'] = args.cpu_threads
     metrics['model_load_seconds'] = time.monotonic() - loading
     record(output / 'metrics.json', metrics)
     inference_index = 0
@@ -167,6 +184,8 @@ def child(args):
         page_start, cpu_start = time.monotonic(), cpu()
         record(stage, {'phase': 'page', 'physical_page': active_page, 'started': page_start})
         if args.backend == 'paddle':
+            if args.instrument_paddle:
+                observer.page = active_page
             for result in pipeline.predict(str(incoming)):
                 result.save_to_json(str(folder))
                 result.save_to_markdown(str(folder))
@@ -201,9 +220,13 @@ def monitor(args):
     command = [sys.executable, '-B', __file__, '--child', '--backend', args.backend,
                '--images', str(args.images), '--models', str(args.models), '--output', str(args.output),
                '--source', str(args.source), '--pages', *map(str, args.pages)]
+    command.extend(['--paddle-version', args.paddle_version, '--cpu-threads', str(args.cpu_threads)])
+    if args.instrument_paddle:
+        command.append('--instrument-paddle')
     if args.observe_shapes:
         command.append('--observe-shapes')
     start, peak, timeout = time.monotonic(), 0, None
+    sampled_at = 0
     with (args.output / 'stdout.log').open('wb') as stdout, (args.output / 'stderr.log').open('wb') as stderr:
         process = subprocess.Popen(command, stdout=stdout, stderr=stderr, start_new_session=True)
         while process.poll() is None:
@@ -216,6 +239,17 @@ def monitor(args):
                 phase = json.loads((args.output / 'stage.json').read_bytes())
             except (OSError, ValueError):
                 pass
+            if time.monotonic() - sampled_at >= 5:
+                sampled_at = time.monotonic()
+                snapshot = {'wall_seconds': sampled_at-start, 'stage': phase, 'process_peak_rss_kib': peak,
+                            'host_loadavg': Path('/proc/loadavg').read_text().strip()}
+                for name in ('memory.current','cpu.stat'):
+                    try:
+                        snapshot['cgroup_'+name] = Path('/sys/fs/cgroup',name).read_text().strip()
+                    except OSError:
+                        snapshot['cgroup_'+name] = None
+                with (args.output/'resource-samples.jsonl').open('a') as samples:
+                    samples.write(json.dumps(snapshot)+'\n')
             limit = args.page_timeout if phase['phase'] == 'page' else args.load_timeout
             record(args.output / 'progress.json', {'stage': phase, 'wall_seconds': time.monotonic() - start,
                                                   'process_peak_rss_kib': peak})
@@ -253,9 +287,14 @@ if __name__ == '__main__':
     parser.add_argument('--load-timeout', type=int, default=180)
     parser.add_argument('--page-timeout', type=int, default=300)
     parser.add_argument('--child', action='store_true')
+    parser.add_argument('--paddle-version', choices=['1.5','1.6'], default='1.5')
+    parser.add_argument('--cpu-threads', type=int, default=2)
+    parser.add_argument('--instrument-paddle', action='store_true')
     parser.add_argument('--resume', action='store_true', help='archive prior run logs; skip only successful pages with identical input SHA')
     parser.add_argument('--observe-shapes', action='store_true', help='separate diagnostic: record actual ONNX input shapes, never tensor contents')
     args = parser.parse_args()
+    if args.cpu_threads < 1:
+        parser.error('cpu threads must be positive')
     if len(set(args.pages)) != len(args.pages) or min(args.pages) < 1:
         parser.error('distinct positive physical pages required')
     if args.child:

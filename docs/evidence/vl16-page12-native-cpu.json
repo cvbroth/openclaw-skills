@@ -1,0 +1,1301 @@
+{
+  "metrics": {
+    "backend": "paddle",
+    "device": "cpu",
+    "cpu_threads": 2,
+    "import_seconds": 0.00016556901391595602,
+    "pages": [
+      {
+        "physical_page": 12,
+        "status": "SUCCEEDED",
+        "elapsed_seconds": 1015.0875640850281,
+        "process_cpu_seconds": 1017.275247,
+        "process_peak_rss_kib_cumulative": 9383972,
+        "first_inference_in_process": true,
+        "input_sha256": "81d706884884e0610632493c29b56250aea4fc164096c7db6b10026a8ebc034c"
+      }
+    ],
+    "versions": {
+      "paddleocr": "3.7.0",
+      "paddlex": "3.7.2",
+      "paddlepaddle": "3.2.2",
+      "numpy": "2.3.5",
+      "onnxruntime": "1.20.1"
+    },
+    "paddle_flags": {
+      "FLAGS_paddle_num_threads": 2
+    },
+    "paddle_version": "1.6",
+    "model_load_seconds": 39.87314290704671
+  },
+  "receipt": {
+    "status": "SUCCEEDED",
+    "exit_code": 0,
+    "wall_seconds": 1056.1274629540276,
+    "process_peak_rss_kib": 9383972,
+    "timeout": null,
+    "pages_requested": [
+      12
+    ],
+    "backend": "paddle",
+    "model_load_limit_seconds": 180,
+    "page_limit_seconds": 1800,
+    "cgroup_memory.peak": "9430552576",
+    "cgroup_memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+    "cgroup_memory.swap.peak": "0",
+    "cgroup_cpu.stat": "usage_usec 1060993008\nuser_usec 951672748\nsystem_usec 109320260\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 10563\nnr_throttled 20\nthrottled_usec 36359\nnr_bursts 0\nburst_usec 0"
+  },
+  "phases": [
+    {
+      "page": 12,
+      "region": 0,
+      "name": "layout_analysis",
+      "state": "started",
+      "monotonic": 867052.748434461,
+      "process_cpu_seconds": 40.078851
+    },
+    {
+      "page": 12,
+      "region": 0,
+      "name": "layout_analysis",
+      "state": "completed",
+      "monotonic": 867055.763733097,
+      "process_cpu_seconds": 45.372286,
+      "wall_seconds": 3.015047390013933,
+      "cpu_seconds": 5.293186999999996,
+      "batch_box_counts": [
+        10
+      ]
+    },
+    {
+      "page": 12,
+      "region": 1,
+      "name": "region",
+      "state": "started",
+      "monotonic": 867055.777955102,
+      "process_cpu_seconds": 45.393043000000006
+    },
+    {
+      "page": 12,
+      "region": 1,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 867055.788642265,
+      "process_cpu_seconds": 45.413762
+    },
+    {
+      "page": 12,
+      "region": 1,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 867055.790703691,
+      "process_cpu_seconds": 45.417057
+    },
+    {
+      "page": 12,
+      "region": 1,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 867071.2655099,
+      "process_cpu_seconds": 60.991459000000006,
+      "wall_seconds": 15.474603663082235,
+      "cpu_seconds": 15.574017999999995
+    },
+    {
+      "page": 12,
+      "region": 1,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867074.017825026,
+      "process_cpu_seconds": 63.742152000000004,
+      "language_steps": 1,
+      "language_wall": 2.5968660169746727,
+      "language_cpu": 2.5959239999999966
+    },
+    {
+      "page": 12,
+      "region": 1,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 867076.231280418,
+      "process_cpu_seconds": 65.954992,
+      "wall_seconds": 20.442433106945828,
+      "language_steps": 10,
+      "generated_token_shape": [
+        1,
+        10
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 12,
+      "region": 1,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 867076.255076239,
+      "process_cpu_seconds": 65.978787,
+      "wall_seconds": 20.47679672401864
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "region",
+      "state": "started",
+      "monotonic": 867076.259689957,
+      "process_cpu_seconds": 65.983401
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 867076.296281176,
+      "process_cpu_seconds": 66.019984
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 867076.297445342,
+      "process_cpu_seconds": 66.021148
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 867189.296672835,
+      "process_cpu_seconds": 178.996489,
+      "wall_seconds": 112.99903578101657,
+      "cpu_seconds": 112.97515299999999
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867201.713430085,
+      "process_cpu_seconds": 191.41031900000002,
+      "language_steps": 1,
+      "language_wall": 11.816213818034157,
+      "language_cpu": 11.813545999999974
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867209.746842953,
+      "process_cpu_seconds": 199.44071399999999,
+      "language_steps": 16,
+      "language_wall": 17.820836262893863,
+      "language_cpu": 17.816362999999853
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867216.645604382,
+      "process_cpu_seconds": 206.33713400000002,
+      "language_steps": 32,
+      "language_wall": 24.329574648989365,
+      "language_cpu": 24.32315899999989
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867223.608115999,
+      "process_cpu_seconds": 213.297056,
+      "language_steps": 48,
+      "language_wall": 30.902045197901316,
+      "language_cpu": 30.89330199999995
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867230.659030863,
+      "process_cpu_seconds": 220.346059,
+      "language_steps": 64,
+      "language_wall": 37.56370346772019,
+      "language_cpu": 37.55310899999992
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867237.833344249,
+      "process_cpu_seconds": 227.518179,
+      "language_steps": 80,
+      "language_wall": 44.346816471545026,
+      "language_cpu": 44.335034999999976
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867245.101663208,
+      "process_cpu_seconds": 234.784538,
+      "language_steps": 96,
+      "language_wall": 51.225493954494596,
+      "language_cpu": 51.21179599999999
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867252.477577518,
+      "process_cpu_seconds": 242.159689,
+      "language_steps": 112,
+      "language_wall": 58.20937470556237,
+      "language_cpu": 58.19498600000006
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867259.96577694,
+      "process_cpu_seconds": 249.646458,
+      "language_steps": 128,
+      "language_wall": 65.30651846539695,
+      "language_cpu": 65.29072199999999
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867267.675590778,
+      "process_cpu_seconds": 257.355434,
+      "language_steps": 144,
+      "language_wall": 72.6228586663492,
+      "language_cpu": 72.606269
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867275.354830205,
+      "process_cpu_seconds": 265.033649,
+      "language_steps": 160,
+      "language_wall": 79.91307690017857,
+      "language_cpu": 79.89546999999999
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867283.142295358,
+      "process_cpu_seconds": 272.820334,
+      "language_steps": 176,
+      "language_wall": 87.3112966644112,
+      "language_cpu": 87.29295699999983
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867291.013558568,
+      "process_cpu_seconds": 280.69009600000004,
+      "language_steps": 192,
+      "language_wall": 94.7922823933186,
+      "language_cpu": 94.77247699999987
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867299.012175633,
+      "process_cpu_seconds": 288.687395,
+      "language_steps": 208,
+      "language_wall": 102.39987536356784,
+      "language_cpu": 102.37878799999982
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 867304.066352009,
+      "process_cpu_seconds": 293.74094399999996,
+      "wall_seconds": 227.76987796090543,
+      "language_steps": 218,
+      "generated_token_shape": [
+        1,
+        218
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 12,
+      "region": 2,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 867304.408704134,
+      "process_cpu_seconds": 294.08327,
+      "wall_seconds": 228.1487726450432
+    },
+    {
+      "page": 12,
+      "region": 3,
+      "name": "region",
+      "state": "started",
+      "monotonic": 867304.411314409,
+      "process_cpu_seconds": 294.085879
+    },
+    {
+      "page": 12,
+      "region": 3,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 867304.428814809,
+      "process_cpu_seconds": 294.103378
+    },
+    {
+      "page": 12,
+      "region": 3,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 867304.429796894,
+      "process_cpu_seconds": 294.10436100000004
+    },
+    {
+      "page": 12,
+      "region": 3,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 867335.990881334,
+      "process_cpu_seconds": 325.660557,
+      "wall_seconds": 31.56089609290939,
+      "cpu_seconds": 31.556011000000012
+    },
+    {
+      "page": 12,
+      "region": 3,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867341.226226796,
+      "process_cpu_seconds": 330.89540100000005,
+      "language_steps": 1,
+      "language_wall": 4.952337461989373,
+      "language_cpu": 4.951863000000003
+    },
+    {
+      "page": 12,
+      "region": 3,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867345.947303765,
+      "process_cpu_seconds": 335.615714,
+      "language_steps": 16,
+      "language_wall": 8.589158413000405,
+      "language_cpu": 8.588069000000246
+    },
+    {
+      "page": 12,
+      "region": 3,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867350.320462246,
+      "process_cpu_seconds": 339.988429,
+      "language_steps": 32,
+      "language_wall": 12.568594802054577,
+      "language_cpu": 12.567099000000212
+    },
+    {
+      "page": 12,
+      "region": 3,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867354.816069403,
+      "process_cpu_seconds": 344.483517,
+      "language_steps": 48,
+      "language_wall": 16.671323803951964,
+      "language_cpu": 16.669356000000278
+    },
+    {
+      "page": 12,
+      "region": 3,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867359.383336509,
+      "process_cpu_seconds": 349.05039300000004,
+      "language_steps": 64,
+      "language_wall": 20.845423190155998,
+      "language_cpu": 20.843079000000273
+    },
+    {
+      "page": 12,
+      "region": 3,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867364.033885899,
+      "process_cpu_seconds": 353.700417,
+      "language_steps": 80,
+      "language_wall": 25.102911714464426,
+      "language_cpu": 25.100085000000263
+    },
+    {
+      "page": 12,
+      "region": 3,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 867366.117583431,
+      "process_cpu_seconds": 355.78391799999997,
+      "wall_seconds": 61.68858531303704,
+      "language_steps": 87,
+      "generated_token_shape": [
+        1,
+        87
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 12,
+      "region": 3,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 867366.288861179,
+      "process_cpu_seconds": 355.955171,
+      "wall_seconds": 61.87732133001555
+    },
+    {
+      "page": 12,
+      "region": 4,
+      "name": "region",
+      "state": "started",
+      "monotonic": 867366.289436115,
+      "process_cpu_seconds": 355.95574500000004
+    },
+    {
+      "page": 12,
+      "region": 4,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 867366.297698558,
+      "process_cpu_seconds": 355.964007
+    },
+    {
+      "page": 12,
+      "region": 4,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 867366.298636604,
+      "process_cpu_seconds": 355.964945
+    },
+    {
+      "page": 12,
+      "region": 4,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 867380.0546634,
+      "process_cpu_seconds": 369.719338,
+      "wall_seconds": 13.755837765987962,
+      "cpu_seconds": 13.754208000000006
+    },
+    {
+      "page": 12,
+      "region": 4,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867382.514454791,
+      "process_cpu_seconds": 372.17889,
+      "language_steps": 1,
+      "language_wall": 2.3213739279890433,
+      "language_cpu": 2.321155000000033
+    },
+    {
+      "page": 12,
+      "region": 4,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 867384.425513894,
+      "process_cpu_seconds": 374.089745,
+      "wall_seconds": 18.127628255053423,
+      "language_steps": 9,
+      "generated_token_shape": [
+        1,
+        9
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 12,
+      "region": 4,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 867384.447252819,
+      "process_cpu_seconds": 374.111478,
+      "wall_seconds": 18.157630893052556
+    },
+    {
+      "page": 12,
+      "region": 5,
+      "name": "region",
+      "state": "started",
+      "monotonic": 867384.448488404,
+      "process_cpu_seconds": 374.112712
+    },
+    {
+      "page": 12,
+      "region": 5,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 867384.457907732,
+      "process_cpu_seconds": 374.12213199999997
+    },
+    {
+      "page": 12,
+      "region": 5,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 867384.458977703,
+      "process_cpu_seconds": 374.123203
+    },
+    {
+      "page": 12,
+      "region": 5,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 867398.525268478,
+      "process_cpu_seconds": 388.18697099999997,
+      "wall_seconds": 14.066054824972525,
+      "cpu_seconds": 14.063537999999994
+    },
+    {
+      "page": 12,
+      "region": 5,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867401.030155742,
+      "process_cpu_seconds": 390.69162700000004,
+      "language_steps": 1,
+      "language_wall": 2.3632049990119413,
+      "language_cpu": 2.362979999999993
+    },
+    {
+      "page": 12,
+      "region": 5,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867404.306101438,
+      "process_cpu_seconds": 393.967223,
+      "language_steps": 16,
+      "language_wall": 4.90256229613442,
+      "language_cpu": 4.902050999999915
+    },
+    {
+      "page": 12,
+      "region": 5,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867407.514549373,
+      "process_cpu_seconds": 397.175082,
+      "language_steps": 32,
+      "language_wall": 7.716395930969156,
+      "language_cpu": 7.715330999999992
+    },
+    {
+      "page": 12,
+      "region": 5,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 867407.539526995,
+      "process_cpu_seconds": 397.200062,
+      "wall_seconds": 23.081388604012318,
+      "language_steps": 32,
+      "generated_token_shape": [
+        1,
+        32
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 12,
+      "region": 5,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 867407.611741096,
+      "process_cpu_seconds": 397.27227,
+      "wall_seconds": 23.163049763068557
+    },
+    {
+      "page": 12,
+      "region": 6,
+      "name": "region",
+      "state": "started",
+      "monotonic": 867407.615907454,
+      "process_cpu_seconds": 397.276436
+    },
+    {
+      "page": 12,
+      "region": 6,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 867407.651449048,
+      "process_cpu_seconds": 397.311978
+    },
+    {
+      "page": 12,
+      "region": 6,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 867407.65256598,
+      "process_cpu_seconds": 397.31309500000003
+    },
+    {
+      "page": 12,
+      "region": 6,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 867520.876081683,
+      "process_cpu_seconds": 510.51265,
+      "wall_seconds": 113.2233248440316,
+      "cpu_seconds": 113.19936899999993
+    },
+    {
+      "page": 12,
+      "region": 6,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867533.283820891,
+      "process_cpu_seconds": 522.917868,
+      "language_steps": 1,
+      "language_wall": 11.807833945960738,
+      "language_cpu": 11.805435999999986
+    },
+    {
+      "page": 12,
+      "region": 6,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867541.306622236,
+      "process_cpu_seconds": 530.938815,
+      "language_steps": 16,
+      "language_wall": 17.80681723705493,
+      "language_cpu": 17.803012000000194
+    },
+    {
+      "page": 12,
+      "region": 6,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867548.201868748,
+      "process_cpu_seconds": 537.8327830000001,
+      "language_steps": 32,
+      "language_wall": 24.31244463380426,
+      "language_cpu": 24.30738400000007
+    },
+    {
+      "page": 12,
+      "region": 6,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867555.224124815,
+      "process_cpu_seconds": 544.852763,
+      "language_steps": 48,
+      "language_wall": 30.9441501700785,
+      "language_cpu": 30.93697500000019
+    },
+    {
+      "page": 12,
+      "region": 6,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867562.318228181,
+      "process_cpu_seconds": 551.944699,
+      "language_steps": 64,
+      "language_wall": 37.64814880490303,
+      "language_cpu": 37.63904699999978
+    },
+    {
+      "page": 12,
+      "region": 6,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867569.467327603,
+      "process_cpu_seconds": 559.092489,
+      "language_steps": 80,
+      "language_wall": 44.40708148304839,
+      "language_cpu": 44.396711999999866
+    },
+    {
+      "page": 12,
+      "region": 6,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867576.732233373,
+      "process_cpu_seconds": 566.3561100000001,
+      "language_steps": 96,
+      "language_wall": 51.280425440869294,
+      "language_cpu": 51.26881599999979
+    },
+    {
+      "page": 12,
+      "region": 6,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867584.123864532,
+      "process_cpu_seconds": 573.7464640000001,
+      "language_steps": 112,
+      "language_wall": 58.281183855840936,
+      "language_cpu": 58.268367999999555
+    },
+    {
+      "page": 12,
+      "region": 6,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 867591.139675971,
+      "process_cpu_seconds": 580.761543,
+      "wall_seconds": 183.48803824698552,
+      "language_steps": 127,
+      "generated_token_shape": [
+        1,
+        127
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 12,
+      "region": 6,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 867591.474632572,
+      "process_cpu_seconds": 581.0962020000001,
+      "wall_seconds": 183.8585250780452
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "region",
+      "state": "started",
+      "monotonic": 867591.479822729,
+      "process_cpu_seconds": 581.1013889999999
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 867591.52270648,
+      "process_cpu_seconds": 581.144273
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 867591.523904902,
+      "process_cpu_seconds": 581.145472
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 867740.730642727,
+      "process_cpu_seconds": 730.3202259999999,
+      "wall_seconds": 149.20653840398882,
+      "cpu_seconds": 149.17455899999993
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867756.263370414,
+      "process_cpu_seconds": 745.8489589999999,
+      "language_steps": 1,
+      "language_wall": 14.816774285049178,
+      "language_cpu": 14.812909999999988
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867765.504373085,
+      "process_cpu_seconds": 755.087619,
+      "language_steps": 16,
+      "language_wall": 21.71715284290258,
+      "language_cpu": 21.71119400000032
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867773.350171611,
+      "process_cpu_seconds": 762.931507,
+      "language_steps": 32,
+      "language_wall": 29.174955731956288,
+      "language_cpu": 29.167341000000533
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867781.306354063,
+      "process_cpu_seconds": 770.885587,
+      "language_steps": 48,
+      "language_wall": 36.743702101986855,
+      "language_cpu": 36.73400600000025
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867789.352193541,
+      "process_cpu_seconds": 778.92947,
+      "language_steps": 64,
+      "language_wall": 44.40224779874552,
+      "language_cpu": 44.39089499999966
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867797.518542142,
+      "process_cpu_seconds": 787.094241,
+      "language_steps": 80,
+      "language_wall": 52.176653935806826,
+      "language_cpu": 52.16383599999972
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867805.725977094,
+      "process_cpu_seconds": 795.3006320000001,
+      "language_steps": 96,
+      "language_wall": 59.99483966990374,
+      "language_cpu": 59.98101399999916
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867814.04686248,
+      "process_cpu_seconds": 803.620679,
+      "language_steps": 112,
+      "language_wall": 67.92549728776794,
+      "language_cpu": 67.91085699999906
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867822.489465695,
+      "process_cpu_seconds": 812.0619360000001,
+      "language_steps": 128,
+      "language_wall": 75.9760545748286,
+      "language_cpu": 75.9600999999991
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867830.992301259,
+      "process_cpu_seconds": 820.56309,
+      "language_steps": 144,
+      "language_wall": 84.08807747706305,
+      "language_cpu": 84.07051599999886
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867839.619090395,
+      "process_cpu_seconds": 829.188207,
+      "language_steps": 160,
+      "language_wall": 92.32634794525802,
+      "language_cpu": 92.30714599999874
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867848.319650145,
+      "process_cpu_seconds": 837.887846,
+      "language_steps": 176,
+      "language_wall": 100.63976641942281,
+      "language_cpu": 100.61966299999881
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867857.157701664,
+      "process_cpu_seconds": 846.7250720000001,
+      "language_steps": 192,
+      "language_wall": 109.09075171255972,
+      "language_cpu": 109.0698609999987
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867866.09879399,
+      "process_cpu_seconds": 855.664665,
+      "language_steps": 208,
+      "language_wall": 117.6443110484397,
+      "language_cpu": 117.62195299999917
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867875.094958276,
+      "process_cpu_seconds": 864.659579,
+      "language_steps": 224,
+      "language_wall": 126.25297462963499,
+      "language_cpu": 126.22941599999933
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867884.201181648,
+      "process_cpu_seconds": 873.7648290000001,
+      "language_steps": 240,
+      "language_wall": 134.97250171552878,
+      "language_cpu": 134.94802499999946
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 867887.659951607,
+      "process_cpu_seconds": 877.2232550000001,
+      "wall_seconds": 296.1370540979551,
+      "language_steps": 246,
+      "generated_token_shape": [
+        1,
+        246
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 12,
+      "region": 7,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 867888.094484907,
+      "process_cpu_seconds": 877.657698,
+      "wall_seconds": 296.61444699193817
+    },
+    {
+      "page": 12,
+      "region": 8,
+      "name": "region",
+      "state": "started",
+      "monotonic": 867888.098428596,
+      "process_cpu_seconds": 877.66164
+    },
+    {
+      "page": 12,
+      "region": 8,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 867888.131995676,
+      "process_cpu_seconds": 877.695202
+    },
+    {
+      "page": 12,
+      "region": 8,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 867888.133083956,
+      "process_cpu_seconds": 877.69629
+    },
+    {
+      "page": 12,
+      "region": 8,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 867979.501491497,
+      "process_cpu_seconds": 969.041127,
+      "wall_seconds": 91.36821897805203,
+      "cpu_seconds": 91.34465399999999
+    },
+    {
+      "page": 12,
+      "region": 8,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867989.983357106,
+      "process_cpu_seconds": 979.519995,
+      "language_steps": 1,
+      "language_wall": 9.95986920595169,
+      "language_cpu": 9.957049000000097
+    },
+    {
+      "page": 12,
+      "region": 8,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 867997.058753531,
+      "process_cpu_seconds": 986.5935999999999,
+      "language_steps": 16,
+      "language_wall": 15.356233754893765,
+      "language_cpu": 15.352199000000383
+    },
+    {
+      "page": 12,
+      "region": 8,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868003.303827073,
+      "process_cpu_seconds": 992.8368059999999,
+      "language_steps": 32,
+      "language_wall": 21.21089969482273,
+      "language_cpu": 21.205016000000114
+    },
+    {
+      "page": 12,
+      "region": 8,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868009.637696681,
+      "process_cpu_seconds": 999.169405,
+      "language_steps": 48,
+      "language_wall": 27.156245423597284,
+      "language_cpu": 27.14917300000002
+    },
+    {
+      "page": 12,
+      "region": 8,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868016.053378129,
+      "process_cpu_seconds": 1005.58331,
+      "language_steps": 64,
+      "language_wall": 33.183167757466435,
+      "language_cpu": 33.174476999999456
+    },
+    {
+      "page": 12,
+      "region": 8,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868022.564729569,
+      "process_cpu_seconds": 1012.092682,
+      "language_steps": 80,
+      "language_wall": 39.306009620195255,
+      "language_cpu": 39.295424999999454
+    },
+    {
+      "page": 12,
+      "region": 8,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868029.183406326,
+      "process_cpu_seconds": 1018.709868,
+      "language_steps": 96,
+      "language_wall": 45.5374084742507,
+      "language_cpu": 45.52536399999974
+    },
+    {
+      "page": 12,
+      "region": 8,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868035.912590858,
+      "process_cpu_seconds": 1025.436706,
+      "language_steps": 112,
+      "language_wall": 51.878605766338296,
+      "language_cpu": 51.86424899999997
+    },
+    {
+      "page": 12,
+      "region": 8,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868037.204238945,
+      "process_cpu_seconds": 1026.728188,
+      "wall_seconds": 149.07205434702337,
+      "language_steps": 115,
+      "generated_token_shape": [
+        1,
+        115
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 12,
+      "region": 8,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868037.499695238,
+      "process_cpu_seconds": 1027.02364,
+      "wall_seconds": 149.40106844203547
+    },
+    {
+      "page": 12,
+      "region": 9,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868037.500193081,
+      "process_cpu_seconds": 1027.024136
+    },
+    {
+      "page": 12,
+      "region": 9,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868037.507323402,
+      "process_cpu_seconds": 1027.031266
+    },
+    {
+      "page": 12,
+      "region": 9,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868037.508237312,
+      "process_cpu_seconds": 1027.03218
+    },
+    {
+      "page": 12,
+      "region": 9,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868049.378965001,
+      "process_cpu_seconds": 1038.9003539999999,
+      "wall_seconds": 11.87053904903587,
+      "cpu_seconds": 11.867991999999958
+    },
+    {
+      "page": 12,
+      "region": 9,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868051.550330681,
+      "process_cpu_seconds": 1041.071468,
+      "language_steps": 1,
+      "language_wall": 2.048878999077715,
+      "language_cpu": 2.048635000000104
+    },
+    {
+      "page": 12,
+      "region": 9,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868052.795428155,
+      "process_cpu_seconds": 1042.315413,
+      "wall_seconds": 15.28792277991306,
+      "language_steps": 6,
+      "generated_token_shape": [
+        1,
+        6
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 12,
+      "region": 9,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868052.806209194,
+      "process_cpu_seconds": 1042.326194,
+      "wall_seconds": 15.305839933105744
+    },
+    {
+      "page": 12,
+      "region": 10,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868052.806575059,
+      "process_cpu_seconds": 1042.3265589999999
+    },
+    {
+      "page": 12,
+      "region": 10,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868052.815021923,
+      "process_cpu_seconds": 1042.335006
+    },
+    {
+      "page": 12,
+      "region": 10,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868052.816095921,
+      "process_cpu_seconds": 1042.33608
+    },
+    {
+      "page": 12,
+      "region": 10,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868065.051190074,
+      "process_cpu_seconds": 1054.569581,
+      "wall_seconds": 12.234860594966449,
+      "cpu_seconds": 12.23327200000017
+    },
+    {
+      "page": 12,
+      "region": 10,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868067.265507991,
+      "process_cpu_seconds": 1056.783629,
+      "language_steps": 1,
+      "language_wall": 2.0888283760286868,
+      "language_cpu": 2.0885820000000876
+    },
+    {
+      "page": 12,
+      "region": 10,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868067.790402986,
+      "process_cpu_seconds": 1057.308505,
+      "wall_seconds": 14.975160878966562,
+      "language_steps": 2,
+      "generated_token_shape": [
+        1,
+        2
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 12,
+      "region": 10,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868067.791804548,
+      "process_cpu_seconds": 1057.309906,
+      "wall_seconds": 14.984999365988187
+    }
+  ],
+  "interpretation": "nested timings are not additive; language forward omits sampling/projector overhead; absence is unknown, not zero; no OCR accuracy claim"
+}

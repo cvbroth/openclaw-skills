@@ -1,0 +1,1442 @@
+{
+  "metrics": {
+    "backend": "paddle",
+    "device": "cpu",
+    "cpu_threads": 2,
+    "import_seconds": 0.00022366398479789495,
+    "pages": [
+      {
+        "physical_page": 23,
+        "status": "SUCCEEDED",
+        "elapsed_seconds": 713.3681533590425,
+        "process_cpu_seconds": 715.624496,
+        "process_peak_rss_kib_cumulative": 9377316,
+        "first_inference_in_process": true,
+        "input_sha256": "10eca256252fed33100c29c5ad5163555a01cf3b6c1f0e3d2be6c87bb1422742"
+      }
+    ],
+    "versions": {
+      "paddleocr": "3.7.0",
+      "paddlex": "3.7.2",
+      "paddlepaddle": "3.2.2",
+      "numpy": "2.3.5",
+      "onnxruntime": "1.20.1"
+    },
+    "paddle_flags": {
+      "FLAGS_paddle_num_threads": 2
+    },
+    "paddle_version": "1.6",
+    "model_load_seconds": 41.31218201608863
+  },
+  "receipt": {
+    "status": "SUCCEEDED",
+    "exit_code": 0,
+    "wall_seconds": 755.8170032070484,
+    "process_peak_rss_kib": 9377316,
+    "timeout": null,
+    "pages_requested": [
+      23
+    ],
+    "backend": "paddle",
+    "model_load_limit_seconds": 180,
+    "page_limit_seconds": 1800,
+    "cgroup_memory.peak": "9450954752",
+    "cgroup_memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+    "cgroup_memory.swap.peak": "0",
+    "cgroup_cpu.stat": "usage_usec 759488992\nuser_usec 719823693\nsystem_usec 39665299\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 7560\nnr_throttled 20\nthrottled_usec 37837\nnr_bursts 0\nburst_usec 0"
+  },
+  "phases": [
+    {
+      "page": 23,
+      "region": 0,
+      "name": "layout_analysis",
+      "state": "started",
+      "monotonic": 868152.798943737,
+      "process_cpu_seconds": 40.93414
+    },
+    {
+      "page": 23,
+      "region": 0,
+      "name": "layout_analysis",
+      "state": "completed",
+      "monotonic": 868155.836037711,
+      "process_cpu_seconds": 46.259845,
+      "wall_seconds": 3.0368124949745834,
+      "cpu_seconds": 5.325429,
+      "batch_box_counts": [
+        14
+      ]
+    },
+    {
+      "page": 23,
+      "region": 1,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868155.845616676,
+      "process_cpu_seconds": 46.279015
+    },
+    {
+      "page": 23,
+      "region": 1,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868155.855200816,
+      "process_cpu_seconds": 46.298176
+    },
+    {
+      "page": 23,
+      "region": 1,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868155.856426438,
+      "process_cpu_seconds": 46.300634
+    },
+    {
+      "page": 23,
+      "region": 1,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868170.639204727,
+      "process_cpu_seconds": 61.169143999999996,
+      "wall_seconds": 14.782572336960584,
+      "cpu_seconds": 14.868124000000002
+    },
+    {
+      "page": 23,
+      "region": 1,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868173.268763949,
+      "process_cpu_seconds": 63.798421,
+      "language_steps": 1,
+      "language_wall": 2.4818937729578465,
+      "language_cpu": 2.481623000000006
+    },
+    {
+      "page": 23,
+      "region": 1,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868176.627485053,
+      "process_cpu_seconds": 67.155725,
+      "language_steps": 16,
+      "language_wall": 5.087706232094206,
+      "language_cpu": 5.086087000000035
+    },
+    {
+      "page": 23,
+      "region": 1,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868176.652799215,
+      "process_cpu_seconds": 67.18103500000001,
+      "wall_seconds": 20.797376507078297,
+      "language_steps": 16,
+      "generated_token_shape": [
+        1,
+        16
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 23,
+      "region": 1,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868176.679920959,
+      "process_cpu_seconds": 67.208157,
+      "wall_seconds": 20.83399522898253
+    },
+    {
+      "page": 23,
+      "region": 2,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868176.680398538,
+      "process_cpu_seconds": 67.208633
+    },
+    {
+      "page": 23,
+      "region": 2,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868176.688043191,
+      "process_cpu_seconds": 67.216278
+    },
+    {
+      "page": 23,
+      "region": 2,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868176.689066272,
+      "process_cpu_seconds": 67.2173
+    },
+    {
+      "page": 23,
+      "region": 2,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868188.603625949,
+      "process_cpu_seconds": 79.13027100000001,
+      "wall_seconds": 11.914361213915981,
+      "cpu_seconds": 11.912776000000008
+    },
+    {
+      "page": 23,
+      "region": 2,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868190.765804759,
+      "process_cpu_seconds": 81.29218300000001,
+      "language_steps": 1,
+      "language_wall": 2.0393436750164255,
+      "language_cpu": 2.0390979999999956
+    },
+    {
+      "page": 23,
+      "region": 2,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868192.015320239,
+      "process_cpu_seconds": 82.54154600000001,
+      "wall_seconds": 15.327067633974366,
+      "language_steps": 6,
+      "generated_token_shape": [
+        1,
+        6
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 23,
+      "region": 2,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868192.026948957,
+      "process_cpu_seconds": 82.553175,
+      "wall_seconds": 15.346366474987008
+    },
+    {
+      "page": 23,
+      "region": 3,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868192.029552097,
+      "process_cpu_seconds": 82.555777
+    },
+    {
+      "page": 23,
+      "region": 3,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868192.04855825,
+      "process_cpu_seconds": 82.574783
+    },
+    {
+      "page": 23,
+      "region": 3,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868192.049600338,
+      "process_cpu_seconds": 82.575825
+    },
+    {
+      "page": 23,
+      "region": 3,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868222.227341954,
+      "process_cpu_seconds": 112.749166,
+      "wall_seconds": 30.177533757057972,
+      "cpu_seconds": 30.173136
+    },
+    {
+      "page": 23,
+      "region": 3,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868227.251022757,
+      "process_cpu_seconds": 117.771809,
+      "language_steps": 1,
+      "language_wall": 4.75174432201311,
+      "language_cpu": 4.750727000000012
+    },
+    {
+      "page": 23,
+      "region": 3,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868231.882682703,
+      "process_cpu_seconds": 122.40303,
+      "language_steps": 16,
+      "language_wall": 8.322372589143924,
+      "language_cpu": 8.321055999999999
+    },
+    {
+      "page": 23,
+      "region": 3,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868236.171952867,
+      "process_cpu_seconds": 126.69188399999999,
+      "language_steps": 32,
+      "language_wall": 12.217361814924516,
+      "language_cpu": 12.215665000000058
+    },
+    {
+      "page": 23,
+      "region": 3,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868240.545861789,
+      "process_cpu_seconds": 131.06499,
+      "language_steps": 48,
+      "language_wall": 16.197702893870883,
+      "language_cpu": 16.195256999999998
+    },
+    {
+      "page": 23,
+      "region": 3,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868245.015099434,
+      "process_cpu_seconds": 135.533694,
+      "language_steps": 64,
+      "language_wall": 20.27375443081837,
+      "language_cpu": 20.270877999999954
+    },
+    {
+      "page": 23,
+      "region": 3,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868245.321900771,
+      "process_cpu_seconds": 135.84044400000002,
+      "wall_seconds": 53.27313674299512,
+      "language_steps": 65,
+      "generated_token_shape": [
+        1,
+        65
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 23,
+      "region": 3,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868245.480885532,
+      "process_cpu_seconds": 135.99943000000002,
+      "wall_seconds": 53.45110103697516
+    },
+    {
+      "page": 23,
+      "region": 4,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868245.482550631,
+      "process_cpu_seconds": 136.00109400000002
+    },
+    {
+      "page": 23,
+      "region": 4,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868245.495167649,
+      "process_cpu_seconds": 136.013711
+    },
+    {
+      "page": 23,
+      "region": 4,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868245.496129558,
+      "process_cpu_seconds": 136.01467300000002
+    },
+    {
+      "page": 23,
+      "region": 4,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868265.721273519,
+      "process_cpu_seconds": 156.236649,
+      "wall_seconds": 20.2249559200136,
+      "cpu_seconds": 20.22179299999999
+    },
+    {
+      "page": 23,
+      "region": 4,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868269.188663156,
+      "process_cpu_seconds": 159.703375,
+      "language_steps": 1,
+      "language_wall": 3.2732689699623734,
+      "language_cpu": 3.2726620000000253
+    },
+    {
+      "page": 23,
+      "region": 4,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868273.040803912,
+      "process_cpu_seconds": 163.55500999999998,
+      "language_steps": 16,
+      "language_wall": 6.260072860168293,
+      "language_cpu": 6.259032000000019
+    },
+    {
+      "page": 23,
+      "region": 4,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868276.695585276,
+      "process_cpu_seconds": 167.209317,
+      "language_steps": 32,
+      "language_wall": 9.51705405721441,
+      "language_cpu": 9.51561200000009
+    },
+    {
+      "page": 23,
+      "region": 4,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868280.456645853,
+      "process_cpu_seconds": 170.96986199999998,
+      "language_steps": 48,
+      "language_wall": 12.879075853386894,
+      "language_cpu": 12.87725200000014
+    },
+    {
+      "page": 23,
+      "region": 4,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868282.870068682,
+      "process_cpu_seconds": 173.382966,
+      "wall_seconds": 37.37471618806012,
+      "language_steps": 58,
+      "generated_token_shape": [
+        1,
+        58
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 23,
+      "region": 4,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868282.988096644,
+      "process_cpu_seconds": 173.500989,
+      "wall_seconds": 37.50535118498374
+    },
+    {
+      "page": 23,
+      "region": 5,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868282.989538066,
+      "process_cpu_seconds": 173.50243
+    },
+    {
+      "page": 23,
+      "region": 5,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868283.000200043,
+      "process_cpu_seconds": 173.513092
+    },
+    {
+      "page": 23,
+      "region": 5,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868283.001157487,
+      "process_cpu_seconds": 173.51405
+    },
+    {
+      "page": 23,
+      "region": 5,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868299.650940793,
+      "process_cpu_seconds": 190.161365,
+      "wall_seconds": 16.64958961191587,
+      "cpu_seconds": 16.64712700000001
+    },
+    {
+      "page": 23,
+      "region": 5,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868302.562099189,
+      "process_cpu_seconds": 193.072208,
+      "language_steps": 1,
+      "language_wall": 2.7471437610220164,
+      "language_cpu": 2.7468330000000094
+    },
+    {
+      "page": 23,
+      "region": 5,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868306.082843469,
+      "process_cpu_seconds": 196.592555,
+      "language_steps": 16,
+      "language_wall": 5.4746018362930045,
+      "language_cpu": 5.473975999999908
+    },
+    {
+      "page": 23,
+      "region": 5,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868309.482408603,
+      "process_cpu_seconds": 199.991022,
+      "language_steps": 32,
+      "language_wall": 8.47716502926778,
+      "language_cpu": 8.47550699999988
+    },
+    {
+      "page": 23,
+      "region": 5,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868312.975191869,
+      "process_cpu_seconds": 203.483404,
+      "language_steps": 48,
+      "language_wall": 11.574027345050126,
+      "language_cpu": 11.572015999999877
+    },
+    {
+      "page": 23,
+      "region": 5,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868314.560405134,
+      "process_cpu_seconds": 205.068457,
+      "wall_seconds": 31.56001468305476,
+      "language_steps": 55,
+      "generated_token_shape": [
+        1,
+        55
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 23,
+      "region": 5,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868314.66068801,
+      "process_cpu_seconds": 205.168725,
+      "wall_seconds": 31.67094783706125
+    },
+    {
+      "page": 23,
+      "region": 6,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868314.662935664,
+      "process_cpu_seconds": 205.170971
+    },
+    {
+      "page": 23,
+      "region": 6,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868314.681170247,
+      "process_cpu_seconds": 205.189193
+    },
+    {
+      "page": 23,
+      "region": 6,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868314.68214822,
+      "process_cpu_seconds": 205.190171
+    },
+    {
+      "page": 23,
+      "region": 6,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868347.714642448,
+      "process_cpu_seconds": 238.217234,
+      "wall_seconds": 33.03230719594285,
+      "cpu_seconds": 33.026880999999975
+    },
+    {
+      "page": 23,
+      "region": 6,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868353.219976615,
+      "process_cpu_seconds": 243.7215,
+      "language_steps": 1,
+      "language_wall": 5.211181293008849,
+      "language_cpu": 5.210172
+    },
+    {
+      "page": 23,
+      "region": 6,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868358.075791028,
+      "process_cpu_seconds": 248.576729,
+      "language_steps": 16,
+      "language_wall": 8.937244338798337,
+      "language_cpu": 8.935827000000018
+    },
+    {
+      "page": 23,
+      "region": 6,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868362.527171257,
+      "process_cpu_seconds": 253.02691800000002,
+      "language_steps": 32,
+      "language_wall": 12.99706851458177,
+      "language_cpu": 12.994500000000073
+    },
+    {
+      "page": 23,
+      "region": 6,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868367.073023012,
+      "process_cpu_seconds": 257.572257,
+      "language_steps": 48,
+      "language_wall": 17.151212250464596,
+      "language_cpu": 17.148203000000194
+    },
+    {
+      "page": 23,
+      "region": 6,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868371.705450107,
+      "process_cpu_seconds": 262.203465,
+      "language_steps": 64,
+      "language_wall": 21.39253420755267,
+      "language_cpu": 21.388379000000384
+    },
+    {
+      "page": 23,
+      "region": 6,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868374.971289355,
+      "process_cpu_seconds": 265.468948,
+      "wall_seconds": 60.289929549908265,
+      "language_steps": 75,
+      "generated_token_shape": [
+        1,
+        75
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 23,
+      "region": 6,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868375.154210274,
+      "process_cpu_seconds": 265.65184200000004,
+      "wall_seconds": 60.49107470398303
+    },
+    {
+      "page": 23,
+      "region": 7,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868375.156292403,
+      "process_cpu_seconds": 265.653923
+    },
+    {
+      "page": 23,
+      "region": 7,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868375.172757698,
+      "process_cpu_seconds": 265.670383
+    },
+    {
+      "page": 23,
+      "region": 7,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868375.173747286,
+      "process_cpu_seconds": 265.671372
+    },
+    {
+      "page": 23,
+      "region": 7,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868404.535459068,
+      "process_cpu_seconds": 295.029022,
+      "wall_seconds": 29.361518318066373,
+      "cpu_seconds": 29.357460000000003
+    },
+    {
+      "page": 23,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868409.568859043,
+      "process_cpu_seconds": 300.061892,
+      "language_steps": 1,
+      "language_wall": 4.765995495021343,
+      "language_cpu": 4.7654940000000465
+    },
+    {
+      "page": 23,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868414.141675896,
+      "process_cpu_seconds": 304.63394,
+      "language_steps": 16,
+      "language_wall": 8.29532553406898,
+      "language_cpu": 8.294217000000117
+    },
+    {
+      "page": 23,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868418.380199079,
+      "process_cpu_seconds": 308.87205,
+      "language_steps": 32,
+      "language_wall": 12.14148867316544,
+      "language_cpu": 12.139998000000162
+    },
+    {
+      "page": 23,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868422.710986558,
+      "process_cpu_seconds": 313.202089,
+      "language_steps": 48,
+      "language_wall": 16.079867957276292,
+      "language_cpu": 16.077672000000177
+    },
+    {
+      "page": 23,
+      "region": 7,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868427.139354,
+      "process_cpu_seconds": 317.62994399999997,
+      "language_steps": 64,
+      "language_wall": 20.117427948280238,
+      "language_cpu": 20.11476100000027
+    },
+    {
+      "page": 23,
+      "region": 7,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868428.001746761,
+      "process_cpu_seconds": 318.492241,
+      "wall_seconds": 52.828804087941535,
+      "language_steps": 67,
+      "generated_token_shape": [
+        1,
+        67
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 23,
+      "region": 7,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868428.152545751,
+      "process_cpu_seconds": 318.643017,
+      "wall_seconds": 52.996062192018144
+    },
+    {
+      "page": 23,
+      "region": 8,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868428.155676573,
+      "process_cpu_seconds": 318.646148
+    },
+    {
+      "page": 23,
+      "region": 8,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868428.1817155,
+      "process_cpu_seconds": 318.672186
+    },
+    {
+      "page": 23,
+      "region": 8,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868428.182778007,
+      "process_cpu_seconds": 318.673249
+    },
+    {
+      "page": 23,
+      "region": 8,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868498.021671202,
+      "process_cpu_seconds": 388.496985,
+      "wall_seconds": 69.83870173199102,
+      "cpu_seconds": 69.82355000000001
+    },
+    {
+      "page": 23,
+      "region": 8,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868506.489738821,
+      "process_cpu_seconds": 396.962302,
+      "language_steps": 1,
+      "language_wall": 8.033660826040432,
+      "language_cpu": 8.030953000000011
+    },
+    {
+      "page": 23,
+      "region": 8,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868512.901897963,
+      "process_cpu_seconds": 403.37211,
+      "language_steps": 16,
+      "language_wall": 12.857970130280592,
+      "language_cpu": 12.853072000000054
+    },
+    {
+      "page": 23,
+      "region": 8,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868518.454705653,
+      "process_cpu_seconds": 408.923596,
+      "language_steps": 32,
+      "language_wall": 18.022013245150447,
+      "language_cpu": 18.01587200000006
+    },
+    {
+      "page": 23,
+      "region": 8,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868524.098288533,
+      "process_cpu_seconds": 414.56514400000003,
+      "language_steps": 48,
+      "language_wall": 23.274800643208437,
+      "language_cpu": 23.266953000000058
+    },
+    {
+      "page": 23,
+      "region": 8,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868529.858598125,
+      "process_cpu_seconds": 420.323679,
+      "language_steps": 64,
+      "language_wall": 28.64523071201984,
+      "language_cpu": 28.635639000000197
+    },
+    {
+      "page": 23,
+      "region": 8,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868535.711287428,
+      "process_cpu_seconds": 426.17375000000004,
+      "language_steps": 80,
+      "language_wall": 34.1073851470137,
+      "language_cpu": 34.09526000000005
+    },
+    {
+      "page": 23,
+      "region": 8,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868540.552935636,
+      "process_cpu_seconds": 431.014506,
+      "wall_seconds": 112.37103260797448,
+      "language_steps": 93,
+      "generated_token_shape": [
+        1,
+        93
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 23,
+      "region": 8,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868540.794097502,
+      "process_cpu_seconds": 431.255635,
+      "wall_seconds": 112.63822171196807
+    },
+    {
+      "page": 23,
+      "region": 9,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868540.797267747,
+      "process_cpu_seconds": 431.258803
+    },
+    {
+      "page": 23,
+      "region": 9,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868540.823557075,
+      "process_cpu_seconds": 431.28509199999996
+    },
+    {
+      "page": 23,
+      "region": 9,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868540.82459793,
+      "process_cpu_seconds": 431.286133
+    },
+    {
+      "page": 23,
+      "region": 9,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868610.873822153,
+      "process_cpu_seconds": 501.320661,
+      "wall_seconds": 70.0490338189993,
+      "cpu_seconds": 70.03434100000004
+    },
+    {
+      "page": 23,
+      "region": 9,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868619.412816448,
+      "process_cpu_seconds": 509.85778600000003,
+      "language_steps": 1,
+      "language_wall": 8.103399468935095,
+      "language_cpu": 8.101552000000027
+    },
+    {
+      "page": 23,
+      "region": 9,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868625.763213331,
+      "process_cpu_seconds": 516.207135,
+      "language_steps": 16,
+      "language_wall": 12.860749072977342,
+      "language_cpu": 12.858081999999854
+    },
+    {
+      "page": 23,
+      "region": 9,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868631.296023439,
+      "process_cpu_seconds": 521.73916,
+      "language_steps": 32,
+      "language_wall": 18.004394606803544,
+      "language_cpu": 18.00098099999991
+    },
+    {
+      "page": 23,
+      "region": 9,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868636.945563025,
+      "process_cpu_seconds": 527.387802,
+      "language_steps": 48,
+      "language_wall": 23.26431617361959,
+      "language_cpu": 23.260090999999875
+    },
+    {
+      "page": 23,
+      "region": 9,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868642.680883011,
+      "process_cpu_seconds": 533.122575,
+      "language_steps": 64,
+      "language_wall": 28.610078745521605,
+      "language_cpu": 28.60533599999974
+    },
+    {
+      "page": 23,
+      "region": 9,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868648.517740199,
+      "process_cpu_seconds": 538.95887,
+      "language_steps": 80,
+      "language_wall": 34.05787325336132,
+      "language_cpu": 34.052595999999994
+    },
+    {
+      "page": 23,
+      "region": 9,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868654.453084083,
+      "process_cpu_seconds": 544.893666,
+      "language_steps": 96,
+      "language_wall": 39.60357031819876,
+      "language_cpu": 39.59778600000004
+    },
+    {
+      "page": 23,
+      "region": 9,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868654.477705597,
+      "process_cpu_seconds": 544.91829,
+      "wall_seconds": 113.65396174404304,
+      "language_steps": 96,
+      "generated_token_shape": [
+        1,
+        96
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 23,
+      "region": 9,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868654.71913579,
+      "process_cpu_seconds": 545.1596979999999,
+      "wall_seconds": 113.92166965804063
+    },
+    {
+      "page": 23,
+      "region": 10,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868654.721877084,
+      "process_cpu_seconds": 545.162437
+    },
+    {
+      "page": 23,
+      "region": 10,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868654.743643205,
+      "process_cpu_seconds": 545.1842029999999
+    },
+    {
+      "page": 23,
+      "region": 10,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868654.744659514,
+      "process_cpu_seconds": 545.18522
+    },
+    {
+      "page": 23,
+      "region": 10,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868702.236441309,
+      "process_cpu_seconds": 592.666286,
+      "wall_seconds": 47.49159424100071,
+      "cpu_seconds": 47.48088400000006
+    },
+    {
+      "page": 23,
+      "region": 10,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868708.995122201,
+      "process_cpu_seconds": 599.4227530000001,
+      "language_steps": 1,
+      "language_wall": 6.399210792034864,
+      "language_cpu": 6.397019
+    },
+    {
+      "page": 23,
+      "region": 10,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868714.445467249,
+      "process_cpu_seconds": 604.8715040000001,
+      "language_steps": 16,
+      "language_wall": 10.578015000210144,
+      "language_cpu": 10.574730999999929
+    },
+    {
+      "page": 23,
+      "region": 10,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868719.380376469,
+      "process_cpu_seconds": 609.805026,
+      "language_steps": 32,
+      "language_wall": 15.119495947146788,
+      "language_cpu": 15.114873999999986
+    },
+    {
+      "page": 23,
+      "region": 10,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868724.410885315,
+      "process_cpu_seconds": 614.834462,
+      "language_steps": 48,
+      "language_wall": 19.757161862333305,
+      "language_cpu": 19.7514799999999
+    },
+    {
+      "page": 23,
+      "region": 10,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868729.557338925,
+      "process_cpu_seconds": 619.9792060000001,
+      "language_steps": 64,
+      "language_wall": 24.509539150283672,
+      "language_cpu": 24.50293899999997
+    },
+    {
+      "page": 23,
+      "region": 10,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868734.7792354,
+      "process_cpu_seconds": 625.199958,
+      "language_steps": 80,
+      "language_wall": 29.337635009200312,
+      "language_cpu": 29.330248000000097
+    },
+    {
+      "page": 23,
+      "region": 10,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868740.145774266,
+      "process_cpu_seconds": 630.564979,
+      "language_steps": 96,
+      "language_wall": 34.31020604725927,
+      "language_cpu": 34.30138100000033
+    },
+    {
+      "page": 23,
+      "region": 10,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868744.636809419,
+      "process_cpu_seconds": 635.055549,
+      "wall_seconds": 89.89298081293236,
+      "language_steps": 109,
+      "generated_token_shape": [
+        1,
+        109
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 23,
+      "region": 10,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868744.841635874,
+      "process_cpu_seconds": 635.2603509999999,
+      "wall_seconds": 90.11956289899535
+    },
+    {
+      "page": 23,
+      "region": 11,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868744.844435564,
+      "process_cpu_seconds": 635.26315
+    },
+    {
+      "page": 23,
+      "region": 11,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868744.866232272,
+      "process_cpu_seconds": 635.284947
+    },
+    {
+      "page": 23,
+      "region": 11,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868744.867256802,
+      "process_cpu_seconds": 635.285971
+    },
+    {
+      "page": 23,
+      "region": 11,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868792.416161005,
+      "process_cpu_seconds": 682.8251660000001,
+      "wall_seconds": 47.54871143097989,
+      "cpu_seconds": 47.539006000000086
+    },
+    {
+      "page": 23,
+      "region": 11,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868799.19566067,
+      "process_cpu_seconds": 689.602686,
+      "language_steps": 1,
+      "language_wall": 6.419660700950772,
+      "language_cpu": 6.417708999999945
+    },
+    {
+      "page": 23,
+      "region": 11,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868804.66581071,
+      "process_cpu_seconds": 695.0719240000001,
+      "language_steps": 16,
+      "language_wall": 10.61694539419841,
+      "language_cpu": 10.614377000000445
+    },
+    {
+      "page": 23,
+      "region": 11,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868809.629044203,
+      "process_cpu_seconds": 700.034615,
+      "language_steps": 32,
+      "language_wall": 15.186185958911665,
+      "language_cpu": 15.183115000000157
+    },
+    {
+      "page": 23,
+      "region": 11,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868814.673037045,
+      "process_cpu_seconds": 705.077766,
+      "language_steps": 48,
+      "language_wall": 19.836381196975708,
+      "language_cpu": 19.832516000000055
+    },
+    {
+      "page": 23,
+      "region": 11,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868819.790312829,
+      "process_cpu_seconds": 710.19448,
+      "language_steps": 64,
+      "language_wall": 24.56044616480358,
+      "language_cpu": 24.556025999999747
+    },
+    {
+      "page": 23,
+      "region": 11,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868825.017440141,
+      "process_cpu_seconds": 715.420529,
+      "language_steps": 80,
+      "language_wall": 29.39346884971019,
+      "language_cpu": 29.387996999999814
+    },
+    {
+      "page": 23,
+      "region": 11,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868830.351793647,
+      "process_cpu_seconds": 720.75388,
+      "language_steps": 96,
+      "language_wall": 34.33296804560814,
+      "language_cpu": 34.32656099999974
+    },
+    {
+      "page": 23,
+      "region": 11,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868831.047825043,
+      "process_cpu_seconds": 721.4498289999999,
+      "wall_seconds": 86.18140274705365,
+      "language_steps": 98,
+      "generated_token_shape": [
+        1,
+        98
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 23,
+      "region": 11,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868831.255546052,
+      "process_cpu_seconds": 721.657517,
+      "wall_seconds": 86.41090902395081
+    },
+    {
+      "page": 23,
+      "region": 12,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868831.255948338,
+      "process_cpu_seconds": 721.657917
+    },
+    {
+      "page": 23,
+      "region": 12,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868831.263112199,
+      "process_cpu_seconds": 721.665081
+    },
+    {
+      "page": 23,
+      "region": 12,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868831.264054095,
+      "process_cpu_seconds": 721.666023
+    },
+    {
+      "page": 23,
+      "region": 12,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868843.670795259,
+      "process_cpu_seconds": 734.0708000000001,
+      "wall_seconds": 12.406547983991913,
+      "cpu_seconds": 12.404588999999987
+    },
+    {
+      "page": 23,
+      "region": 12,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868845.920930561,
+      "process_cpu_seconds": 736.320644,
+      "language_steps": 1,
+      "language_wall": 2.123809303971939,
+      "language_cpu": 2.1235169999999925
+    },
+    {
+      "page": 23,
+      "region": 12,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868846.635652558,
+      "process_cpu_seconds": 737.035263,
+      "wall_seconds": 15.372348309028894,
+      "language_steps": 3,
+      "generated_token_shape": [
+        1,
+        3
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 23,
+      "region": 12,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868846.63767957,
+      "process_cpu_seconds": 737.037289,
+      "wall_seconds": 15.381544439005665
+    },
+    {
+      "page": 23,
+      "region": 13,
+      "name": "region",
+      "state": "started",
+      "monotonic": 868846.638154911,
+      "process_cpu_seconds": 737.037765
+    },
+    {
+      "page": 23,
+      "region": 13,
+      "name": "generate",
+      "state": "started",
+      "monotonic": 868846.648128343,
+      "process_cpu_seconds": 737.047738
+    },
+    {
+      "page": 23,
+      "region": 13,
+      "name": "vision_encoding",
+      "state": "started",
+      "monotonic": 868846.649289237,
+      "process_cpu_seconds": 737.048899
+    },
+    {
+      "page": 23,
+      "region": 13,
+      "name": "vision_encoding",
+      "state": "completed",
+      "monotonic": 868859.574260157,
+      "process_cpu_seconds": 749.971391,
+      "wall_seconds": 12.924720551003702,
+      "cpu_seconds": 12.922245000000089
+    },
+    {
+      "page": 23,
+      "region": 13,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868861.911883751,
+      "process_cpu_seconds": 752.3081609999999,
+      "language_steps": 1,
+      "language_wall": 2.2063269469654188,
+      "language_cpu": 2.2054809999999634
+    },
+    {
+      "page": 23,
+      "region": 13,
+      "name": "language_generation",
+      "state": "progress",
+      "monotonic": 868865.113847792,
+      "process_cpu_seconds": 755.5096880000001,
+      "language_steps": 16,
+      "language_wall": 4.6883636977290735,
+      "language_cpu": 4.687186999999653
+    },
+    {
+      "page": 23,
+      "region": 13,
+      "name": "generate",
+      "state": "completed",
+      "monotonic": 868866.10724753,
+      "process_cpu_seconds": 756.502957,
+      "wall_seconds": 19.458876239019446,
+      "language_steps": 21,
+      "generated_token_shape": [
+        1,
+        21
+      ],
+      "reached_configured_token_limit": false
+    },
+    {
+      "page": 23,
+      "region": 13,
+      "name": "region",
+      "state": "completed",
+      "monotonic": 868866.119337939,
+      "process_cpu_seconds": 756.515048,
+      "wall_seconds": 19.480942141031846
+    }
+  ],
+  "interpretation": "nested timings are not additive; language forward omits sampling/projector overhead; absence is unknown, not zero; no OCR accuracy claim"
+}

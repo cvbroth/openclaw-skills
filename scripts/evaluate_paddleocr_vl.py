@@ -42,11 +42,11 @@ def validate_pages(pages):
     return pages
 
 
-def build_pipeline(engine, models):
+def build_pipeline(engine, models, cpu_threads=2):
     if engine == 'paddleocr-vl-1.5':
         from paddleocr import PaddleOCRVL
         return PaddleOCRVL(paddlex_config=str(Path(__file__).resolve().parents[1] / 'deploy/paddleocr-vl-cpu-eval.yaml'),
-            pipeline_version='v1.5', device='cpu', cpu_threads=2,
+            pipeline_version='v1.5', device='cpu', cpu_threads=cpu_threads,
             layout_detection_model_name='PP-DocLayoutV3', layout_detection_model_dir=str(models / 'layout'),
             vl_rec_model_name='PaddleOCR-VL-1.5-0.9B', vl_rec_model_dir=str(models / 'vl'),
             use_doc_orientation_classify=False, use_doc_unwarping=False, use_layout_detection=True)

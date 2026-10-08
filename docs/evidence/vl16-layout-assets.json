@@ -1,0 +1,21 @@
+{
+  "model": "PP-DocLayoutV3",
+  "identity_scope": "hashes of existing fixed files actually referenced by native layout, not newly downloaded; unused historical .partial is not loaded",
+  "files": [
+    {
+      "file": "inference.json",
+      "bytes": 1196890,
+      "sha256": "2b68367c5b312a03de5a6e1642c597c8f95165a7e40cd59c6700cf4a5042f4fd"
+    },
+    {
+      "file": "inference.pdiparams",
+      "bytes": 130806572,
+      "sha256": "70bd316b0582769ec968829fd1feb1a6a58b7c941b938327e551b6b12b45c137"
+    },
+    {
+      "file": "inference.yml",
+      "bytes": 1482,
+      "sha256": "506fcfac13b3b546ae40d7886b44126420f392adb694e3f8bb6a6286a1f90fdc"
+    }
+  ]
+}

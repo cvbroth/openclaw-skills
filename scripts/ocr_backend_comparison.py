@@ -65,6 +65,25 @@ def adapt_mineru(folder, page):
     return blocks
 
 
+def adapt_paddle(folder, page):
+    """Adapt only completed native page output; never assemble partial regions."""
+    candidates = list(folder.glob('*_res.json'))
+    if len(candidates) != 1:
+        raise ValueError('ONE_COMPLETED_NATIVE_PAGE_REQUIRED')
+    native = json.loads(candidates[0].read_bytes())
+    native = native.get('res', native)
+    if 'parsing_res_list' not in native:
+        raise ValueError('NATIVE_PARSING_BLOCKS_MISSING')
+    blocks = normalize_blocks(native['parsing_res_list'], page,
+                              'native source-image pixel xyxy, origin top-left')
+    (folder / 'blocks.json').write_text(json.dumps(blocks, ensure_ascii=False, indent=2))
+    markdown = [path for path in folder.glob('*.md') if path.name != 'raw.md']
+    if len(markdown) != 1:
+        raise ValueError('ONE_NATIVE_MARKDOWN_REQUIRED')
+    shutil.copy2(markdown[0], folder / 'raw.md')
+    return blocks
+
+
 def import_m3(experiment, manifest, output):
     output.mkdir(parents=True, exist_ok=True)
     source_manifest = json.loads((experiment / 'manifest.json').read_bytes())
@@ -179,11 +198,16 @@ if __name__ == '__main__':
     adapt = sub.add_parser('adapt-mineru')
     adapt.add_argument('--folder', type=Path, required=True)
     adapt.add_argument('--page', type=int, required=True)
+    paddle = sub.add_parser('adapt-paddle')
+    paddle.add_argument('--folder', type=Path, required=True)
+    paddle.add_argument('--page', type=int, required=True)
     args = parser.parse_args()
     if args.action == 'import-m3':
         import_m3(args.experiment, json.loads(args.manifest.read_bytes()), args.output)
     elif args.action == 'adapt-mineru':
         adapt_mineru(args.folder, args.page)
+    elif args.action == 'adapt-paddle':
+        adapt_paddle(args.folder, args.page)
     else:
         pairs = []
         for item in args.candidate:
