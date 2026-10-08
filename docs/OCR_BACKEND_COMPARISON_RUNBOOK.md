@@ -1,3 +1,7 @@
+## 2026-10-08 限定GLM兼容修复与M3质量自评
+
+后续单方案记录见[GLM EOT验证](GLM_EOT_REPAIR_REPORT.md)：小图异常，正式页未跑，导入renderer差异限制因果结论；不将其写成修复成功。M3另按[独立入口](M3_TRANSCRIPTION_QUALITY50.md)与[50页报告](M3_QUALITY50_REPORT.md)运行，正文与质量严格分离、质量格式失败不丢正文。两者都未接生产、未改Skill或模板。
+
 # 十页CPU横向实验入口（仅开发）
 
 ## GLM-OCR官方Ollama CPU两页增量

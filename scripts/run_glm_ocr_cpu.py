@@ -91,6 +91,7 @@ def main(args):
     server = subprocess.Popen(['/bin/ollama', 'serve'], stdout=log, stderr=log)
     events = []
     error = None
+    inference_seconds = None
     def hard_timeout():
         write(root / 'timeout.json', {'status': 'TIMEOUT', 'wall_limit_seconds': args.timeout,
                                      'elapsed_seconds': time.monotonic() - started,
@@ -110,6 +111,10 @@ def main(args):
                 time.sleep(.1)
         else:
             raise RuntimeError('OLLAMA_START_FAILED')
+        if args.modelfile:
+            with (root / 'model-create.log').open('wb') as create_log:
+                subprocess.run(['/bin/ollama', 'create', args.model, '-f', str(args.modelfile)],
+                               stdout=create_log, stderr=create_log, check=True, timeout=args.timeout)
         show = urllib.request.Request('http://127.0.0.1:11434/api/show',
                                       data=json.dumps({'model': args.model}).encode(),
                                       headers={'Content-Type': 'application/json'})
@@ -143,7 +148,7 @@ def main(args):
                 partial.write(event.get('response', ''))
                 partial.flush()
         inference_seconds = time.monotonic() - inference_start
-    except Exception as exc:
+    except (Exception, KeyboardInterrupt) as exc:
         error = {'type': type(exc).__name__, 'message': str(exc)}
         (root / 'exception.txt').write_text(traceback.format_exc())
         if isinstance(exc, urllib.error.HTTPError):
@@ -152,7 +157,7 @@ def main(args):
     finally:
         text, status, terminal = adapt_events(events)
         if error:
-            status = 'FAILED' if not text else 'PARTIAL_ERROR'
+            status = 'ABORTED' if error['type'] == 'KeyboardInterrupt' else ('FAILED' if not text else 'PARTIAL_ERROR')
         (root / 'raw.md').write_text(text)
         write(root / 'response.json', terminal)
         write(root / 'blocks.json', [{'id': f'p{args.page:03}-b0001', 'type': 'unsegmented_transcription',
@@ -186,6 +191,7 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--page', type=int, required=True)
     parser.add_argument('--model', default='glm-ocr:q8_0')
+    parser.add_argument('--modelfile', type=Path, help='explicit isolated repaired-GGUF import; original model untouched')
     parser.add_argument('--threads', type=int, default=2)
     parser.add_argument('--timeout', type=int, default=1800)
     parser.add_argument('--diagnostic-stop-strings', action='store_true',

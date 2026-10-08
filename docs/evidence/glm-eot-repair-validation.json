@@ -1,0 +1,95 @@
+{
+  "classification": "ABORTED_REPETITIVE_SMALL_SAMPLE",
+  "measured_until_seconds": 106.12847629201133,
+  "cgroup_peak_bytes_at_last_sample": 5070458880,
+  "cgroup_cpu_seconds_at_last_sample": 204.050884,
+  "average_cpu_cores_to_last_sample": 1.9226779760651256,
+  "swap_peak_bytes": 0,
+  "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n",
+  "visible_repeated_task_phrase_occurrences": 319,
+  "partial_characters_at_abort_request": 7337,
+  "native_eog_registered": [
+    59246,
+    59253
+  ],
+  "actual_generated_token_sequence": "not captured",
+  "natural_end": false,
+  "formal_pages": {
+    "12": "NOT_RUN_SMOKE_FAILED",
+    "23": "NOT_RUN_SMOKE_FAILED"
+  },
+  "observer_shutdown_error": "KeyboardInterrupt followed by UnboundLocalError; fixed after run, not rerun; no native receipt/final resource file",
+  "terminal_metrics": "unknown; last sample only",
+  "repair": {
+    "repair": "add tokenizer.ggml.eot_token_id=59253 only",
+    "gguf_package": "0.19.0",
+    "upstream": "https://github.com/ollama/ollama/pull/17195",
+    "source_sha256": "24ca1840804a2aa3faeb2cadf31f628ec8bd48393cf1938c414f0e6cda81914a",
+    "output_sha256": "ef3021a50758335617c156664acc2a28ef069999e7d55a5559213e8e80f65598",
+    "output_bytes": 1588187136,
+    "added_fields": [
+      "tokenizer.ggml.eot_token_id"
+    ],
+    "changed_nonvirtual_fields": [],
+    "all_tensor_bytes_equal": true,
+    "tensor_count": 527
+  },
+  "preparation_wheels": [
+    {
+      "name": "certifi-2026.7.22-py3-none-any.whl",
+      "sha256": "62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775",
+      "bytes": 136983
+    },
+    {
+      "name": "charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+      "sha256": "3d31298449090ab8d47b7b1b2a555ff73cac7ed438a08b7ac160980c7ebed649",
+      "bytes": 257601
+    },
+    {
+      "name": "gguf-0.19.0-py3-none-any.whl",
+      "sha256": "70bcd10edfe697fb2dad6e40af2234b9d8ece9a41a99761405121ebda1c3c1cd",
+      "bytes": 118475
+    },
+    {
+      "name": "idna-3.20-py3-none-any.whl",
+      "sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+      "bytes": 69583
+    },
+    {
+      "name": "numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "sha256": "675d61ffbfa78604709862923189bad94014bef562cc35cf61d3a07bba02a7ed",
+      "bytes": 17950613
+    },
+    {
+      "name": "pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+      "sha256": "ba1cc08a7ccde2d2ec775841541641e4548226580ab850948cbfda66a1befcdc",
+      "bytes": 807870
+    },
+    {
+      "name": "requests-2.34.2-py3-none-any.whl",
+      "sha256": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0",
+      "bytes": 73075
+    },
+    {
+      "name": "tqdm-4.67.1-py3-none-any.whl",
+      "sha256": "26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2",
+      "bytes": 78540
+    },
+    {
+      "name": "urllib3-2.8.0-py3-none-any.whl",
+      "sha256": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+      "bytes": 135717
+    }
+  ],
+  "import_configuration_confound": {
+    "original_distribution": {
+      "renderer": "glm-ocr",
+      "parser": "glm-ocr"
+    },
+    "repaired_local_gguf_import": {
+      "renderer": null,
+      "parser": null
+    },
+    "scope": "actual config comparison; confound means no isolated causal attribution"
+  }
+}

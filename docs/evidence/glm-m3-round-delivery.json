@@ -1,0 +1,28 @@
+{
+  "files": [
+    {
+      "server_path": "/srv/storage/users/chen/FileTools-Deliveries/glm-eot-m3-quality50-20261008/filetools-glm-eot-repair-20261008-final.zip",
+      "windows_path": "\\\\myserver\\Chen\\FileTools-Deliveries\\glm-eot-m3-quality50-20261008\\filetools-glm-eot-repair-20261008-final.zip",
+      "bytes": 4144827,
+      "sha256": "77872d2cd381c3fa9ec11a953aebf2526b279a26a3e8135f7e0e7c0b33308168"
+    },
+    {
+      "server_path": "/srv/storage/users/chen/FileTools-Deliveries/glm-eot-m3-quality50-20261008/filetools-m3-quality50-20261008.zip",
+      "windows_path": "\\\\myserver\\Chen\\FileTools-Deliveries\\glm-eot-m3-quality50-20261008\\filetools-m3-quality50-20261008.zip",
+      "bytes": 203997973,
+      "sha256": "da325d55b5978be6b0e46f2091c9bae47baf6255ff9b670566e8932dd466080d"
+    }
+  ],
+  "delivery_directory_not_mounted_to_agent_or_worker": true,
+  "glm_status": "small synthetic sample aborted for visible repetition;12/23 not run;renderer confound retained",
+  "m3_calls": 50,
+  "m3_retries": 0,
+  "m3_transcriptions": 49,
+  "m3_valid_quality_json": 36,
+  "m3_quality_format_failures": 13,
+  "m3_service_failed_pages": [
+    136
+  ],
+  "actual_account_cost": "unknown",
+  "user_download_or_acceptance_verified": false
+}
