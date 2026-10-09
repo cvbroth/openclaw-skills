@@ -1,0 +1,14 @@
+{
+  "server_directory": "/srv/storage/users/chen/FileTools-Deliveries/standalone-http-20261008",
+  "server_file": "/srv/storage/users/chen/FileTools-Deliveries/standalone-http-20261008/filetools-standalone-http-20261008.zip",
+  "windows_path": "\\\\myserver\\Chen\\FileTools-Deliveries\\standalone-http-20261008\\filetools-standalone-http-20261008.zip",
+  "bytes": 10109400,
+  "sha256": "a69d761d94a44785f70db394fe4876637e4623a21be9c83b8449f2aafbfc5eee",
+  "http_url": "http://127.0.0.1:18971/",
+  "real_project_id": "802cf70a-e7da-429b-ac92-8d08204bef11",
+  "private_evidence_root": "/home/chen/dev/openclaw-filetools-dev/runtime/standalone-http-r1",
+  "not_in_incoming": true,
+  "user_download_verified": false,
+  "shared_copy_verified": true,
+  "delivered_at_date": "2026-10-09"
+}

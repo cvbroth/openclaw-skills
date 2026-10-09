@@ -85,6 +85,8 @@ class ProjectTests(unittest.TestCase):
         self.assertNotEqual(first, second)
         self.assertEqual(before, digest(self.root / "content/content.md"))
         self.assertEqual(json.loads((self.root / "review/feedback.json").read_text())["revision"], 2)
+        self.assertIn('"revision": 2', (self.root / "review/feedback.js").read_text())
+        self.assertIn("Changed comment", (self.root / "review/feedback.js").read_text())
 
     def test_invalid_receipts(self):
         for field, value in [

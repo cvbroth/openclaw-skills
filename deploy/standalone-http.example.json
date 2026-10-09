@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "service": {"upload_bytes": 104857600, "max_pages": 200, "max_pixels": 20000000, "bind": "127.0.0.1", "port": 18971},
+  "conversion": {"dpi": 220, "language": "zh", "quality": true, "max_selected_pages": 5, "generate_documents": true},
+  "template": {"id": "questions-zh-cn", "version": "1.0.0"},
+  "engines": {
+    "local": {"type": "rapidocr", "model": "rapidocr-onnxruntime-1.4.4-bundled", "endpoint": "", "credential_env": "", "timeout": 180, "concurrency": 1, "retries": 0, "cpu_threads": 2},
+    "m3": {"type": "minimax-messages", "model": "MiniMax-M3", "endpoint": "https://api.minimaxi.com/anthropic/v1/messages", "credential_env": "FILETOOLS_M3_KEY", "timeout": 180, "concurrency": 1, "retries": 0, "cpu_threads": 2},
+    "compatible": {"type": "openai-vision", "model": "configure-a-vision-model", "endpoint": "https://example.invalid/v1/chat/completions", "credential_env": "FILETOOLS_COMPAT_KEY", "timeout": 180, "concurrency": 1, "retries": 0, "cpu_threads": 2}
+  }
+}

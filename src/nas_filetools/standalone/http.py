@@ -1,0 +1,302 @@
+"""Loopback-only development HTTP/UI boundary. No OpenClaw/session dependencies."""
+
+import argparse
+import json
+import mimetypes
+import os
+from pathlib import Path
+import shutil
+import signal
+import socket
+import sys
+import tempfile
+import threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import parse_qs, unquote, urlsplit
+import uuid
+import zipfile
+
+from ..artifact_project import emit_viewer, import_feedback, relative, validate_feedback
+from .config import capabilities, load, snapshot
+from .tasks import ACTIVE, Projects, filename
+
+
+class Handler(BaseHTTPRequestHandler):
+    protocol_version = "HTTP/1.1"
+
+    def log_message(self, *args):
+        pass  # no URLs/body/credentials in access logs
+
+    @property
+    def manager(self):
+        return self.server.manager
+
+    def send_json(self, data, status=200):
+        body = json.dumps(data, ensure_ascii=False, allow_nan=False).encode()
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def guard(self):
+        allowed = {f"127.0.0.1:{self.server.server_port}", f"localhost:{self.server.server_port}"}
+        host = self.headers.get("Host", "")
+        if host not in allowed:
+            raise PermissionError("invalid host")
+        origin = self.headers.get("Origin")
+        if origin and origin not in {"http://" + h for h in allowed}:
+            raise PermissionError("cross-origin request refused")
+        if self.headers.get("Sec-Fetch-Site") == "cross-site":
+            raise PermissionError("cross-site refused")
+        self.connection.settimeout(30)
+
+    def json_body(self):
+        length = self.length(1024 * 1024)
+        data = self.rfile.read(length)
+        if len(data) != length:
+            raise ValueError("incomplete JSON")
+        return json.loads(data)
+
+    def length(self, limit):
+        if self.headers.get("Transfer-Encoding") or len(self.headers.get_all("Content-Length") or []) != 1:
+            raise ValueError("single Content-Length required")
+        n = int(self.headers["Content-Length"])
+        if not 0 < n <= limit:
+            raise ValueError("body size limit")
+        return n
+
+    def stream(self, path, download=None):
+        path = Path(path)
+        size = path.stat().st_size
+        start, end = 0, size - 1
+        status = 200
+        value = self.headers.get("Range")
+        if value:
+            import re
+
+            match = re.fullmatch(r"bytes=(\d+)-(\d*)", value)
+            if not match:
+                raise ValueError("unsupported range")
+            start = int(match[1])
+            end = min(int(match[2]) if match[2] else end, end)
+            if start > end:
+                raise ValueError("range outside file")
+            status = 206
+        self.send_response(status)
+        self.send_header("Content-Type", mimetypes.guess_type(path.name)[0] or "application/octet-stream")
+        self.send_header("Content-Length", str(end - start + 1))
+        self.send_header("Accept-Ranges", "bytes")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header(
+            "Content-Security-Policy",
+            "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'self'; base-uri 'none'; frame-ancestors 'none'",
+        )
+        if status == 206:
+            self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
+        if download:
+            from urllib.parse import quote
+
+            self.send_header("Content-Disposition", "attachment; filename*=UTF-8''" + quote(download))
+        self.end_headers()
+        with path.open("rb") as stream:
+            stream.seek(start)
+            remaining = end - start + 1
+            while remaining:
+                chunk = stream.read(min(65536, remaining))
+                if not chunk:
+                    break
+                self.wfile.write(chunk)
+                remaining -= len(chunk)
+
+    def dispatch(self, method):
+        self.guard()
+        url = urlsplit(self.path)
+        parts = [unquote(x) for x in url.path.split("/") if x]
+        m = self.manager
+        if method == "GET" and not parts:
+            return self.stream(Path(__file__).parent / "assets/index.html")
+        if method == "GET" and parts[0] == "assets" and len(parts) == 2 and parts[1] in {"app.js", "app.css"}:
+            return self.stream(Path(__file__).parent / "assets" / parts[1])
+        if method == "GET" and parts == ["api", "engines"]:
+            return self.send_json(
+                {
+                    name: {
+                        **snapshot(engine),
+                        "available": not engine["credential_env"]
+                        or bool(os.environ.get(engine["credential_env"])),
+                        "capabilities": capabilities(engine),
+                    }
+                    for name, engine in m.config["engines"].items()
+                }
+            )
+        if method == "GET" and parts == ["api", "trash"]:
+            return self.send_json(m.list(trashed=True))
+        if method == "POST" and len(parts) == 4 and parts[:2] == ["api", "trash"] and parts[3] == "restore":
+            self.json_body()
+            m.restore(parts[2])
+            return self.send_json({"status": "restored"})
+        if method == "GET" and parts == ["api", "projects"]:
+            return self.send_json(m.list())
+        if method == "POST" and parts == ["api", "uploads"]:
+            query = parse_qs(url.query)
+            name = filename(query.get("filename", [""])[0])
+            engine = query.get("engine", ["local"])[0]
+            pages = [int(x) for x in query.get("pages", ["1"])[0].split(",")]
+            if engine not in m.config["engines"]:
+                raise ValueError("unknown engine")
+            length = self.length(m.config["service"]["upload_bytes"])
+            if shutil.disk_usage(m.root).free < length + 512 * 1024 * 1024:
+                raise ValueError("insufficient disk reserve")
+            path = m.root / "uploads" / (uuid.uuid4().hex + Path(name).suffix.lower())
+            try:
+                with path.open("xb") as stream:
+                    remaining = length
+                    while remaining:
+                        block = self.rfile.read(min(65536, remaining))
+                        if not block:
+                            raise ValueError("incomplete upload")
+                        stream.write(block)
+                        remaining -= len(block)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                return self.send_json(m.upload(path, name, engine, pages), 202)
+            finally:
+                if path.exists():
+                    path.unlink()
+        if len(parts) >= 3 and parts[:2] == ["api", "projects"]:
+            pid = parts[2]
+            project = m.get(pid)
+            root = m.path(pid)
+            if len(parts) == 3:
+                if method == "GET":
+                    return self.send_json(project)
+                if method == "PATCH":
+                    m.rename(pid, self.json_body()["name"])
+                    return self.send_json(m.get(pid))
+                if method == "DELETE":
+                    m.trash(pid)
+                    return self.send_json({"status": "trashed"})
+            if len(parts) == 4 and parts[3] == "tasks" and method == "POST":
+                data = self.json_body()
+                return self.send_json(m.enqueue(pid, data["engine"], data["pages"]), 202)
+            if len(parts) == 6 and parts[3] == "tasks" and method == "POST":
+                if parts[5] == "cancel":
+                    self.json_body()
+                    m.cancel(pid, parts[4])
+                    return self.send_json({"status": "cancelling"})
+                if parts[5] == "format":
+                    self.json_body()
+                    return self.send_json(m.reformat(pid, parts[4]), 202)
+                if parts[5] == "retry":
+                    self.json_body()
+                    return self.send_json(m.retry(pid, parts[4]), 202)
+            if len(parts) == 4 and parts[3] == "feedback":
+                feedback = root / "review/feedback.json"
+                if method == "GET":
+                    return self.send_json(json.loads(feedback.read_text()))
+                if method == "POST":
+                    receipt = self.json_body()
+                    with m.lock:
+                        # Legacy validation + append-only import; comments never become content.
+                        validate_feedback(m.get(pid), receipt)
+                        import_feedback(root, receipt)
+                    return self.send_json(json.loads(feedback.read_text()))
+            if len(parts) == 5 and parts[3] == "download" and method == "GET":
+                art = next((a for a in project["artifacts"] if a["artifact_id"] == parts[4]), None)
+                if not art or not art["path"]:
+                    raise FileNotFoundError("artifact is external reference, not downloadable")
+                return self.stream(relative(root, art["path"]), Path(art["path"]).name)
+            if len(parts) == 4 and parts[3] == "export" and method == "GET":
+                if any(t["status"] in ACTIVE for t in project.get("tasks", [])):
+                    raise ValueError("export requires terminal tasks")
+                with tempfile.TemporaryDirectory(dir=m.root) as temp:
+                    package = Path(temp) / "project.zip"
+                    with m.lock:
+                        latest = m.get(pid)
+                        if any(t["status"] in ACTIVE for t in latest.get("tasks", [])):
+                            raise ValueError("export requires terminal tasks")
+                        emit_viewer(root, latest)
+                        with zipfile.ZipFile(package, "w", zipfile.ZIP_DEFLATED) as archive:
+                            for file in root.rglob("*"):
+                                if file.is_file() and not file.is_symlink() and not file.name.startswith("."):
+                                    archive.write(file, file.relative_to(root))
+                    return self.stream(package, project["project_id"] + ".zip")
+        if method == "GET" and len(parts) >= 3 and parts[0] == "p":
+            root = m.path(parts[1])
+            path = relative(root, "/".join(parts[2:]))
+            if not path.is_file():
+                raise FileNotFoundError("resource unavailable")
+            return self.stream(path)
+        raise FileNotFoundError("endpoint missing")
+
+    def handle_method(self):
+        try:
+            self.dispatch(self.command)
+        except (BrokenPipeError, ConnectionResetError, socket.timeout):
+            self.close_connection = True
+        except PermissionError:
+            self.close_connection = True
+            self.send_json({"error": "REQUEST_FORBIDDEN"}, 403)
+        except FileNotFoundError:
+            self.close_connection = True
+            self.send_json({"error": "NOT_FOUND"}, 404)
+        except (ValueError, KeyError, StopIteration, TypeError) as exc:
+            self.close_connection = True
+            self.send_json({"error": "INVALID_REQUEST", "reason": str(exc)[:160]}, 400)
+        except Exception as exc:
+            self.close_connection = True
+            self.send_json({"error": "LOCAL_SERVER_ERROR", "type": type(exc).__name__}, 500)
+
+    do_GET = do_POST = do_PATCH = do_DELETE = handle_method
+
+
+def serve(root, config, testing=False):
+    import fcntl
+
+    root = Path(root)
+    root.mkdir(parents=True, exist_ok=True)
+    # A second service cannot recover/modify the same running store.
+    with (root / ".service-lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        server = ThreadingHTTPServer((config["service"]["bind"], config["service"]["port"]), Handler)
+        manager = Projects(root, config)
+        server.daemon_threads = True
+        server.manager = manager
+
+        def stop(*_):
+            threading.Thread(target=server.shutdown, daemon=True).start()
+
+        signal.signal(signal.SIGTERM, stop)
+        signal.signal(signal.SIGINT, stop)
+        try:
+            server.serve_forever(poll_interval=0.2)
+        finally:
+            server.server_close()
+            manager.close()
+
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("--root", type=Path, required=True)
+    p.add_argument("--config", type=Path, required=True)
+    p.add_argument("--testing", action="store_true")
+    p.add_argument(
+        "--credential-stdin", help="one configured credential ENV name; value read from private pipe"
+    )
+    a = p.parse_args()
+    config = load(a.config, a.testing)
+    if a.credential_stdin:
+        if a.credential_stdin not in {e["credential_env"] for e in config["engines"].values()}:
+            raise ValueError("unknown credential reference")
+        value = sys.stdin.readline(8193).rstrip("\r\n")
+        if not value or len(value) > 8192:
+            raise ValueError("credential pipe missing/invalid")
+        os.environ[a.credential_stdin] = value
+    serve(a.root, config, a.testing)
+
+
+if __name__ == "__main__":
+    main()

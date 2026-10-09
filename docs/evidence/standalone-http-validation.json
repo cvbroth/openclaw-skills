@@ -1,0 +1,497 @@
+{
+  "scope": "independent development HTTP service; no production deployment",
+  "real_runs": [
+    {
+      "project_id": "fd80ac7e-ea82-4162-9b5d-32a4a67c535c",
+      "task_id": "763dd8a0-1ec0-4266-8863-5dd337bc9c7a",
+      "engine": "local",
+      "status": "SUCCEEDED",
+      "pages": [
+        {
+          "page": "1",
+          "status": "SUCCEEDED",
+          "wall_seconds": 1.8084088959731162,
+          "peak_rss_kib": 460508,
+          "elapsed_seconds": 1.6347403669496998,
+          "usage": null,
+          "returned_model": null,
+          "input": {
+            "width": 1200,
+            "height": 1000,
+            "mime": "image/png",
+            "bytes": 39653,
+            "sha256": "d89aa4eff24d4a4795bf8a819bb51075107a6c43fe87e76adc57aaed1b39f943"
+          },
+          "submitted_input": null,
+          "attempts": 1
+        }
+      ],
+      "generation": null,
+      "artifacts": [
+        {
+          "artifact_id": "9c496064-e10f-4b2a-ade4-636362ce1e41",
+          "format": "markdown",
+          "sha256": "9733c0aedac7f41cb7902dde77009d1a331ac4008043544ba46605a1eb562d3e",
+          "version": "1",
+          "bytes": 192
+        },
+        {
+          "artifact_id": "d16c0d9a-976c-4d3d-ba5b-1f8cfab245ec",
+          "format": "json",
+          "sha256": "eca59f631fca2891de16f141aa068312bfc780c5995e216822ee85a6b118a17a",
+          "version": "1",
+          "bytes": 4152
+        },
+        {
+          "artifact_id": "97bd138b-a079-471e-a69c-41352dc851d1",
+          "format": "json",
+          "sha256": "77d05195987b044f10cb3ce0e0261965b1f21cff6eb9ce601bdf751444d66cff",
+          "version": "1",
+          "bytes": 74
+        },
+        {
+          "artifact_id": "e0ae80a2-c58f-4666-9081-fbf84f8fc1cc",
+          "format": "docx",
+          "sha256": "f47945e1f2c613b73bb55a67028fc72603a900e661a75e1f39631674179d2a12",
+          "version": "1",
+          "bytes": 37857
+        },
+        {
+          "artifact_id": "45278541-a598-4db8-a102-b776ae6fdd04",
+          "format": "pdf",
+          "sha256": "db6198e4f52de70e129bf328d79275b0a510adbb5486a6ccbd3386dd3796b305",
+          "version": "1",
+          "bytes": 15947
+        },
+        {
+          "artifact_id": "fd3440d1-a39b-4998-aaec-27cb281811be",
+          "format": "json",
+          "sha256": "576b88f87bf509ce3ce52672097e946db5d704e036b8dd5d01e6d31ede18a225",
+          "version": "1",
+          "bytes": 460
+        }
+      ]
+    },
+    {
+      "project_id": "bda027bf-509f-4563-86c2-5f3f8f2952e0",
+      "task_id": "63f902d5-4afc-46eb-b5e6-a6d95a3fb5ac",
+      "engine": "m3",
+      "status": "SUCCEEDED",
+      "pages": [
+        {
+          "page": "1",
+          "status": "SUCCEEDED",
+          "wall_seconds": 2.5680289339507,
+          "peak_rss_kib": 30220,
+          "elapsed_seconds": 2.4357561690267175,
+          "usage": {
+            "input_tokens": 1786,
+            "output_tokens": 119,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 128,
+            "service_tier": "standard"
+          },
+          "returned_model": null,
+          "input": {
+            "width": 1200,
+            "height": 1000,
+            "mime": "image/png",
+            "bytes": 39653,
+            "sha256": "d89aa4eff24d4a4795bf8a819bb51075107a6c43fe87e76adc57aaed1b39f943"
+          },
+          "submitted_input": null,
+          "attempts": 1
+        }
+      ],
+      "generation": null,
+      "artifacts": [
+        {
+          "artifact_id": "615fc42c-74ce-4d14-b464-2579fe4cfc9d",
+          "format": "markdown",
+          "sha256": "ad7c988b94c137d48e2a48c3ce166f9327a3590f79220ec7aee32a6d0a156801",
+          "version": "1",
+          "bytes": 204
+        },
+        {
+          "artifact_id": "5d52479f-8350-414d-b94b-351136978692",
+          "format": "json",
+          "sha256": "0d3bce9ddb0878c4d7ae60dab795f7f4f836fbc9cd2002da53e4448ecb4cc4a5",
+          "version": "1",
+          "bytes": 1201
+        },
+        {
+          "artifact_id": "28a7bd3a-617a-4200-ad6a-2e96ab4b3926",
+          "format": "json",
+          "sha256": "b40f71a99cd3faefdde9743a1634083fae86ea6e742b33a6cec9a16068885f84",
+          "version": "1",
+          "bytes": 459
+        },
+        {
+          "artifact_id": "5a828420-03d3-4c8e-b680-6eba5695bd87",
+          "format": "docx",
+          "sha256": "a98af1a6d23c543035480933fb9eb98a4a0723467bb7937cd6c5a00ee8abae6e",
+          "version": "1",
+          "bytes": 37870
+        },
+        {
+          "artifact_id": "464895e9-6223-4ce1-a4dd-68fa40cab489",
+          "format": "pdf",
+          "sha256": "6c908f42c7440828bc304ca593348d61b6e8f18da8d0545316cc1751f39305df",
+          "version": "1",
+          "bytes": 16031
+        },
+        {
+          "artifact_id": "f707c6fe-139e-482a-ad15-65e3fef4ee58",
+          "format": "json",
+          "sha256": "02a29518fe028b6c12b91412bd7c1903002b998754aee09580ea70b6227d9dce",
+          "version": "1",
+          "bytes": 460
+        }
+      ],
+      "returned_model_from_raw_response": "MiniMax-M3"
+    },
+    {
+      "project_id": "802cf70a-e7da-429b-ac92-8d08204bef11",
+      "task_id": "43f3a1ef-5bba-4e17-a31b-f6fc8e5ef0b2",
+      "engine": "local",
+      "status": "SUCCEEDED",
+      "pages": [
+        {
+          "page": "1",
+          "status": "SUCCEEDED",
+          "wall_seconds": 11.18439817300532,
+          "peak_rss_kib": 768808,
+          "elapsed_seconds": 11.013222160981968,
+          "usage": null,
+          "returned_model": null,
+          "input": {
+            "width": 1819,
+            "height": 2573,
+            "mime": "image/png",
+            "bytes": 2254983,
+            "sha256": "81d706884884e0610632493c29b56250aea4fc164096c7db6b10026a8ebc034c"
+          },
+          "submitted_input": null,
+          "attempts": 1
+        }
+      ],
+      "generation": {
+        "status": "SUCCEEDED",
+        "elapsed_seconds": 0.21475546003784984,
+        "peak_rss_kib": 93080
+      },
+      "artifacts": [
+        {
+          "artifact_id": "c5a201d8-81bd-46a3-9304-641a3b9702c3",
+          "format": "markdown",
+          "sha256": "596eaf6b26b5dbff0e32a2a8839c5b2a67580673cbd64b3b40a1b28d6416fd8b",
+          "version": "2",
+          "bytes": 3786
+        },
+        {
+          "artifact_id": "6efe9806-53af-432b-95b5-9e4f2cbc3f6e",
+          "format": "json",
+          "sha256": "4bed3d19caeadab8308dd138af0a63c3d2fdc414b4a43f833a90755c69d735a5",
+          "version": "2",
+          "bytes": 37119
+        },
+        {
+          "artifact_id": "092b532d-5536-4a2c-9449-823ad9140cfe",
+          "format": "json",
+          "sha256": "77d05195987b044f10cb3ce0e0261965b1f21cff6eb9ce601bdf751444d66cff",
+          "version": "2",
+          "bytes": 74
+        },
+        {
+          "artifact_id": "844c385e-c9d7-4f1d-99fb-ef04a27d69d5",
+          "format": "docx",
+          "sha256": "23c8fb6fe6e52e990c352be22e99329c0cd3f109db91a697aea2907cfc878789",
+          "version": "2",
+          "bytes": 40084
+        },
+        {
+          "artifact_id": "3b158453-4746-4a2f-ae45-9839bb0f20ee",
+          "format": "pdf",
+          "sha256": "6a1c2d0d4847f8c82961c40e6d659ef273b5cd5230b9a848d60484abfe1f4466",
+          "version": "2",
+          "bytes": 54469
+        },
+        {
+          "artifact_id": "d5c5b4ff-04a5-4e64-82c8-a3b21271103f",
+          "format": "json",
+          "sha256": "bcb61ddaccae9e8f717c7c6d9341e0ce5b9b45c22b8a77452bd012202ba36ad7",
+          "version": "2",
+          "bytes": 1341
+        },
+        {
+          "artifact_id": "5338b4f0-37ea-4282-859b-962bd7ccd7fd",
+          "format": "json",
+          "sha256": "ddb96cf24e369bd65269679cd6b41ffe036d144ce27968739874502ac6764837",
+          "version": "2",
+          "bytes": 94
+        }
+      ]
+    },
+    {
+      "project_id": "802cf70a-e7da-429b-ac92-8d08204bef11",
+      "task_id": "90df07b4-300c-4af5-a56b-bab570574ed5",
+      "engine": "m3",
+      "status": "SUCCEEDED",
+      "pages": [
+        {
+          "page": "1",
+          "status": "SUCCEEDED",
+          "wall_seconds": 10.513363743084483,
+          "peak_rss_kib": 41336,
+          "elapsed_seconds": 10.396007413975894,
+          "usage": {
+            "input_tokens": 3910,
+            "output_tokens": 957,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 128,
+            "service_tier": "standard"
+          },
+          "returned_model": null,
+          "input": {
+            "width": 1819,
+            "height": 2573,
+            "mime": "image/png",
+            "bytes": 2254983,
+            "sha256": "81d706884884e0610632493c29b56250aea4fc164096c7db6b10026a8ebc034c"
+          },
+          "submitted_input": {
+            "width": 1819,
+            "height": 2573,
+            "mime": "image/png",
+            "bytes": 2254983,
+            "sha256": "81d706884884e0610632493c29b56250aea4fc164096c7db6b10026a8ebc034c",
+            "client_bytes_unchanged": true,
+            "provider_internal_transform": "unknown"
+          },
+          "attempts": 1
+        }
+      ],
+      "generation": {
+        "status": "SUCCEEDED",
+        "elapsed_seconds": 0.21743439394049346,
+        "peak_rss_kib": 92964
+      },
+      "artifacts": [
+        {
+          "artifact_id": "b859bf33-8a17-4126-ab0a-53003583703f",
+          "format": "markdown",
+          "sha256": "7bba279c3a857bc0e12cc49819a54d0a452fd4490827db09c6b74d0eecba3fa0",
+          "version": "2",
+          "bytes": 4159
+        },
+        {
+          "artifact_id": "3a306749-7c95-405a-8e6f-811e0058dcfa",
+          "format": "json",
+          "sha256": "0ea6252611cdf20f24df8c0e7ccd96963837aa06250cdafa15322e6c4e4c5480",
+          "version": "2",
+          "bytes": 9211
+        },
+        {
+          "artifact_id": "b69818c1-b030-4f12-9a45-295563f34dcb",
+          "format": "json",
+          "sha256": "a7f1578307f53fd04507b90aa688305f19f52575d249bd2ea67356da039e6380",
+          "version": "2",
+          "bytes": 617
+        },
+        {
+          "artifact_id": "501770cf-7253-4992-aeb2-be79245eccd3",
+          "format": "docx",
+          "sha256": "75e784042333e9fc84ad17053282cee57e42ec49e5e84bb9e28e650e611c3f29",
+          "version": "2",
+          "bytes": 40148
+        },
+        {
+          "artifact_id": "c7117181-8fca-447e-8a36-3164d99f5a7f",
+          "format": "pdf",
+          "sha256": "db85f8a3fdbd8b5730123c452590de0390cd0a50be3ac2f13d7644ba7d66d014",
+          "version": "2",
+          "bytes": 55083
+        },
+        {
+          "artifact_id": "9125e877-0fbf-4e0c-b085-f83cc839a144",
+          "format": "json",
+          "sha256": "f8e663a869a62aa94740f7f6b16545e2cf90b47436f4f1ef56ff82576d3b98d1",
+          "version": "2",
+          "bytes": 1341
+        },
+        {
+          "artifact_id": "e9d2dad9-6552-4537-b630-e543b6e1f3b2",
+          "format": "json",
+          "sha256": "e0bac420e1e47a8e02ab10c35297fb3f9a20cee2d2313ba2b4793f47c232deda",
+          "version": "2",
+          "bytes": 94
+        }
+      ],
+      "returned_model_from_raw_response": "MiniMax-M3"
+    }
+  ],
+  "browser": {
+    "browser": "140.0.7339.16",
+    "synthetic_project_id": "71c20238-7350-4c5b-899a-a3883cccd833",
+    "checks": [
+      "actual browser upload -> async local RapidOCR -> completed after tab close",
+      "rename persisted",
+      "Word/PDF HTTP download bytes match registered SHA",
+      "blank ignored, clear persisted, comment survives changing reference; JSON export",
+      "explicit import conflict resolution with backup; fresh browser loads server comment",
+      "real page independent scrolling, fixed toolbar and visible comments",
+      "legacy project: 1 actual historical remote error, 13 parse errors, 29 good self-assessments",
+      "missing credential is explicit; actual UI retry keeps previous successful task outputs",
+      "actual UI trash and restore preserve project artifacts/comments"
+    ],
+    "js_errors": [],
+    "cloud_calls_from_browser_test": 0,
+    "human_acceptance": false
+  },
+  "browser_extra": {
+    "browser": "140.0.7339.16",
+    "checks": [
+      "DOCX missing-preview message",
+      "PDF object and open/download fallback",
+      "artifact-bound comment isolation",
+      "mobile independent view switch retains draft",
+      "server stores DOCX comment against correct artifact hash"
+    ],
+    "js_errors": [],
+    "cloud_calls": 0,
+    "screenshot_context_only_local_font_and_CSP_bypass": true,
+    "functional_context_CSP_bypass": false,
+    "human_acceptance": false
+  },
+  "offline_export": {
+    "browser": "140.0.7339.16",
+    "offline_comments_match_server": true,
+    "reviewer_preserved": "developer-agent",
+    "artifact_comment_isolation": true,
+    "offline_http_requests": 0,
+    "js_errors": [],
+    "final_service_project_list": true,
+    "human_acceptance": false
+  },
+  "credential_scan": {
+    "packages": 2,
+    "files_checked": 160,
+    "credential_value_present": false,
+    "credential_source": "single authorized existing secret, held in memory only",
+    "scope": "two final exported projects; not a general secret detector"
+  },
+  "rendering": {
+    "local": {
+      "word_and_pdf": {
+        "word": {
+          "pages": 2,
+          "content_equal": true,
+          "fonts": [
+            "DroidSansFallback"
+          ],
+          "geometry_checked": true,
+          "pagination_boundaries": "checked",
+          "text_black": true,
+          "document_page_numbers": "checked",
+          "visual_review": "required",
+          "raster_engine": "Poppler pdftoppm"
+        },
+        "pdf": {
+          "pages": 2,
+          "content_equal": true,
+          "fonts": [
+            "Droid Sans Fallback Regular"
+          ],
+          "geometry_checked": true,
+          "pagination_boundaries": "checked",
+          "text_black": true,
+          "document_page_numbers": "checked",
+          "visual_review": "required",
+          "raster_engine": "Poppler pdftoppm"
+        }
+      },
+      "readers": {
+        "sha256": "6a1c2d0d4847f8c82961c40e6d659ef273b5cd5230b9a848d60484abfe1f4466",
+        "bytes": 54469,
+        "versions": {
+          "pdfium": "153.0.7999.0",
+          "pypdfium2": "5.13.0",
+          "mupdf": [
+            "1.25.5",
+            "1.25.6",
+            "20250331000001"
+          ],
+          "poppler": "pdftoppm version 22.12.0\nCopyright 2005-2022 The Poppler Developers - http://poppler.freedesktop.org\nCopyright 1996-2011, 2022 Glyph & Cog, LLC"
+        },
+        "pages": 2,
+        "scale": 1.7,
+        "automatic_ink_check_passed": true,
+        "pdfium_ordered_searchable_text_equal": true
+      },
+      "developer_visual_inspection": "all pages viewed for these two Word renders and two PDFs, plus PDFium/MuPDF; not user acceptance",
+      "supported_structure": "real image retained as verbatim unsegmented material, not accepted question layout"
+    },
+    "m3": {
+      "word_and_pdf": {
+        "word": {
+          "pages": 2,
+          "content_equal": true,
+          "fonts": [
+            "DroidSansFallback"
+          ],
+          "geometry_checked": true,
+          "pagination_boundaries": "checked",
+          "text_black": true,
+          "document_page_numbers": "checked",
+          "visual_review": "required",
+          "raster_engine": "Poppler pdftoppm"
+        },
+        "pdf": {
+          "pages": 2,
+          "content_equal": true,
+          "fonts": [
+            "Droid Sans Fallback Regular"
+          ],
+          "geometry_checked": true,
+          "pagination_boundaries": "checked",
+          "text_black": true,
+          "document_page_numbers": "checked",
+          "visual_review": "required",
+          "raster_engine": "Poppler pdftoppm"
+        }
+      },
+      "readers": {
+        "sha256": "db85f8a3fdbd8b5730123c452590de0390cd0a50be3ac2f13d7644ba7d66d014",
+        "bytes": 55083,
+        "versions": {
+          "pdfium": "153.0.7999.0",
+          "pypdfium2": "5.13.0",
+          "mupdf": [
+            "1.25.5",
+            "1.25.6",
+            "20250331000001"
+          ],
+          "poppler": "pdftoppm version 22.12.0\nCopyright 2005-2022 The Poppler Developers - http://poppler.freedesktop.org\nCopyright 1996-2011, 2022 Glyph & Cog, LLC"
+        },
+        "pages": 2,
+        "scale": 1.7,
+        "automatic_ink_check_passed": true,
+        "pdfium_ordered_searchable_text_equal": true
+      },
+      "developer_visual_inspection": "all pages viewed for these two Word renders and two PDFs, plus PDFium/MuPDF; not user acceptance",
+      "supported_structure": "real image retained as verbatim unsegmented material, not accepted question layout"
+    }
+  },
+  "automated_tests": {
+    "passed": 35,
+    "seconds": 15.29,
+    "warnings": "5 existing SWIG deprecation warnings",
+    "uses_fixtures_and_mock_providers": true,
+    "scope": "real engine runs listed separately"
+  },
+  "static_checks": {
+    "ruff": "passed",
+    "diff_check": "passed",
+    "bash_syntax": "passed"
+  }
+}

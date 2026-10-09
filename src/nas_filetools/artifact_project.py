@@ -170,15 +170,7 @@ def validate_feedback(project, receipt):
                 raise ValueError("timezone required")
         except (KeyError, TypeError, ValueError) as exc:
             raise ValueError("invalid update time") from exc
-        key = json.dumps(
-            [
-                comment["artifact_id"],
-                comment["locator"],
-                comment.get("reference_artifact_id"),
-                comment.get("reference_locator"),
-            ],
-            sort_keys=True,
-        )
+        key = json.dumps([comment["artifact_id"], comment["locator"]], sort_keys=True)
         if key in seen:
             raise ValueError("conflicting duplicate comment target")
         seen.add(key)
@@ -228,9 +220,17 @@ def import_feedback(root, receipt):
         with staging.open("x", encoding="utf-8") as stream:
             json.dump(record, stream, ensure_ascii=False, indent=2)
         os.replace(staging, current)
+        emit_feedback_script(root, record)
         return target
     finally:
         lock.unlink()
+
+
+def emit_feedback_script(root, record):
+    review = Path(root) / "review"
+    staging = review / ".feedback-script-next.js"
+    staging.write_text("window.PROJECT_FEEDBACK=" + json.dumps(record, ensure_ascii=True).replace("<", "\\u003c") + ";", encoding="utf-8")
+    os.replace(staging, review / "feedback.js")
 
 
 def emit_viewer(root, project):
@@ -240,6 +240,7 @@ def emit_viewer(root, project):
         write_json(
             root / "review" / "feedback.json", {"revision": 0, "comments": [], "status": "unconfirmed"}
         )
+    emit_feedback_script(root, json.loads((root / "review/feedback.json").read_text()))
     for artifact in project["artifacts"]:
         for page in artifact["pages"]:
             for key in ("image", "data", "pdf"):

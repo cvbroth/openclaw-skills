@@ -335,7 +335,7 @@ class StoryLayout:
         '''
 
     def story(self, items):
-        content = "".join(f'<p class="{style.lower().replace(" ", "-")}">{html.escape(text)}</p>' for style, text in items)
+        content = "".join(f'<p class="{style.lower().replace(" ", "-")}">{html.escape(text).replace(chr(10), "<br>")}</p>' for style, text in items)
         return fitz.Story("<html><body>" + content + "</body></html>", user_css=self.css,
                           archive=fitz.Archive(str(self.font_path.parent)) if self.font_path else None)
 
@@ -543,14 +543,23 @@ def write_pdf(path, items, font_path, template=None):
                 if group[0][0] in ("Title", "Subject", "Heading 1", "Heading 2", "Heading 3"):
                     for _, _, following in groups[group_index + 1:]:
                         if following[0][0] != "Question":
-                            reserve += layout.height(following)
-                            continue
+                            height = layout.height(following)
+                            if following[0][0] in ("Title", "Subject", "Heading 1", "Heading 2", "Heading 3"):
+                                reserve += height
+                                continue
+                            reserve += min(height, t["minimum_start_lines"] * layout.line + t["space_after_pt"])
+                            break
                         if layout.question_short(following):
                             reserve += layout.height(following)
                         else:
                             reserve += t["minimum_start_lines"] * layout.line + t["space_after_pt"]
                         break
-                draw_unit(group, keep=True, minimum=layout.height(group) + reserve)
+                height = layout.height(group)
+                bounded = height <= layout.short_limit
+                minimum = height + reserve if group[0][0] != "Normal" else min(
+                    height, t["minimum_start_lines"] * layout.line + t["space_after_pt"]
+                )
+                draw_unit(group, keep=bounded, minimum=minimum)
                 continue
             short = layout.question_short(group)
             decisions.append({"start_item": start, "end_item": end, "short": short, "measured_pt": layout.height(group)})

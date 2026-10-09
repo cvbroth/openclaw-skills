@@ -265,3 +265,16 @@ GLM停止后，现有M3原PNG连接以种子2026100802固定50页（含12/23/136
 基于6125db0保留GLM/M3全部真实结果，当前轮无新模型调用/OCR/文档转换，不改生产。新增标准库artifact_project、轻量静态评审和旧50页适配，两个独立项目分别展示M3历史结果与真实6–10页Word/PDF小样；不混造衍生关系。原件reference不复制，模板快照实际SHA核对，旧包不变。左右独立选择产物/位置与滚动、固定工具栏/评论区、窄屏切换、当前资源按需加载，技术信息默认折叠。Word用明确标注的历史渲染，评论文档级；输出页与原页不猜配。
 
 评论按项目/产物及参考版本哈希/定位隔离，导入校验并追加历史，初始无人工评论；不替代OCR修订账本或用户验收。43项相关合成回归、新模块最终9项、真实Chromium50页文本/懒加载/切换/目录移动等验证通过；缺预览回退为隔离模拟。完整报告docs/ARTIFACT_PROJECT_REVIEW_REPORT.md、使用docs/ARTIFACT_PROJECT_REVIEW.md、公开证据docs/evidence/artifact-project-validation.json。私有资源runtime/artifact-review-final，共享包位置/SHA见docs/evidence/artifact-project-delivery.json。Skill增量只说明开发边界，未部署；等待用户查看，不继续模型、生产或全册。
+
+
+## 独立 HTTP 上传、转换与项目评审（2026-10-08实施，10-09交付）
+
+基于f2a1ebeba3df430ce36971e23a037f4d0f7b99e1增量新增standalone包，HTTP/UI、持久化串行任务、引擎适配三层，不依赖OpenClaw会话或插件。保留外层整册未提交成果及所有历史测评。已实现流式上传、项目名称/版本/产物登记、后台逐页进度、取消/失败页重试、重启INTERRUPTED、免识别格式重生成、评论服务端保存与离线导出、回收站恢复。公共模板1.0.0未改；Word/PDF沿用成熟生成器，未知结构原文保留待核对，不猜题目归属。
+
+真实合成图与已授权物理12页PNG分别完成RapidOCR1.4.4和MiniMax-M3；仅2次新M3请求、无重试，实际费用未知；原页上传PNG字节/尺寸/SHA不变，服务内部处理未知。原响应及质量与正文分开，不含评论。原页两个任务识别各一次，首次长片段标题孤立经实际渲染发现并修复通用PDF分页，复用识别追加v2，旧版保留。真实页尚未可靠恢复为题干/选项，不能宣称正式试题排版或文字准确。通用OpenAI兼容适配器仅本地mock及缺凭据失败验证，不宣称真实供应商通过。
+
+35项相关合成测试、ruff/diff检查通过。真实Chromium检查上传关闭网页、双栏/窄屏/产物选择、评论清除/空白/冲突/持久化、下载哈希/回收站；离线解压移动后评论与developer-agent来源仍可读取、无HTTP请求。两份Word各2页经LibreOffice实际渲染；两份PDF各2页经PDFium153/Poppler22.12/MuPDF实际渲染及开发逐页查看，当前样例未见漏显/裁切，不能代表用户端Word字体替换或未来文件验收。160个导出文件未出现实际密钥值；密钥只经授权单密钥私有管道供服务环境，无配置/浏览器/日志泄漏。业务图文/响应/评论/截图全部留忽略目录。
+
+独立容器filetools-http-dev-ready，2CPU/4GiB无额外swap、只读根/UID1000、loopback18971；使用既有候选镜像ID及源码只读挂载，不修改生产Gateway/Worker/Skill/模板/额度。启动/架构/API见docs/STANDALONE_HTTP.md，实施说明与报告见STANDALONE_HTTP_IMPLEMENTATION.md及STANDALONE_HTTP_REPORT.md，脱敏实测与交付路径/SHA见docs/evidence/standalone-http-*.json。私有证据runtime/standalone-http-r1，真实项目802cf70a-e7da-429b-ac92-8d08204bef11。
+
+共享交付ZIP于10-09成功复制并校验，先前自动审批额度失败未执行，后经正常审批重试成功，没有绕过。Windows路径\\myserver\Chen\FileTools-Deliveries\standalone-http-20261008\filetools-standalone-http-20261008.zip，非Incoming。访问需ssh -N -L 18971:127.0.0.1:18971 chen@myserver，再开http://127.0.0.1:18971/。未部署生产/OpenClaw、未处理整册/永久保存/入库；等待用户查看，勿自动扩大收费调用或处理范围。

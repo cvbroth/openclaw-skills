@@ -121,3 +121,20 @@ def test_margin_removal_requires_evidence_and_keeps_original_fragment():
         structure_ocr(raw, evidence=[{**evidence, "reference": ""}])
     with pytest.raises(ValueError, match="MARGIN_SOURCE_MISMATCH"):
         structure_ocr(raw, evidence=[{**evidence, "text": "another"}])
+
+
+def test_long_verbatim_block_starts_under_headings(tmp_path):
+    from nas_filetools.document_sample import write_pdf, write_docx, validate_pair
+    from nas_filetools.document_layout_checks import check_layout
+    font = tmp_path / "font.ttf"
+    font.write_bytes(fitz.Font("cjk").buffer)
+    items = [("Title", "长文保留测试"), ("Heading 3", "待核对片段"),
+             ("Normal", "\n".join("保留无法确定结构的原始文字，不猜测题目归属。" for _ in range(90)))]
+    write_pdf(tmp_path / "out.pdf", items, font)
+    write_docx(tmp_path / "out.docx", items, font)
+    assert validate_pair(tmp_path / "out.docx", tmp_path / "out.pdf", items)["content_equal"]
+    result = check_layout(tmp_path / "out.pdf", items, font)
+    assert result["passed"], result["failures"]
+    with fitz.open(tmp_path / "out.pdf") as pdf:
+        assert len(pdf) > 1
+        assert "保留无法确定" in pdf[0].get_text()
