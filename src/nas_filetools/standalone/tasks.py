@@ -69,6 +69,19 @@ def inspect_file(path, config):
     from ..engines import probe
     from ..contracts import Limits
 
+    if Path(path).suffix.lower() == ".pdf":
+        import fitz
+        from ..contracts import Fault
+
+        with fitz.open(path) as doc:
+            if not doc.is_pdf or doc.needs_pass or len(doc) < 1:
+                raise Fault("INVALID_OR_ENCRYPTED_PDF")
+            pages = len(doc)
+            maximum = config["service"]["max_pages"]
+            if pages > maximum:
+                raise Fault("PAGE_LIMIT", f"PDF共{pages}页，最多允许{maximum}页（包含{maximum}页）")
+        # Upload validation never loads, extracts or rasterizes any PDF page.
+        return {"kind": "pdf", "units": pages, "warnings": [], "preview": [], "preview_coverage": []}
     limits = Limits(
         max_pages=config["service"]["max_pages"], max_image_pixels=config["service"]["max_pixels"]
     )
@@ -227,7 +240,12 @@ class Projects(PreviewJobs, FormatJobs):
             from ..contracts import Fault
 
             code = exc.code if isinstance(exc, Fault) else type(exc).__name__
-            raise ValueError("UPLOAD_VALIDATION: " + code) from None
+            detail = (
+                (": " + exc.message)
+                if isinstance(exc, Fault) and code == "PAGE_LIMIT" and Path(temp).suffix.lower() == ".pdf"
+                else ""
+            )
+            raise ValueError("UPLOAD_VALIDATION: " + code + detail) from None
         params = {**self.config["conversion"], **(options or {})}
         if set(params) != set(self.config["conversion"]):
             raise ValueError("conversion keys")

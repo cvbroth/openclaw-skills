@@ -1,0 +1,11 @@
+{
+  "filename": "filetools-http-pdf-1000-update-20261009.zip",
+  "bytes": 425685,
+  "sha256": "650249f834cf3c95c0fc907f103c88e527d69d478153ad44219160021b01a1a5",
+  "entries": 181,
+  "crc_check": "passed",
+  "contains": "Source/config/report/synthetic screenshot only; existing offline project packages unchanged",
+  "windows_extraction": "not verified",
+  "new_ocr_calls": 0,
+  "new_cloud_calls": 0
+}

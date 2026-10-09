@@ -1,0 +1,46 @@
+{
+  "results": [
+    {
+      "physical_pages": 1,
+      "bytes": 460,
+      "status": 202,
+      "seconds": 0.016687005991116166,
+      "registered_pages": 1
+    },
+    {
+      "physical_pages": 999,
+      "bytes": 167941,
+      "status": 202,
+      "seconds": 0.006701642996631563,
+      "registered_pages": 999
+    },
+    {
+      "physical_pages": 1000,
+      "bytes": 168112,
+      "status": 202,
+      "seconds": 0.005845529027283192,
+      "registered_pages": 1000
+    },
+    {
+      "physical_pages": 1001,
+      "bytes": 168282,
+      "status": 400,
+      "seconds": 0.002982808044180274,
+      "error": {
+        "error": "INVALID_REQUEST",
+        "reason": "UPLOAD_VALIDATION: PAGE_LIMIT: PDF共1001页，最多允许1000页（包含1000页）"
+      }
+    }
+  ],
+  "pdf_limit_inclusive": 1000,
+  "upload_bytes": 536870912,
+  "max_selected_pages": 5,
+  "upload_page_load_calls": 0,
+  "upload_text_extract_calls": 0,
+  "upload_raster_calls": 0,
+  "temporary_upload_files_remaining": 0,
+  "engine_calls": 0,
+  "conversion_verified": false,
+  "fixture": "synthetic blank-page PDFs; validation only",
+  "process_peak_rss_kib": 64836
+}

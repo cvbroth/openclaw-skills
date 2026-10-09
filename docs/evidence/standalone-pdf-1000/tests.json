@@ -1,0 +1,12 @@
+{
+  "related_tests": 29,
+  "seconds": 20.54,
+  "existing_pymupdf_deprecation_warnings": 5,
+  "selected_page_render_regression": "Only selected page 2 of a 2-page synthetic PDF produced one source preview",
+  "production_changed": false,
+  "engine_calls": 0,
+  "upload_capacity_bytes_unchanged": 536870912,
+  "pdf_total_pages_inclusive": 1000,
+  "task_pages_unchanged": 5,
+  "private_config_comparison": "Only service.max_pages changed; private backup retained"
+}

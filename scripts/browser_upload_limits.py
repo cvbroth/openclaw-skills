@@ -27,8 +27,8 @@ def run(base, output):
             time.sleep(0.05)
         limits = page.request.get(base + "/api/limits").json()
         text = page.locator("#uploadLimits").inner_text()
-        assert limits == {"upload_bytes": 536870912, "max_pdf_pages": 200, "max_selected_pages": 5}
-        assert "200 页" in text and "5 页" in text
+        assert limits == {"upload_bytes": 536870912, "max_pdf_pages": 1000, "max_selected_pages": 5}
+        assert "1000 页" in text and "5 页" in text
         page.evaluate(
             "Object.defineProperty(document.querySelector('#file'),'files',{value:[{name:'oversize.png',size:536870913}]})"
         )

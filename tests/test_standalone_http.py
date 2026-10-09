@@ -311,7 +311,7 @@ class HTTPTests(unittest.TestCase):
         import http.client
 
         limits = self.request("/api/limits")
-        self.assertEqual(limits, {"upload_bytes": 536870912, "max_pdf_pages": 200, "max_selected_pages": 5})
+        self.assertEqual(limits, {"upload_bytes": 536870912, "max_pdf_pages": 1000, "max_selected_pages": 5})
         raw = self.image.read_bytes()
         self.config["service"]["upload_bytes"] = len(raw)
         accepted = self.upload()
@@ -353,6 +353,43 @@ class HTTPTests(unittest.TestCase):
             )
         self.assertEqual(list((self.root / "data/uploads").iterdir()), [])
         doc.close()
+
+    def test_pdf_total_page_boundary_without_upload_render(self):
+        import fitz
+        from unittest.mock import patch
+
+        fixtures = {}
+        for pages in [1, 999, 1000, 1001]:
+            doc = fitz.open()
+            for _ in range(pages):
+                doc.new_page()
+            fixtures[pages] = doc.tobytes()
+            doc.close()
+        with (
+            patch.object(
+                self.m,
+                "enqueue",
+                side_effect=lambda pid, *a, **k: {"project_id": pid, "task_id": "upload-only"},
+            ),
+            patch.object(fitz.Document, "load_page", side_effect=AssertionError("upload loaded PDF page")),
+            patch.object(fitz.Page, "get_text", side_effect=AssertionError("upload extracted text")),
+            patch.object(fitz.Page, "get_pixmap", side_effect=AssertionError("upload rendered page")),
+        ):
+            for pages in [1, 999, 1000]:
+                result = self.request(
+                    "/api/uploads?filename=boundary.pdf&engine=fixture&pages=1", "POST", fixtures[pages]
+                )
+                self.assertEqual(self.m.get(result["project_id"])["source_info"]["units"], pages)
+            with self.assertRaises(urllib.error.HTTPError) as rejected:
+                self.request(
+                    "/api/uploads?filename=over-limit.pdf&engine=fixture&pages=1", "POST", fixtures[1001]
+                )
+            self.assertEqual(rejected.exception.code, 400)
+            reason = json.loads(rejected.exception.read())["reason"]
+            self.assertIn("PAGE_LIMIT", reason)
+            self.assertIn("1001", reason)
+            self.assertIn("1000", reason)
+            self.assertEqual(list((self.root / "data/uploads").iterdir()), [])
 
     def test_restore_body_consumed_on_keepalive_connection(self):
         import http.client

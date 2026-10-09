@@ -110,4 +110,6 @@ R2布局、迁移与实测：STANDALONE_REVIEW_R2_PLAN.md / STANDALONE_REVIEW_R2
 
 ## 上传容量补充
 
-示例与独立开发配置单文件512MiB（536870912字节），PDF最多200页、单任务最多5页保持不变。GET /api/limits供界面显示分离限制，超限返回413并清理失败上传。保持64KiB流式写盘。大文件上传不等于整册转换通过；实测见STANDALONE_UPLOAD_512_REPORT.md。
+示例与独立开发配置单文件512MiB（536870912字节），PDF最多1000页（包含1000页）、单任务最多5页。PDF上传只检查基本有效性/加密状态/页数，不提取或渲染正文；转换只处理选页。GET /api/limits供界面显示分离限制，超限返回413并清理失败上传。保持64KiB流式写盘。大文件上传不等于整册转换通过；实测见STANDALONE_UPLOAD_512_REPORT.md。
+
+PDF页数调整与真实1000/1001页边界验证见STANDALONE_PDF_1000_REPORT.md；此前容量报告中的200页为当时历史配置。

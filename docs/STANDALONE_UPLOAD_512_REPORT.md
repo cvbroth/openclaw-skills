@@ -1,5 +1,7 @@
 # 独立HTTP单文件上传512MiB验证报告
 
+> 后续PDF总页数已改为1000（含），见STANDALONE_PDF_1000_REPORT.md。本报告的200页记录是当时验证条件，历史证据不改写。512MiB与单任务5页保持。
+
 基于R3提交b0846c79ea350559651937f46f1b1132b66c6fb2增量修改。实施说明STANDALONE_UPLOAD_512_PLAN.md。没有新OCR或云调用，不改生产、原件、已部署Skill及模板。
 
 ## 修改
