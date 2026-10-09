@@ -17,7 +17,7 @@ import uuid
 import zipfile
 
 from ..artifact_project import emit_viewer, import_feedback, relative, validate_feedback
-from .config import capabilities, load, snapshot
+from .config import load
 from .tasks import ACTIVE, Projects, filename
 from .export_policy import exportable, windows_safe, portable_manifest
 from .naming import decorate, project_title
@@ -137,9 +137,11 @@ class Handler(BaseHTTPRequestHandler):
             method == "GET"
             and parts[0] == "assets"
             and len(parts) == 2
-            and parts[1] in {"app.js", "app.css", "templates.js"}
+            and parts[1] in {"app.js", "app.css", "templates.js", "engines.js"}
         ):
             return self.stream(Path(__file__).parent / "assets" / parts[1])
+        if method == "GET" and parts == ["engines"]:
+            return self.stream(Path(__file__).parent / "assets/engines.html")
         if method == "GET" and parts == ["templates"]:
             return self.stream(Path(__file__).parent / "assets/templates.html")
         if method == "GET" and parts == ["api", "limits"]:
@@ -178,17 +180,16 @@ class Handler(BaseHTTPRequestHandler):
                             m.library.publish(tid, version, m.get(entry["preview_project_id"]))
                         )
         if method == "GET" and parts == ["api", "engines"]:
-            return self.send_json(
-                {
-                    name: {
-                        **snapshot(engine),
-                        "available": not engine["credential_env"]
-                        or bool(os.environ.get(engine["credential_env"])),
-                        "capabilities": capabilities(engine),
-                    }
-                    for name, engine in m.config["engines"].items()
-                }
-            )
+            with m.lock:
+                return self.send_json(m.settings.public())
+        if len(parts) >= 3 and parts[:2] == ["api", "engines"]:
+            if len(parts) == 3 and method == "POST":
+                data = self.json_body()
+                with m.lock:
+                    return self.send_json(m.settings.update(parts[2], data))
+            if len(parts) == 4 and parts[3] == "test" and method == "POST":
+                self.json_body()
+                return self.send_json(m.settings.test(parts[2]))
         if method == "GET" and parts == ["api", "trash"]:
             return self.send_json(m.list(trashed=True))
         if method == "POST" and len(parts) == 4 and parts[:2] == ["api", "trash"] and parts[3] == "restore":
@@ -200,10 +201,7 @@ class Handler(BaseHTTPRequestHandler):
         if method == "POST" and parts == ["api", "uploads"]:
             query = parse_qs(url.query)
             name = filename(query.get("filename", [""])[0])
-            engine = query.get("engine", ["local"])[0]
-            pages = [int(x) for x in query.get("pages", ["1"])[0].split(",")]
-            if engine not in m.config["engines"]:
-                raise ValueError("unknown engine")
+            project_name = query.get("project_name", [None])[0] or None
             length = self.length(m.config["service"]["upload_bytes"], upload=True)
             if shutil.disk_usage(m.root).free < length + 512 * 1024 * 1024:
                 raise ValueError("insufficient disk reserve")
@@ -219,7 +217,7 @@ class Handler(BaseHTTPRequestHandler):
                         remaining -= len(block)
                     stream.flush()
                     os.fsync(stream.fileno())
-                return self.send_json(m.upload(path, name, engine, pages), 202)
+                return self.send_json(m.upload(path, name, project_name), 202)
             finally:
                 if path.exists():
                     path.unlink()
@@ -227,6 +225,9 @@ class Handler(BaseHTTPRequestHandler):
             pid = parts[2]
             project = m.get(pid)
             root = m.path(pid)
+            if len(parts) == 4 and parts[3] == "analysis" and method == "POST":
+                self.json_body()
+                return self.send_json(m.analyze(pid), 202)
             if len(parts) == 3:
                 if method == "GET":
                     return self.send_json(project)
@@ -286,16 +287,23 @@ class Handler(BaseHTTPRequestHandler):
                     decorate(project)["artifacts"][project["artifacts"].index(art)]["download_name"],
                 )
             if len(parts) == 4 and parts[3] == "export" and method == "GET":
-                if any(t["status"] in ACTIVE for t in project.get("tasks", [])) or any(
-                    a.get("preview_render", {}).get("status") in ACTIVE for a in project["artifacts"]
+                if (
+                    project.get("analysis", {}).get("status") in ACTIVE
+                    or any(t["status"] in ACTIVE for t in project.get("tasks", []))
+                    or any(a.get("preview_render", {}).get("status") in ACTIVE for a in project["artifacts"])
                 ):
                     raise ValueError("export requires terminal tasks")
                 with tempfile.TemporaryDirectory(dir=m.root) as temp:
                     package = Path(temp) / "project.zip"
                     with m.lock:
                         latest = m.get(pid)
-                        if any(t["status"] in ACTIVE for t in latest.get("tasks", [])) or any(
-                            a.get("preview_render", {}).get("status") in ACTIVE for a in latest["artifacts"]
+                        if (
+                            latest.get("analysis", {}).get("status") in ACTIVE
+                            or any(t["status"] in ACTIVE for t in latest.get("tasks", []))
+                            or any(
+                                a.get("preview_render", {}).get("status") in ACTIVE
+                                for a in latest["artifacts"]
+                            )
                         ):
                             raise ValueError("export requires terminal tasks")
                         emit_viewer(root, latest)

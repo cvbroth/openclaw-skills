@@ -1,0 +1,25 @@
+{
+  "project_id": {
+    "project_id": "0da366ea-98d9-46b3-b51a-bbd7a25af923",
+    "analysis_status": "SUCCEEDED",
+    "completed_pages": 5,
+    "analysis_registered": true,
+    "recognition_task_ids_unchanged": true
+  },
+  "local_project_id": {
+    "project_id": "202fc668-701f-4b10-a755-cda210b08481",
+    "analysis_status": "SUCCEEDED",
+    "completed_pages": 1,
+    "analysis_registered": true,
+    "recognition_task_ids_unchanged": true
+  },
+  "invalid_project_id": {
+    "project_id": "b8165850-6b69-41ee-8be4-18b7fc6dba14",
+    "analysis_status": "FAILED",
+    "completed_pages": 0,
+    "analysis_registered": true,
+    "recognition_task_ids_unchanged": true
+  },
+  "word_pdf_actual_preview": true,
+  "js_errors": []
+}

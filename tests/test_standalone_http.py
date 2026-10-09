@@ -68,7 +68,23 @@ class HTTPTests(unittest.TestCase):
         req = urllib.request.Request(self.base + path, data, headers or {}, method=method)
         with urllib.request.urlopen(req, timeout=10) as response:
             raw = response.read()
-            return json.loads(raw) if response.headers["Content-Type"].startswith("application/json") else raw
+            result = (
+                json.loads(raw) if response.headers["Content-Type"].startswith("application/json") else raw
+            )
+        # Legacy scenario helpers now explicitly start conversion after upload; HTTP never does.
+        if method == "POST" and path.startswith("/api/uploads?") and "engine=" in path:
+            from urllib.parse import parse_qs, urlsplit
+
+            query = parse_qs(urlsplit(path).query)
+            return self.request(
+                "/api/projects/" + result["project_id"] + "/tasks",
+                "POST",
+                {
+                    "engine": query["engine"][0],
+                    "pages": [int(n) for n in query.get("pages", ["1"])[0].split(",")],
+                },
+            )
+        return result
 
     def upload(self, engine="fixture"):
         return self.request(
@@ -194,6 +210,14 @@ class HTTPTests(unittest.TestCase):
             req = urllib.request.Request(
                 base + "/api/uploads?filename=crash.png&engine=delay&pages=1",
                 self.image.read_bytes(),
+                method="POST",
+            )
+            with urllib.request.urlopen(req) as r:
+                item = json.load(r)
+            req = urllib.request.Request(
+                base + "/api/projects/" + item["project_id"] + "/tasks",
+                json.dumps({"engine": "delay", "pages": [1]}).encode(),
+                {"Content-Type": "application/json"},
                 method="POST",
             )
             with urllib.request.urlopen(req) as r:
@@ -376,14 +400,10 @@ class HTTPTests(unittest.TestCase):
             patch.object(fitz.Page, "get_pixmap", side_effect=AssertionError("upload rendered page")),
         ):
             for pages in [1, 999, 1000]:
-                result = self.request(
-                    "/api/uploads?filename=boundary.pdf&engine=fixture&pages=1", "POST", fixtures[pages]
-                )
+                result = self.request("/api/uploads?filename=boundary.pdf", "POST", fixtures[pages])
                 self.assertEqual(self.m.get(result["project_id"])["source_info"]["units"], pages)
             with self.assertRaises(urllib.error.HTTPError) as rejected:
-                self.request(
-                    "/api/uploads?filename=over-limit.pdf&engine=fixture&pages=1", "POST", fixtures[1001]
-                )
+                self.request("/api/uploads?filename=over-limit.pdf", "POST", fixtures[1001])
             self.assertEqual(rejected.exception.code, 400)
             reason = json.loads(rejected.exception.read())["reason"]
             self.assertIn("PAGE_LIMIT", reason)

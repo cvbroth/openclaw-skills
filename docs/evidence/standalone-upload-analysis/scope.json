@@ -1,0 +1,13 @@
+{
+  "historical_projects_checked": 15,
+  "historical_task_records_unchanged": true,
+  "historical_file_hashes_checked": 83,
+  "historical_bytes_unchanged": true,
+  "cloud_requests_this_round": 0,
+  "real_local_ocr_pages": 1,
+  "real_direct_text_pages": [
+    1,
+    3
+  ],
+  "data": "synthetic; no business text"
+}

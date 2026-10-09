@@ -31,6 +31,8 @@ from .template_library import TemplateLibrary
 from .naming import decorate
 from .content_structure import parse_markdown, reading_html
 from .source_quality import migrate
+from .analysis_jobs import AnalysisJobs
+from .engine_settings import EngineSettings
 
 ACTIVE = {"QUEUED", "RUNNING", "CANCELLING"}
 
@@ -95,19 +97,23 @@ def inspect_file(path, config):
             im.verify()
             if im.format not in {"PNG", "JPEG", "WEBP"}:
                 raise ValueError("file signature unsupported")
+            info["actual_type"] = im.format
             suffix = Path(path).suffix.lower()
             if im.format != {".png": "PNG", ".jpg": "JPEG", ".jpeg": "JPEG", ".webp": "WEBP"}[suffix]:
                 raise ValueError("extension/signature mismatch")
     return info
 
 
-class Projects(PreviewJobs, FormatJobs):
+class Projects(PreviewJobs, FormatJobs, AnalysisJobs):
     def __init__(self, root, config, *, start_worker=True):
         self.root = Path(root).resolve()
         self.config = config
         self.lock = threading.RLock()
         for name in ["projects", "trash", "uploads"]:
             (self.root / name).mkdir(parents=True, exist_ok=True)
+        self.settings = EngineSettings(self.root, config)
+        self.runtime_engines = {}
+        self.runtime_keys = {}
         self.library = TemplateLibrary(self.root / "template-library")
         self.queue = queue.Queue()
         self.stopping = threading.Event()
@@ -131,7 +137,18 @@ class Projects(PreviewJobs, FormatJobs):
 
     def get(self, pid):
         with self.lock:
-            return json.loads((self.path(pid) / "project.json").read_text())
+            root = self.path(pid)
+            p = json.loads((root / "project.json").read_text())
+            analysis = p.get("analysis", {})
+            if analysis.get("path") and (root / analysis["path"]).is_file():
+                try:
+                    p["analysis"] = {**analysis, **json.loads((root / analysis["path"]).read_text())}
+                    p["analysis"]["status"] = analysis["status"]
+                    if analysis.get("error"):
+                        p["analysis"]["error"] = analysis["error"]
+                except (ValueError, OSError):
+                    pass
+            return p
 
     def list(self, trashed=False):
         with self.lock:
@@ -173,6 +190,11 @@ class Projects(PreviewJobs, FormatJobs):
         for file in (self.root / "projects").glob("*/project.json"):
             project = json.loads(file.read_text())
             changed = False
+            if project.get("analysis", {}).get("status") in ACTIVE:
+                project["analysis"].update(
+                    status="INTERRUPTED",
+                    error={"code": "SERVICE_RESTART", "message": "分析中断，可重试；已完成页保留。"},
+                )
             project.setdefault("project_kind", "historical-validation")
             if "source_quality_schema" not in project:
                 backup = file.parent / "diagnostics/migrations/source-quality-v1"
@@ -230,48 +252,37 @@ class Projects(PreviewJobs, FormatJobs):
             if changed:
                 self.save(file.parent, project)
 
-    def upload(self, temp, name, engine, pages, options=None):
+    def upload(self, temp, name, project_name=None):
         name = filename(name)
-        if engine not in self.config["engines"]:
-            raise ValueError("unknown engine")
+        from ..contracts import Fault
+
         try:
             info = inspect_file(temp, self.config)
+            info["validation_status"] = "SUCCEEDED"
+            info["actual_type"] = "PDF" if info["kind"] == "pdf" else info["actual_type"]
         except Exception as exc:
-            from ..contracts import Fault
-
-            code = exc.code if isinstance(exc, Fault) else type(exc).__name__
-            detail = (
-                (": " + exc.message)
-                if isinstance(exc, Fault) and code == "PAGE_LIMIT" and Path(temp).suffix.lower() == ".pdf"
-                else ""
-            )
-            raise ValueError("UPLOAD_VALIDATION: " + code + detail) from None
-        params = {**self.config["conversion"], **(options or {})}
-        if set(params) != set(self.config["conversion"]):
-            raise ValueError("conversion keys")
-        from .config import integer
-
-        integer(params["dpi"], 100, 300)
-        if params["language"] not in {"zh", "en"} or any(
-            type(params[k]) is not bool for k in ["quality", "generate_documents"]
+            if isinstance(exc, Fault) and exc.code == "PAGE_LIMIT":
+                raise ValueError("UPLOAD_VALIDATION: PAGE_LIMIT: " + exc.message) from None
+            info = {
+                "kind": "pdf" if Path(name).suffix.lower() == ".pdf" else "image",
+                "units": None,
+                "actual_type": None,
+                "validation_status": "FAILED",
+                "error": {
+                    "code": exc.code if isinstance(exc, Fault) else type(exc).__name__,
+                    "message": "基本文件检查失败，原件保留，可重试分析。",
+                },
+            }
+        if project_name is not None and (
+            not isinstance(project_name, str)
+            or not 1 <= len(project_name.strip()) <= 120
+            or any(ord(c) < 32 for c in project_name)
         ):
-            raise ValueError("invalid conversion parameters")
-        params["max_selected_pages"] = self.config["conversion"]["max_selected_pages"]
-        if (
-            not isinstance(pages, list)
-            or not pages
-            or len(pages) > params["max_selected_pages"]
-            or pages != sorted(set(pages))
-            or any(type(n) is not int or not 1 <= n <= info["units"] for n in pages)
-        ):
-            raise ValueError("explicit sorted unique page selection required")
+            raise ValueError("invalid project name")
         pid = str(uuid.uuid4())
         root = self.root / "projects" / pid
-        project = create_project(root, name, "upload-" + pid)
-        # Adopt chosen ID, independent of content SHA. Upload never reads all bytes into RAM.
-        project["project_id"] = pid
-        project["tasks"] = []
-        project["project_kind"] = "user"
+        project = create_project(root, project_name.strip() if project_name else name, "upload-" + pid)
+        project.update(project_id=pid, tasks=[], project_kind="user", upload_state="SAVED")
         source = root / "sources" / name
         shutil.move(temp, source)
         artifact = register_artifact(
@@ -282,22 +293,43 @@ class Projects(PreviewJobs, FormatJobs):
             path="sources/" + name,
         )
         project["source_artifact_id"] = artifact["artifact_id"]
-        project["source_info"] = {k: info[k] for k in ["kind", "units"]}
+        project["source_info"] = {
+            k: info.get(k) for k in ["kind", "units", "actual_type", "validation_status", "error"]
+        }
+        project["source_info"].update(original_filename=name, bytes=source.stat().st_size)
+        if "width" in info:
+            project["source_info"]["dimensions"] = [info["width"], info["height"]]
         emit_viewer(root, project)
         with self.lock:
             self.save(root, project)
-            return self.enqueue(pid, engine, pages, params)
+            analysis = self.analyze(pid)
+            return {
+                "project_id": pid,
+                "upload_status": "SAVED",
+                "file_check_status": info["validation_status"],
+                "analysis_id": analysis["analysis_id"],
+                "recognition_tasks": 0,
+            }
 
     def enqueue(self, pid, engine, pages, parameters=None):
         with self.lock:
             project = self.get(pid)
             root = self.path(pid)
-            if engine not in self.config["engines"]:
+            if engine not in self.settings.public():
                 raise ValueError("unknown engine")
+            if not self.settings.public()[engine]["available"]:
+                raise ValueError("引擎待配置或已停用，请先打开识别引擎设置。")
             if "source_info" not in project:
                 raise ValueError(
                     "legacy reference project: review/download supported; upload accessible original for a new conversion"
                 )
+            if (
+                project.get("source_info", {}).get("units") is None
+                or project.get("source_info", {}).get("validation_status") == "FAILED"
+            ):
+                raise ValueError("原件检测未完成或失败，请先重试分析。")
+            if engine == "pdf-text" and project["source_info"]["kind"] != "pdf":
+                raise ValueError("直接文字提取仅适用于PDF。")
             if any(t["status"] in ACTIVE for t in project.get("tasks", [])):
                 raise ValueError("project has active task")
             if (
@@ -312,7 +344,8 @@ class Projects(PreviewJobs, FormatJobs):
             task = {
                 "task_id": tid,
                 "engine_id": engine,
-                "engine": snapshot(self.config["engines"][engine]),
+                "engine": snapshot(self.settings.engine(engine)),
+                "engine_name": self.settings.public()[engine]["name"],
                 "parameters": parameters or copy.deepcopy(self.config["conversion"]),
                 "template": self.config["template"],
                 "status": "QUEUED",
@@ -322,6 +355,8 @@ class Projects(PreviewJobs, FormatJobs):
             }
             project.setdefault("tasks", []).append(task)
             self.save(root, project)
+            self.runtime_engines[tid] = self.settings.engine(engine)
+            self.runtime_keys[tid] = self.settings.credential(engine)
             self.cancels[tid] = threading.Event()
             self.queue.put((pid, tid))
             return {"project_id": pid, "task_id": tid}
@@ -351,8 +386,12 @@ class Projects(PreviewJobs, FormatJobs):
             pending = [n for n, row in t["pages"].items() if row["status"] != "SUCCEEDED"]
             if not pending:
                 raise ValueError("no failed/interrupted pages")
+            if not self.settings.public()[t["engine_id"]]["available"]:
+                raise ValueError("引擎待配置或已停用。")
+            self.runtime_engines.setdefault(tid, self.settings.engine(t["engine_id"]))
+            self.runtime_keys.setdefault(tid, self.settings.credential(t["engine_id"]))
             # Never silently switch changed server engine config for an existing task.
-            if t["engine"] != snapshot(self.config["engines"][t["engine_id"]]):
+            if t["engine"] != snapshot(self.settings.engine(t["engine_id"])):
                 raise ValueError("engine config changed; create new task")
             for n in pending:
                 t["pages"][n]["status"] = "QUEUED"
@@ -392,6 +431,8 @@ class Projects(PreviewJobs, FormatJobs):
     def trash(self, pid):
         with self.lock:
             p = self.get(pid)
+            if p.get("analysis", {}).get("status") in ACTIVE:
+                raise ValueError("wait for active source analysis before trash")
             if any(t["status"] in ACTIVE for t in p.get("tasks", [])) or any(
                 a.get("preview_render", {}).get("status") in ACTIVE for a in p["artifacts"]
             ):
@@ -414,13 +455,24 @@ class Projects(PreviewJobs, FormatJobs):
             except queue.Empty:
                 continue
             try:
-                if tid.startswith("preview:"):
+                if tid.startswith("analysis:"):
+                    self.execute_analysis(pid, tid.split(":", 1)[1])
+                elif tid.startswith("preview:"):
                     self.execute_preview(pid, tid.split(":", 1)[1])
                 elif self.task(self.get(pid), tid).get("operation") == "format-artifact":
                     self.execute_format(pid, tid)
                 else:
                     self.execute(pid, tid)
             except Exception as exc:
+                if tid.startswith("analysis:"):
+                    with self.lock:
+                        p = self.get(pid)
+                        p["analysis"].update(
+                            status="FAILED",
+                            error={"code": type(exc).__name__, "message": "分析执行失败，原件保留，可重试。"},
+                        )
+                        self.save(self.path(pid), p)
+                    continue
                 if tid.startswith("preview:"):
                     with self.lock:
                         p = self.get(pid)
@@ -451,6 +503,8 @@ class Projects(PreviewJobs, FormatJobs):
                             page["status"] = "INTERRUPTED"
                     self.save(self.path(pid), p)
             finally:
+                self.runtime_keys.pop(tid, None)
+                self.runtime_engines.pop(tid, None)
                 self.queue.task_done()
 
     def update(self, pid, tid, callback):
@@ -460,7 +514,9 @@ class Projects(PreviewJobs, FormatJobs):
             callback(p, t)
             self.save(self.path(pid), p)
 
-    def run_child(self, request, result, timeout, cancel, module="nas_filetools.standalone.engine_worker"):
+    def run_child(
+        self, request, result, timeout, cancel, module="nas_filetools.standalone.engine_worker", secret=None
+    ):
         engine = request["engine"]
         req = result.with_name("request.json")
         atomic(req, request)
@@ -472,7 +528,9 @@ class Projects(PreviewJobs, FormatJobs):
             "OPENBLAS_NUM_THREADS": str(engine["cpu_threads"]),
         }
         key = engine.get("credential_env")
-        if key and key in os.environ:
+        if key and secret is not None:
+            env[key] = secret
+        elif key and key in os.environ:
             env[key] = os.environ[key]
         started = time.monotonic()
         with (
@@ -596,16 +654,32 @@ class Projects(PreviewJobs, FormatJobs):
 
             self.update(pid, tid, started)
             try:
-                image = self.render(root, p, tid, n, t["parameters"])
+                runtime_engine = self.runtime_engines.get(tid) or {
+                    **t["engine"],
+                    "credential_env": self.settings.engine(t["engine_id"])["credential_env"],
+                }
+                source = next(a for a in p["artifacts"] if a["artifact_id"] == p["source_artifact_id"])
+                if digest(relative(root, source["path"])) != source["sha256"]:
+                    from ..contracts import Fault
+
+                    raise Fault("SOURCE_HASH_CHANGED", "原件哈希变化，停止处理；未修改原件。")
+                image = (
+                    None
+                    if runtime_engine["type"] == "pdf-text"
+                    else self.render(root, p, tid, n, t["parameters"])
+                )
                 result = self.run_child(
                     {
-                        "image": str(image),
-                        "engine": self.config["engines"][t["engine_id"]],
+                        "image": str(image) if image else None,
+                        "source": str(root / source["path"]),
+                        "physical_page": n,
+                        "engine": runtime_engine,
                         "parameters": t["parameters"],
                     },
                     directory / "result.json",
                     t["engine"]["timeout"],
                     cancel,
+                    secret=self.runtime_keys.get(tid),
                 )
             except Exception as exc:
                 result = {
@@ -616,8 +690,10 @@ class Projects(PreviewJobs, FormatJobs):
                     "error": {
                         "category": "local",
                         "stage": "render",
-                        "code": type(exc).__name__,
-                        "message": "Input rendering or request preparation failed.",
+                        "code": getattr(exc, "code", type(exc).__name__),
+                        "message": "原件哈希变化，停止处理。"
+                        if getattr(exc, "code", None) == "SOURCE_HASH_CHANGED"
+                        else "Input rendering or request preparation failed.",
                     },
                 }
                 image = None

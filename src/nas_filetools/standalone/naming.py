@@ -15,7 +15,11 @@ def decorate(project):
     tasks = {t["task_id"]: t for t in project.get("tasks", [])}
     for a in project["artifacts"]:
         source = a["artifact_id"] == project.get("source_artifact_id")
-        engine = a.get("recognition_engine") or tasks.get(a.get("task_id"), {}).get("engine_id", "历史结果")
+        engine = (
+            tasks.get(a.get("task_id"), {}).get("engine_name")
+            or a.get("recognition_engine")
+            or tasks.get(a.get("task_id"), {}).get("engine_id", "历史结果")
+        )
         engine = {"m3": "MiniMax M3", "local": "本地OCR", "format": "复用已有文字"}.get(engine, engine)
         if source:
             purpose = "原图" if a["format"] == "image" else "原件"

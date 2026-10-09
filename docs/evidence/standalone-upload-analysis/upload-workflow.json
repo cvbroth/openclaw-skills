@@ -1,0 +1,18 @@
+{
+  "upload_created_without_recognition": true,
+  "upload_states": [
+    "上传进度：0%",
+    "上传进度：100%",
+    "正在检查文件（尚未启动转换）",
+    "上传进度：0%",
+    "上传进度：100%",
+    "正在检查文件（尚未启动转换）",
+    "上传进度：0%",
+    "上传进度：100%",
+    "正在检查文件（尚未启动转换）"
+  ],
+  "settings_write_clear_no_key_readback": true,
+  "remote_connection_test": "no request; unverified",
+  "browser": "140.0.7339.16",
+  "js_errors": []
+}

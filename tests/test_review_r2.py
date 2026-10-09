@@ -120,7 +120,8 @@ class PreviewTests(unittest.TestCase):
             try:
                 image = Path(folder) / "source.png"
                 Image.new("RGB", (200, 300), "white").save(image)
-                item = manager.upload(image, "source.png", "fixture", [1])
+                created = manager.upload(image, "source.png")
+                item = manager.enqueue(created["project_id"], "fixture", [1])
                 pid = item["project_id"]
                 deadline = time.monotonic() + 10
                 while (

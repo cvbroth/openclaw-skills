@@ -1,0 +1,12 @@
+{
+  "passed": 68,
+  "failed": 0,
+  "seconds": 34.07,
+  "warnings": 5,
+  "network": "none",
+  "cpus": 2,
+  "memory_gib": 4,
+  "additional_swap": false,
+  "ruff": "passed",
+  "diff_check": "passed"
+}

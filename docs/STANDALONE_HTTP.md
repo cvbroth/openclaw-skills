@@ -6,7 +6,7 @@
 
 依赖复用项目固定版本：Python 3.11/3.12、PyMuPDF 1.25.5、python-docx 1.1.2、Pillow 11.1.0；本地 OCR 另需 `rapidocr-onnxruntime==1.4.4`、`onnxruntime==1.20.1`、`numpy==1.26.4`。字体使用既有固定 Droid Sans Fallback。没有新增 Web 框架或浏览器运行依赖。R2 的实际 Word 逐页预览新增 LibreOffice Writer 运行依赖（已实测7.4.7.2及既有中文字体）；PDF预览复用PyMuPDF。pytest/Chromium/Poppler/PDFium仅用于开发验证。详见 STANDALONE_REVIEW_R2_REPORT.md。
 
-复制 `deploy/standalone-http.example.json` 到私有目录，修改受信任的服务端配置。凭据从环境变量读取，不写入 JSON。可直接在独立虚拟环境启动；现有服务器推荐复用已固定候选镜像作为**新的开发容器**：
+复制 `deploy/standalone-http.example.json` 到私有目录，修改受信任的服务端配置。凭据可沿用环境变量；新增写入式私有设置及迁移见 STANDALONE_UPLOAD_ANALYSIS.md。密钥不进入项目或公开配置。可直接在独立虚拟环境启动；现有服务器推荐复用已固定候选镜像作为**新的开发容器**：
 
 ```bash
 scripts/launch_standalone_http.sh "$PRIVATE_STORE" "$PRIVATE_CONFIG" \
@@ -14,7 +14,7 @@ scripts/launch_standalone_http.sh "$PRIVATE_STORE" "$PRIVATE_CONFIG" \
   filetools-http-dev-example
 ```
 
-可选第五参数是凭据环境变量名，启动器从标准输入接收一个密钥，经私有 FIFO 交给服务。不要把密钥放在命令参数、shell 历史或日志中；应用自身不调用 OpenClaw 获取认证。当前测试实例由独立的、已授权的单密钥引导过程提供 M3 凭据。停止/重启只针对自建 `filetools-http-dev-*` 容器，先检查所有任务终态。保留 store 即保留任务、产物与评论；每个 store 仅允许一个服务进程。
+可选第五参数是凭据环境变量名，启动器从标准输入接收一个密钥，经私有 FIFO 交给服务。不要把密钥放在命令参数、shell 历史或日志中；应用自身不调用 OpenClaw 获取认证。历史测试实例曾通过单密钥引导；本轮开发实例未配置远端密钥，远端显示待配置。停止/重启只针对自建 `filetools-http-dev-*` 容器，先检查所有任务终态。保留 store 即保留任务、产物与评论；每个 store 仅允许一个服务进程。
 
 当前监听 `127.0.0.1:18971`。Windows 终端建立转发后，浏览器打开本机地址：
 
@@ -26,7 +26,7 @@ ssh -N -L 18971:127.0.0.1:18971 chen@myserver
 
 ## 使用
 
-1. 选择 PDF/PNG/JPEG/WebP、引擎及明确的物理页码列表，点击上传。默认仅首张，示例最多5张；上传64KiB分块落盘，成功返回202及项目/任务ID，识别在后台运行。关闭网页不取消任务。
+1. 首页只选择 PDF/PNG/JPEG/WebP 及可选项目名，上传创建项目；不自动识别或排版。后台原件分析单独显示状态。进入详情后明确选择方法和物理页，最多5页/转换任务。上传与分析契约、限制及设置见 [上传与分析说明](STANDALONE_UPLOAD_ANALYSIS.md)。
 2. 项目默认以文件名命名。可改名、查看逐页进度、取消、只重试未成功页。切换引擎明确新建任务，保留原任务与全部产物。服务不会自动重试付费请求。取消只停止本地等待/子进程，不能保证远端未计费。
 3. “复用识别重新生成文档”不请求任何识别引擎，追加结果版本；适用于格式修复或改名后的重新排版。成功页不重跑。不会修改公共模板。
 4. 列表点击进入独立 `/projects/<id>` 详情，评审左右独立选择、翻页、缩放和滚动。PDF使用后台逐页图片；Word使用LibreOffice对实际DOCX渲染的图片，不借用独立PDF。预览失败显示真实错误并可重试，不能当作成功；导出包含已生成预览。无分页映射时不推断对应关系。
@@ -81,7 +81,7 @@ uploads/                # 暂存流式上传
 | HTTP接口 | 行为 |
 |---|---|
 | GET /api/engines | 脱敏清单、能力及凭据是否可用 |
-| POST /api/uploads?filename=...&engine=...&pages=1,2 | 原始文件body、单一Content-Length；202返回project_id/task_id |
+| POST /api/uploads?filename=...&project_name=... | 原始文件body、单一Content-Length；202返回project_id/analysis_id，无转换task_id |
 | GET /；GET /projects/:pid | 列表/独立详情HTML，可刷新、直接访问 |
 | GET /api/projects；GET /api/projects/:pid | 列表/详情、任务逐页状态 |
 | POST /api/projects/:pid/previews/:artifact_id | `{ "retry":true }`，仅DOCX/PDF产物后台预览；不隐式处理整份原件 |

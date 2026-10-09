@@ -1,0 +1,267 @@
+[
+  {
+    "project_id": "0da366ea-98d9-46b3-b51a-bbd7a25af923",
+    "source_info": {
+      "kind": "pdf",
+      "units": 5,
+      "actual_type": "PDF",
+      "validation_status": "SUCCEEDED",
+      "original_filename": "source-types.pdf",
+      "bytes": 1442606
+    },
+    "analysis_status": "SUCCEEDED",
+    "completed_pages": 5,
+    "categories": [
+      "text",
+      "scan",
+      "mixed",
+      "text",
+      "blank_or_undetermined"
+    ],
+    "tasks": [
+      {
+        "task_id": "1d28e640-21f6-47a5-98ed-3746246eccf5",
+        "status": "SUCCEEDED",
+        "engine": {
+          "type": "pdf-text",
+          "model": "PyMuPDF text extraction",
+          "endpoint": "",
+          "timeout": 60,
+          "cpu_threads": 2,
+          "concurrency": 1,
+          "retries": 0
+        },
+        "page_metrics": [
+          {
+            "physical_page": 1,
+            "wall_seconds": 0.20866610505618155,
+            "peak_rss_kib": 65936,
+            "status": "SUCCEEDED"
+          },
+          {
+            "physical_page": 3,
+            "wall_seconds": 0.20717295305803418,
+            "peak_rss_kib": 65936,
+            "status": "SUCCEEDED"
+          }
+        ]
+      }
+    ],
+    "artifacts": [
+      {
+        "artifact_id": "87fe47f7-57cc-4c30-9c4c-6dc662faaa2e",
+        "format": "pdf",
+        "sha256": "90a4920916280ba87805de87a6deefaa291819c58ca8927348a8f6f8ba2d6f90",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "b9a8c3ea-42e9-4d6a-9ad6-3adc3f4fec31",
+        "format": "markdown",
+        "sha256": "d63849f565264f42aef6902d2e374e089748beacfc8a5292a97e8bbac4b8c2ce",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "b37149b7-6470-41f2-bfb6-9f6dfc8533ca",
+        "format": "json",
+        "sha256": "0fc0c0f9c7d245047dcca5a4c11ad842b1bab92bf521a707ba6ddc9bbfaeeae1",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "373f56c3-485b-4d02-84c5-dbd5f1a742f9",
+        "format": "json",
+        "sha256": "88ea76ae5edb858c8f6a6b02596aaa46de4ef2905d2936b62320578fbacc534a",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "57b847e9-caf0-4484-a580-4338826781df",
+        "format": "docx",
+        "sha256": "12a36a0efde5dbf97e00c244cd84346109beffeae728629323dc6e0b6154f7f0",
+        "preview_status": "SUCCEEDED"
+      },
+      {
+        "artifact_id": "fe50af27-1416-4c65-95ad-8fdaf3e1e75f",
+        "format": "pdf",
+        "sha256": "a475a28727433a7ed0ae5aaa9a7532b3de9e0fba986c9805bb9a8aad48375def",
+        "preview_status": "SUCCEEDED"
+      },
+      {
+        "artifact_id": "54d0d045-5afe-499d-8fd8-05c7116c0efc",
+        "format": "json",
+        "sha256": "32cee3ca9d03314e42f84610c09756b020aeb93f7eea4fcad6524cfb4252f10f",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "04fc7e42-6f74-4582-96a1-04f28436215a",
+        "format": "json",
+        "sha256": "5bb7a61219548ab350d3503bfcece8cd602b977f404414e58f5d741fe971ccd8",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "c68641b0-3cce-446e-948a-1c20133cfb94",
+        "format": "json",
+        "sha256": "15e776add78cc51285c53b2b46b50b343f1c84e219236771c38e10624e53c6d9",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "585b47d3-06e3-42be-b286-f02a14b01941",
+        "format": "json",
+        "sha256": "c771a7584b8daa3854581a72b91c2bf10295d9037c61a03793503851524b24c0",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "54727980-6dbc-4032-a37e-085e454a876d",
+        "format": "json",
+        "sha256": "50d34822f2a8846b7a61918142d03888d22d6aad9be2162915693d0596e40ac4",
+        "preview_status": null
+      }
+    ]
+  },
+  {
+    "project_id": "202fc668-701f-4b10-a755-cda210b08481",
+    "source_info": {
+      "kind": "image",
+      "units": 1,
+      "actual_type": "PNG",
+      "validation_status": "SUCCEEDED",
+      "original_filename": "local-ocr.png",
+      "bytes": 7377,
+      "dimensions": [
+        650,
+        180
+      ]
+    },
+    "analysis_status": "SUCCEEDED",
+    "completed_pages": 1,
+    "categories": [],
+    "tasks": [
+      {
+        "task_id": "152a654e-e1e6-4df8-a4f0-44f208231349",
+        "status": "SUCCEEDED",
+        "engine": {
+          "type": "rapidocr",
+          "model": "rapidocr-onnxruntime-1.4.4-bundled",
+          "endpoint": "",
+          "timeout": 180,
+          "concurrency": 1,
+          "retries": 0,
+          "cpu_threads": 2
+        },
+        "page_metrics": [
+          {
+            "physical_page": 1,
+            "wall_seconds": 1.9203525909688324,
+            "peak_rss_kib": 659292,
+            "status": "SUCCEEDED"
+          }
+        ]
+      }
+    ],
+    "artifacts": [
+      {
+        "artifact_id": "97ddc36a-958d-4fdc-8e3c-c96560a5f921",
+        "format": "image",
+        "sha256": "ad5e4cbf4e56408fbec68307ee570dd57e89667faab14a795b48d11d66596c59",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "6347e6be-7c38-4ccf-83dd-e2248604d77f",
+        "format": "markdown",
+        "sha256": "e583dc16eb4717d8af8e6207fef4e14c2e3f8f548bc7faf58eb45eb1cf1d4880",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "cb8606be-b2aa-4b57-bc77-ba5c52f1c570",
+        "format": "json",
+        "sha256": "e94222771ac4a83e1f2621b8739623e777184ad734716780b9de446c742d4293",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "7c6475a0-d1eb-443d-96d0-08cc65920afa",
+        "format": "json",
+        "sha256": "77d05195987b044f10cb3ce0e0261965b1f21cff6eb9ce601bdf751444d66cff",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "0b9f6461-5f44-4dc0-9a69-b6e91e03fbcf",
+        "format": "docx",
+        "sha256": "a9c51565a8573e7ebae0b63653744b99aed6c078df1cdea830eb8b7e7eb0f72b",
+        "preview_status": "SUCCEEDED"
+      },
+      {
+        "artifact_id": "a2be8365-2808-423d-a691-63f5ae32efb6",
+        "format": "pdf",
+        "sha256": "f9b1a698ca6f9a5a7a8eb5d85c13ef7554eab5918c847a96d87abd4a135cb787",
+        "preview_status": "SUCCEEDED"
+      },
+      {
+        "artifact_id": "6f274722-fa62-4a49-9df7-86daaa7086b1",
+        "format": "json",
+        "sha256": "6755e14a33723d5d76b530c81789c9af28b18dffcb576500f3cd4dc8b12f23dc",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "a6235bdc-938d-41f6-bbf0-917c1e21fb91",
+        "format": "json",
+        "sha256": "bd2cbc430dabab90ec1f687591de73fa874eb162596aa76593dcc62beee5263e",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "485bf39b-7bbc-49e2-a190-b50e90fe5a0f",
+        "format": "json",
+        "sha256": "854e349d62d41044055cff6c966d1b65329bbbed7966d2fab548ee040d6d8be2",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "a6888f77-97d1-4a53-a94a-6a28af90269f",
+        "format": "json",
+        "sha256": "cf9e9b8170261955371a1d4446565ffa6546eb68ff519af0c31fd8d3451cd14c",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "c119036d-ec0e-47d2-a880-c003e7c8290d",
+        "format": "json",
+        "sha256": "1c8594b5d25c9640af6dfffcba0cf27219215c180c8eed75912a29b091d74bb4",
+        "preview_status": null
+      }
+    ]
+  },
+  {
+    "project_id": "b8165850-6b69-41ee-8be4-18b7fc6dba14",
+    "source_info": {
+      "kind": "pdf",
+      "units": null,
+      "actual_type": null,
+      "validation_status": "FAILED",
+      "error": {
+        "code": "FileDataError",
+        "message": "基本文件检查失败，原件保留，可重试分析。"
+      },
+      "original_filename": "invalid.pdf",
+      "bytes": 40
+    },
+    "analysis_status": "FAILED",
+    "completed_pages": 0,
+    "categories": [],
+    "tasks": [],
+    "artifacts": [
+      {
+        "artifact_id": "b021d492-2267-4b06-ac23-ff7045fa7fc1",
+        "format": "pdf",
+        "sha256": "db991061042bd14610c0cde4544ca9d1230cd3bf906b1964c195a496da3d6ef4",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "6255fd3b-2e31-42f4-8fe7-518b2a5395ec",
+        "format": "json",
+        "sha256": "19511bb315d6afe5e8a93e0d7e8355c3a596b3cb929343edec7020da662f4fcb",
+        "preview_status": null
+      },
+      {
+        "artifact_id": "157697a2-5115-41de-bcac-cacff825827d",
+        "format": "json",
+        "sha256": "90e1a531665324c180db5cb7e60431fb1c9111309fa5fcd5aa77db3e92bf2a40",
+        "preview_status": null
+      }
+    ]
+  }
+]
