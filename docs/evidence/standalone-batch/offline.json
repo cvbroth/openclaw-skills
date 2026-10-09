@@ -1,0 +1,12 @@
+{
+  "relocated_file_protocol": true,
+  "exact_word_pdf_link": true,
+  "actual_word_pdf_images": true,
+  "comment_preserved": true,
+  "refresh_exact_artifact": true,
+  "large_project_image_requests": 1,
+  "large_project_single_image_element": true,
+  "isolated_copy_recycled_selector": true,
+  "javascript_errors": [],
+  "windows_real_unzip": "not-tested"
+}

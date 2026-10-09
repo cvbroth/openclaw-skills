@@ -147,7 +147,7 @@ def recognize(image, engine, params):
             "cpu_threads": engine["cpu_threads"],
         }
     else:
-        secret = os.environ.get(engine["credential_env"])
+        secret = os.environ.get("FILETOOLS_ENGINE_CREDENTIAL", os.environ.get(engine["credential_env"]))
         if not secret:
             return {
                 **result,

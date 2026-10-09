@@ -315,3 +315,7 @@ GLM停止后，现有M3原PNG连接以种子2026100802固定50页（含12/23/136
 ## 独立 HTTP 上传分析增量（2026-10-09）
 
 基于19ab5f44b856b204fdb0a9a19643a1126547a143，上传仅创建项目、原件逐页后台分析、直接PDF文字提取、私有引擎设置及启动时配置快照已接入独立开发服务。生产未修改，远端没有真实调用。详见 docs/STANDALONE_UPLOAD_ANALYSIS.md、docs/STANDALONE_UPLOAD_ANALYSIS_REPORT.md。旧上传 API 不再自动创建转换任务，客户端须显式 POST tasks；512MiB/1000总页/5选页限制不变。历史OCR、模板和评审成果保留。最终提交号以 Git 为准。
+
+## 独立 HTTP 批量与管理增量（2026-10-09）
+
+基于7611f3eb15a9c52645fa6a53c8f208585ccf1550增量。实施说明docs/STANDALONE_BATCH_PLAN.md，接口/迁移docs/STANDALONE_BATCH.md，真实/模拟边界docs/STANDALONE_BATCH_REPORT.md。示例与独立开发单任务选页现为1000，上传512MiB/PDF总1000及既有生产资源不变。严格范围解析、串行逐页、任务历史分页/阶段、产物短名称和可恢复管理、稳定ID评审深链已接入；旧5页描述按历史时点解释。仅合成千页调度，未实测云端千页或整册文档。本轮无真实OCR/云调用，真实两页直接提取；原件/公共模板/生产OpenClaw不变。私有交付位置另行回执，最终提交以Git为准。

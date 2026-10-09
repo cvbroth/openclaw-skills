@@ -21,7 +21,7 @@ class PreviewJobs:
         with self.lock:
             project = self.get(pid)
             artifact = next((a for a in project["artifacts"] if a["artifact_id"] == aid), None)
-            if not artifact or artifact["format"] not in {"pdf", "docx"} or not artifact["path"]:
+            if not artifact or artifact.get("recycled") or artifact["format"] not in {"pdf", "docx"} or not artifact["path"]:
                 raise ValueError("preview requires registered local DOCX/PDF")
             if aid == project.get("source_artifact_id"):
                 raise ValueError("原件仅预览显式处理的物理页；不触发整份原件渲染")

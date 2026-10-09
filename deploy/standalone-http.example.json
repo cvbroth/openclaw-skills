@@ -1,7 +1,7 @@
 {
   "version": 1,
   "service": {"upload_bytes": 536870912, "max_pages": 1000, "max_pixels": 20000000, "bind": "127.0.0.1", "port": 18971},
-  "conversion": {"dpi": 220, "language": "zh", "quality": true, "max_selected_pages": 5, "generate_documents": true},
+  "conversion": {"dpi": 220, "language": "zh", "quality": true, "max_selected_pages": 1000, "generate_documents": true},
   "template": {"id": "questions-zh-cn", "version": "1.0.0"},
   "engines": {
     "local": {"type": "rapidocr", "model": "rapidocr-onnxruntime-1.4.4-bundled", "endpoint": "", "credential_env": "", "timeout": 180, "concurrency": 1, "retries": 0, "cpu_threads": 2},

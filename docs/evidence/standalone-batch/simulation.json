@@ -1,0 +1,16 @@
+{
+  "scope": "simulation-only; deterministic child/render replacements",
+  "project_id": "2b34777c-ce39-4c78-9a8e-7cf0c22790fd",
+  "task_id": "e6d7f9aa-27f1-4861-b8cb-5c2e627b0bcc",
+  "selected_pages": 1000,
+  "completed_pages": 1000,
+  "cancelled_after_successful_pages": 100,
+  "simulated_restart": "INTERRUPTED",
+  "explicit_resume_pages": 900,
+  "successful_pages_not_rerun": true,
+  "sequential_calls_exact_order": true,
+  "model_requests": 0,
+  "scheduler_wall_seconds": 176.51888707000762,
+  "process_peak_rss_kib": 108816,
+  "document_generation": "not performed; fake content only"
+}

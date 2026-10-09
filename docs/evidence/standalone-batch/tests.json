@@ -1,0 +1,17 @@
+{
+  "passed": 90,
+  "failed": 0,
+  "seconds": 39.79,
+  "warnings": 5,
+  "cpus": 2,
+  "memory_gib": 4,
+  "network": "none",
+  "additional_swap": false,
+  "real_cloud_requests": 0,
+  "real_ocr_requests": 0,
+  "fake_provider_requests": 2,
+  "real_direct_extraction_pages": [
+    1,
+    3
+  ]
+}

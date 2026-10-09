@@ -112,7 +112,7 @@ def test_naming_changes_only_presentation():
     for a, b in zip(old["artifacts"], p["artifacts"]):
         assert all(a[k] == b[k] for k in ["artifact_id", "path", "version", "sha256"])
         assert b["download_name"].startswith("新名称_")
-    assert "未核对" in p["artifacts"][1]["display_name"]
+    assert "未核对" in p["artifacts"][1]["structure_notice"]
 
 
 def test_actual_markdown_docx_pdf_and_page_number_switch(tmp_path):

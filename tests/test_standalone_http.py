@@ -335,7 +335,7 @@ class HTTPTests(unittest.TestCase):
         import http.client
 
         limits = self.request("/api/limits")
-        self.assertEqual(limits, {"upload_bytes": 536870912, "max_pdf_pages": 1000, "max_selected_pages": 5})
+        self.assertEqual(limits, {"upload_bytes": 536870912, "max_pdf_pages": 1000, "max_selected_pages": 1000})
         raw = self.image.read_bytes()
         self.config["service"]["upload_bytes"] = len(raw)
         accepted = self.upload()
@@ -362,6 +362,7 @@ class HTTPTests(unittest.TestCase):
 
         self.config["service"]["upload_bytes"] = 536870912
         doc = fitz.open()
+        self.config["conversion"]["max_selected_pages"] = 5
         for _ in range(6):
             doc.new_page()
         with self.assertRaises(urllib.error.HTTPError):

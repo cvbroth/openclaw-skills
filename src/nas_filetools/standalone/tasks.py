@@ -33,6 +33,7 @@ from .content_structure import parse_markdown, reading_html
 from .source_quality import migrate
 from .analysis_jobs import AnalysisJobs
 from .engine_settings import EngineSettings
+from .artifact_management import ArtifactManagement
 
 ACTIVE = {"QUEUED", "RUNNING", "CANCELLING"}
 
@@ -104,7 +105,7 @@ def inspect_file(path, config):
     return info
 
 
-class Projects(PreviewJobs, FormatJobs, AnalysisJobs):
+class Projects(PreviewJobs, FormatJobs, AnalysisJobs, ArtifactManagement):
     def __init__(self, root, config, *, start_worker=True):
         self.root = Path(root).resolve()
         self.config = config
@@ -148,6 +149,15 @@ class Projects(PreviewJobs, FormatJobs, AnalysisJobs):
                         p["analysis"]["error"] = analysis["error"]
                 except (ValueError, OSError):
                     pass
+            source = next(
+                (a for a in p["artifacts"] if a["artifact_id"] == p.get("source_artifact_id")), None
+            )
+            if source and source.get("path"):
+                file = relative(root, source["path"])
+                if file.is_file():
+                    p.setdefault("source_info", {}).setdefault("bytes", file.stat().st_size)
+                    if p["source_info"].get("bytes") is None:
+                        p["source_info"]["bytes"] = file.stat().st_size
             return p
 
     def list(self, trashed=False):
@@ -332,14 +342,11 @@ class Projects(PreviewJobs, FormatJobs, AnalysisJobs):
                 raise ValueError("直接文字提取仅适用于PDF。")
             if any(t["status"] in ACTIVE for t in project.get("tasks", [])):
                 raise ValueError("project has active task")
-            if (
-                not isinstance(pages, list)
-                or not pages
-                or len(pages) > self.config["conversion"]["max_selected_pages"]
-                or pages != sorted(set(pages))
-                or any(type(n) is not int or not 1 <= n <= project["source_info"]["units"] for n in pages)
-            ):
-                raise ValueError("invalid pages")
+            from .page_ranges import parse_pages
+
+            pages = parse_pages(
+                pages, project["source_info"]["units"], self.config["conversion"]["max_selected_pages"]
+            )
             tid = str(uuid.uuid4())
             task = {
                 "task_id": tid,
@@ -527,6 +534,8 @@ class Projects(PreviewJobs, FormatJobs, AnalysisJobs):
             "OMP_NUM_THREADS": str(engine["cpu_threads"]),
             "OPENBLAS_NUM_THREADS": str(engine["cpu_threads"]),
         }
+        if secret is not None:
+            env["FILETOOLS_ENGINE_CREDENTIAL"] = secret
         key = engine.get("credential_env")
         if key and secret is not None:
             env[key] = secret
@@ -621,7 +630,7 @@ class Projects(PreviewJobs, FormatJobs, AnalysisJobs):
         t = self.task(p, tid)
         root = self.path(pid)
         cancel = self.cancels[tid]
-        self.update(pid, tid, lambda p, t: t.update(status="RUNNING", started_at=now()))
+        self.update(pid, tid, lambda p, t: t.update(status="RUNNING", phase="recognition", started_at=now()))
         for key, old in t["pages"].items():
             if t.get("format_only"):
                 break
@@ -752,6 +761,7 @@ class Projects(PreviewJobs, FormatJobs, AnalysisJobs):
                         page["status"] = "CANCELLED"
 
             self.update(pid, tid, mark_cancelled)
+        self.update(pid, tid, lambda p, t: t.update(phase="generation"))
         self.publish_results(pid, tid)
 
         def final(project, task):
@@ -768,6 +778,7 @@ class Projects(PreviewJobs, FormatJobs, AnalysisJobs):
             for page in task["pages"].values():
                 if page["status"] in ACTIVE:
                     page["status"] = "CANCELLED"
+            task["phase"] = "finished"
             task["finished_at"] = now()
             task.pop("format_only", None)
 

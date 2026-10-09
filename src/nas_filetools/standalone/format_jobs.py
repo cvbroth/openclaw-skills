@@ -53,7 +53,7 @@ class FormatJobs:
             if any(t["status"] in ACTIVE for t in project.get("tasks", [])):
                 raise ValueError("project has active task")
             artifact = next(a for a in project["artifacts"] if a["artifact_id"] == aid)
-            if artifact["format"] != "markdown" or not artifact["path"]:
+            if artifact.get("recycled") or artifact["format"] != "markdown" or not artifact["path"]:
                 raise ValueError("source_artifact_id: registered Markdown required")
             template = self.library.load(choice["id"], choice["version"], allow_draft)
             tid = str(uuid.uuid4())
@@ -70,6 +70,7 @@ class FormatJobs:
                 "template_sha256": template["record"]["sha256"],
                 "template_data": template,
                 "status": "QUEUED",
+                "phase": "generation",
                 "created_at": now(),
             }
             if not allow_draft:

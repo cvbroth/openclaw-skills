@@ -137,7 +137,7 @@ class Handler(BaseHTTPRequestHandler):
             method == "GET"
             and parts[0] == "assets"
             and len(parts) == 2
-            and parts[1] in {"app.js", "app.css", "templates.js", "engines.js"}
+            and parts[1] in {"app.js", "management.js", "app.css", "templates.js", "engines.js"}
         ):
             return self.stream(Path(__file__).parent / "assets" / parts[1])
         if method == "GET" and parts == ["engines"]:
@@ -250,10 +250,14 @@ class Handler(BaseHTTPRequestHandler):
                     latest["selected_template"] = {"id": data["id"], "version": data["version"]}
                     m.save(root, latest)
                 return self.send_json(m.get(pid))
+            if len(parts) == 5 and parts[3] == "artifacts" and method == "PATCH":
+                return self.send_json(m.edit_artifact(pid, parts[4], self.json_body()))
             if len(parts) == 4 and parts[3] == "tasks" and method == "POST":
                 data = self.json_body()
                 return self.send_json(m.enqueue(pid, data["engine"], data["pages"]), 202)
             if len(parts) == 6 and parts[3] == "tasks" and method == "POST":
+                if parts[5] == "archive":
+                    return self.send_json(m.archive_task(pid, parts[4], self.json_body().get("archived")))
                 if parts[5] == "cancel":
                     self.json_body()
                     m.cancel(pid, parts[4])

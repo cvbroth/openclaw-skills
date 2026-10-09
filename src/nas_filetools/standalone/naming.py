@@ -21,38 +21,42 @@ def decorate(project):
             or tasks.get(a.get("task_id"), {}).get("engine_id", "历史结果")
         )
         engine = {"m3": "MiniMax M3", "local": "本地OCR", "format": "复用已有文字"}.get(engine, engine)
-        if source:
-            purpose = "原图" if a["format"] == "image" else "原件"
-        elif a["format"] == "markdown":
-            purpose = "文字提取稿"
-        elif a["format"] in {"docx", "pdf"}:
-            purpose = (
-                "试题排版稿"
+        purpose = (
+            "原件"
+            if source
+            else {"markdown": "提取文字", "docx": "Word排版稿", "pdf": "PDF排版稿"}.get(
+                a["format"],
+                "原图评价"
+                if a.get("role") == "quality"
+                else "技术诊断"
+                if a.get("role") == "diagnostic"
+                else "来源结构",
+            )
+        )
+        a["display_name"] = a.get("display_name_override") or purpose
+        task = tasks.get(a.get("task_id"), {})
+        physical_pages = sorted(
+            {v["source_page"] for v in a.get("pages", []) if type(v.get("source_page")) is int}
+        )
+        if not physical_pages:
+            physical_pages = sorted(int(n) for n in task.get("pages", {}))
+        a["display_metadata"] = {
+            "method": "复用已有文字排版" if task.get("operation") == "format-artifact" else engine,
+            "version": str(a.get("version", "1")),
+            "template": a.get("template_label"),
+            "created_at": a.get("created_at") or task.get("created_at"),
+            "source_pages": physical_pages,
+        }
+        a["structure_notice"] = (
+            (
+                "已按支持的试题结构排版，仍须核对原文"
                 if a.get("content_nature") == "exam-structured"
-                else (
-                    "Markdown排版稿（题目结构未核对）"
-                    if a.get("content_nature") == "markdown-basic"
-                    else "保真片段排版稿（未确认题目结构）"
-                )
+                else "基础Markdown排版；题目结构未核对"
+                if a.get("content_nature") == "markdown-basic"
+                else "保真片段；未确认题目结构"
             )
-        elif a.get("role") == "quality":
-            purpose = "原图评价记录"
-        elif a.get("role") == "diagnostic":
-            purpose = "技术诊断"
-        else:
-            purpose = "来源结构记录"
-        a["display_name"] = a.get("display_name_override") or (
-            " · ".join(
-                [purpose, project["name"]]
-                if source
-                else [
-                    purpose,
-                    engine,
-                    *([a["format"].upper()] if a["format"] in {"docx", "pdf"} else []),
-                    "第" + str(a["version"]) + "版",
-                    *([a["template_label"]] if a.get("template_label") else []),
-                ]
-            )
+            if a["format"] in {"docx", "pdf"}
+            else ""
         )
         title = project_title(project["name"])
         suffix = Path(a.get("path") or "").suffix or {
@@ -63,10 +67,10 @@ def decorate(project):
             "docx": ".docx",
             "pdf": ".pdf",
         }.get(a["format"], "")
-        parts = [title, purpose, engine]
+        parts = [title, a["display_name"]]
         parts = [
             re.sub(r'[<>:"/\\|?*\x00-\x1f]', "_", x).encode()[:limit].decode("utf-8", errors="ignore")
-            for x, limit in zip(parts, [96, 90, 32])
+            for x, limit in zip(parts, [96, 90])
         ]
         a["download_name"] = "_".join(parts) + f"_v{a['version']}{suffix}"
     return project

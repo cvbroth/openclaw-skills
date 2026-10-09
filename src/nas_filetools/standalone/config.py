@@ -30,7 +30,7 @@ def validate(data, *, testing=False):
     if set(conversion) != {"dpi", "language", "quality", "max_selected_pages", "generate_documents"}:
         raise ValueError("conversion keys")
     integer(conversion["dpi"], 100, 300)
-    integer(conversion["max_selected_pages"], 1, 20)
+    integer(conversion["max_selected_pages"], 1, 1000)
     if conversion["language"] not in {"zh", "en"} or any(
         type(conversion[k]) is not bool for k in ["quality", "generate_documents"]
     ):

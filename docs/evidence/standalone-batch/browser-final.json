@@ -1,0 +1,16 @@
+{
+  "poll_input_node_preserved": true,
+  "scroll_before_after": [
+    487,
+    487
+  ],
+  "browser_parser_boundaries": true,
+  "remote_1000_confirmation_cancel_no_task": true,
+  "actual_source_and_word_preview": true,
+  "left_locator": {
+    "kind": "physical_page",
+    "page": 1
+  },
+  "invalid_link_remains_explicit_after_refresh": true,
+  "js_errors": []
+}

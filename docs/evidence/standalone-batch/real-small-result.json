@@ -1,0 +1,78 @@
+{
+  "project_id": "0da366ea-98d9-46b3-b51a-bbd7a25af923",
+  "task_id": "23742fd8-9d50-4b46-bfcd-084504350bcd",
+  "status": "SUCCEEDED",
+  "phase": "finished",
+  "pages": [
+    {
+      "physical_page": 1,
+      "status": "SUCCEEDED",
+      "wall_seconds": 0.2186860830988735,
+      "peak_rss_kib": 77928
+    },
+    {
+      "physical_page": 3,
+      "status": "SUCCEEDED",
+      "wall_seconds": 0.21562938706483692,
+      "peak_rss_kib": 77928
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "045ae230-a1a3-401b-b56c-9c5718a4bb9b",
+      "format": "markdown",
+      "sha256": "ac12fab836157211d431788a9e45ddd0524f51bcd3e44a89f8c4a7cc19a77c2c",
+      "preview_status": null,
+      "version": "1"
+    },
+    {
+      "artifact_id": "ef47f480-207f-4dea-9623-a29e0b1dcd99",
+      "format": "json",
+      "sha256": "c3d01454079a945a902d49b39a31d80687762118dfa53546f97a0a1c3d09c6df",
+      "preview_status": null,
+      "version": "1"
+    },
+    {
+      "artifact_id": "272efe8a-0133-4b31-a879-534f57f15ff1",
+      "format": "json",
+      "sha256": "88ea76ae5edb858c8f6a6b02596aaa46de4ef2905d2936b62320578fbacc534a",
+      "preview_status": null,
+      "version": "1"
+    },
+    {
+      "artifact_id": "74184fbb-5e12-4d9c-9931-5fde4449ba68",
+      "format": "docx",
+      "sha256": "c41ead83ccef643aa38269296f684e3cb75e7361a79e65f9e112b7cec5ffd559",
+      "preview_status": "SUCCEEDED",
+      "version": "1"
+    },
+    {
+      "artifact_id": "93b20ccb-637f-42b4-b900-d0a12256fb50",
+      "format": "pdf",
+      "sha256": "4859a143016b25369f6e6ad8abb541901f7326d9cec6d9d55703742241597556",
+      "preview_status": "SUCCEEDED",
+      "version": "1"
+    },
+    {
+      "artifact_id": "294a5567-84b9-4d88-b1d2-21824a00c92b",
+      "format": "json",
+      "sha256": "32cee3ca9d03314e42f84610c09756b020aeb93f7eea4fcad6524cfb4252f10f",
+      "preview_status": null,
+      "version": "1"
+    },
+    {
+      "artifact_id": "a6886dd8-ca5e-417a-b84f-4dd99d938ec1",
+      "format": "json",
+      "sha256": "5bb7a61219548ab350d3503bfcece8cd602b977f404414e58f5d741fe971ccd8",
+      "preview_status": null,
+      "version": "1"
+    },
+    {
+      "artifact_id": "70217eb9-3de1-4311-bef2-cfb85b943fa9",
+      "format": "json",
+      "sha256": "1d8a50eaae9159e8265daba3b076563c1e0a7015bc2d67ddd162248dce738579",
+      "preview_status": null,
+      "version": "1"
+    }
+  ]
+}
