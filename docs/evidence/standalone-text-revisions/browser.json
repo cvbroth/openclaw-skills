@@ -1,0 +1,16 @@
+{
+  "dirty_cancel_and_left_independence": true,
+  "save_reload_mapping_and_diff": true,
+  "two_tab_conflict": true,
+  "restore_creates_new_version": true,
+  "browser": "140.0.7339.16",
+  "real_word_pdf_previews": true,
+  "page_errors": [],
+  "recognition_requests": 0,
+  "post_endpoint_counts": {
+    "source-preview": 3,
+    "text-revisions": 4,
+    "format": 1,
+    "tasks": 0
+  }
+}

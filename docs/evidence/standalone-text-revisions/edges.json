@@ -1,0 +1,10 @@
+{
+  "dirty_discard": true,
+  "dirty_save_before_page_change": true,
+  "leave_cancel": true,
+  "native_reload_guard": true,
+  "format_completion_preserves_new_unsaved_draft": true,
+  "saved_revision_survives_simulated_format_failure": true,
+  "source_comment_reload": true,
+  "ocr_calls": 0
+}

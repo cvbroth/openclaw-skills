@@ -18,6 +18,7 @@ import zipfile
 
 from ..artifact_project import emit_viewer, import_feedback, relative, validate_feedback
 from .config import load
+from .text_revisions import RevisionConflict
 from .tasks import ACTIVE, Projects, filename
 from .export_policy import exportable, windows_safe, portable_manifest
 from .naming import decorate, project_title
@@ -240,6 +241,19 @@ class Handler(BaseHTTPRequestHandler):
                 if method == "DELETE":
                     m.trash(pid)
                     return self.send_json({"status": "trashed"})
+            if len(parts) == 5 and parts[3] == "text" and method == "GET":
+                data = m.text_artifact(pid, parts[4])
+                query = parse_qs(url.query)
+                if "locator" in query:
+                    locator = json.loads(query["locator"][0])
+                    data["pages"] = [page for page in data["pages"] if page["locator"] == locator]
+                    if not data["pages"]:
+                        raise ValueError("未知稳定位置")
+                return self.send_json(data)
+            if len(parts) == 4 and parts[3] == "text-revisions" and method == "POST":
+                return self.send_json(m.save_text_revision(pid, self.json_body()))
+            if len(parts) == 5 and parts[3] == "text-diff" and method == "GET":
+                return self.send_json(m.text_diff(pid, parts[4], parse_qs(url.query)["against"][0]))
             if len(parts) == 4 and parts[3] == "format" and method == "POST":
                 data = self.json_body()
                 return self.send_json(
@@ -351,7 +365,7 @@ class Handler(BaseHTTPRequestHandler):
             if (
                 len(parts) == 4
                 and parts[2] == "review"
-                and parts[3] in {"index.html", "viewer.js", "viewer.css"}
+                and parts[3] in {"index.html", "viewer.js", "viewer.css", "editor.js"}
             ):
                 path = Path(__file__).parent.parent / "project_assets" / parts[3]
             if not path.is_file():
@@ -370,6 +384,9 @@ class Handler(BaseHTTPRequestHandler):
         except BodyTooLarge as exc:
             self.close_connection = True
             self.send_json({"error": "UPLOAD_TOO_LARGE", "reason": str(exc), "limit_bytes": exc.limit}, 413)
+        except RevisionConflict as exc:
+            self.close_connection = True
+            self.send_json({"error": "REVISION_CONFLICT", "reason": str(exc)}, 409)
         except PermissionError:
             self.close_connection = True
             self.send_json({"error": "REQUEST_FORBIDDEN"}, 403)

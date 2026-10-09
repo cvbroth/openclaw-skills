@@ -27,6 +27,7 @@ from ..publication import publish
 from .config import snapshot
 from .previews import PreviewJobs, signature
 from .format_jobs import FormatJobs
+from .text_revisions import TextRevisions
 from .template_library import TemplateLibrary
 from .naming import decorate
 from .content_structure import parse_markdown, reading_html
@@ -106,7 +107,7 @@ def inspect_file(path, config):
     return info
 
 
-class Projects(SourcePreviewJobs, PreviewJobs, FormatJobs, AnalysisJobs, ArtifactManagement):
+class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, AnalysisJobs, ArtifactManagement):
     def __init__(self, root, config, *, start_worker=True):
         self.root = Path(root).resolve()
         self.config = config

@@ -323,3 +323,9 @@ GLM停止后，现有M3原PNG连接以种子2026100802固定50页（含12/23/136
 ## 独立HTTP R6：完整原件分页与工作台
 
 基于R5 9ad211c4d0c40e64316db85b1eda339001665cd9增量，原件完整物理索引与图片缓存分离、独立单页预览通道、全宽任务/产物布局及紧凑评审。实施/使用/真实边界见docs/STANDALONE_SOURCE_PREVIEW_PLAN.md、STANDALONE_SOURCE_PREVIEW.md、STANDALONE_SOURCE_PREVIEW_REPORT.md。仅合成169页验证，无OCR/云调用，生产/OpenClaw/模板不变。在线全部页可选、离线仅已缓存页可看；未缓存页评论仍可定位。211旧文件与20旧任务记录保持。保留私有开发备份与旧包，最终SHA以Git为准。
+
+## 2026-10-09 R7 人工文字修补
+
+基于R6增量；见 docs/STANDALONE_TEXT_REVISIONS_PLAN.md、STANDALONE_TEXT_REVISIONS.md、STANDALONE_TEXT_REVISIONS_REPORT.md。独立HTTP新增TextRevisions模块、注册Markdown逐位置编辑、不可变完整修订、同步结构/阅读视图、幂等与链头冲突、历史差异/恢复、保存后复用format_artifact。原稿/质量/评论不覆盖，旧坐标不冒充修订字坐标。
+
+右栏编辑只加载当前映射位置；左栏独立。未保存切换有保存/放弃/取消，浏览器关闭/刷新原生保护；离线只读。缺映射拒绝，不猜页。真实合成23页编辑后生成Word/PDF并实际预览，零识别/云请求；旧216登记文件和21项目任务记录不变。相关124项回归及最终32项专项通过。私有证据runtime/standalone-r7，公开合成证据docs/evidence/standalone-text-revisions。只更新独立开发服务；生产、OpenClaw、模板均未改。

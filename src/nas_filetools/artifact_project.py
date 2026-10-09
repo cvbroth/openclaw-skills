@@ -282,7 +282,7 @@ def emit_viewer(root, project):
         encoding="utf-8",
     )
     assets = Path(__file__).parent / "project_assets"
-    for name in ("index.html", "viewer.js", "viewer.css"):
+    for name in ("index.html", "viewer.js", "viewer.css", "editor.js"):
         shutil.copyfile(assets / name, root / "review" / name)
     (root / "review" / "project.js").write_text(
         "window.PROJECT=" + json.dumps(project, ensure_ascii=True).replace("<", "\\u003c") + ";",

@@ -1,0 +1,10 @@
+{
+  "zip_bytes": 311305,
+  "zip_sha256": "1e7c7987c8453d1f082964e50a24d3afbfa109cc5eafa8f2a51d16e0c26e5220",
+  "portable_paths_crc": true,
+  "relocated_file_protocol_reading": true,
+  "offline_edit_disabled": true,
+  "actual_word_pdf_images_decode": true,
+  "page_errors": [],
+  "windows_actual_unzip": "not available; portable path and CRC checks only"
+}

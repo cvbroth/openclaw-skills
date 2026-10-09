@@ -78,3 +78,11 @@ python3 filetools/bin/pdf_split.py split 大.pdf --every 50  # 拆分/取页/合
 
 1. 把 `filetools` 文件夹拷到 OpenClaw 的 skills 目录
 2. 按 `filetools/references/setup.md` 装依赖（一次就行）
+
+## 独立 HTTP R7 人工文字修补（开发服务）
+
+有明确映射的文字稿支持逐页编辑、不可变修订、版本差异与恢复，保存后复用既有模板生成Word/PDF；不重新OCR。原件、质量评价、评论和历史稿保持独立。仅独立开发服务，未接入生产OpenClaw。
+
+- [使用、接口与数据迁移](docs/STANDALONE_TEXT_REVISIONS.md)
+- [计划及数据约定](docs/STANDALONE_TEXT_REVISIONS_PLAN.md)
+- [真实浏览器、合成故障与未验证边界](docs/STANDALONE_TEXT_REVISIONS_REPORT.md)

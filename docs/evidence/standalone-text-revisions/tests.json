@@ -1,0 +1,17 @@
+{
+  "regression": {
+    "passed": 124,
+    "seconds": 88.74
+  },
+  "final_api": {
+    "passed": 32,
+    "seconds": 41.78
+  },
+  "warnings": "5 existing PyMuPDF/SWIG deprecations; no thread failure in final runs",
+  "scope": "isolated synthetic and inherited HTTP regressions; not real cloud or production",
+  "final_bad_hash_locator_assertions": {
+    "passed": 4,
+    "deselected": 28,
+    "seconds": 3.76
+  }
+}

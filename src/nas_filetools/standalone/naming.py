@@ -33,7 +33,9 @@ def decorate(project):
                 else "来源结构",
             )
         )
-        a["display_name"] = a.get("display_name_override") or purpose
+        a["display_name"] = a.get("display_name_override") or (
+            "修订文字" if a.get("text_revision") else purpose
+        )
         task = tasks.get(a.get("task_id"), {})
         physical_pages = sorted(
             {v["source_page"] for v in a.get("pages", []) if type(v.get("source_page")) is int}
@@ -45,6 +47,8 @@ def decorate(project):
             if source
             else "复用已有文字排版"
             if task.get("operation") == "format-artifact"
+            else "人工文字修订"
+            if a.get("text_revision")
             else engine,
             "version": str(a.get("version", "1")),
             "template": (
