@@ -1,0 +1,12 @@
+{
+  "browser": "140.0.7339.16",
+  "checks": [
+    "two source assessments coexist and can be selected",
+    "invalid PDF actual FileDataError shown, retry fails visibly, no success image",
+    "real synthetic DOCX/PDF side-by-side",
+    "narrow switch retains draft",
+    "wrong project receipt refused without overwriting draft"
+  ],
+  "errors": [],
+  "new_ocr_or_cloud_calls": 0
+}

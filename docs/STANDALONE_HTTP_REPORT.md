@@ -1,5 +1,7 @@
 # 独立 HTTP 闭环验证报告（2026-10-08）
 
+> R2纠正：R1下载、object与离线开发渲染不构成产品内Word/PDF对照预览通过；现已增量实现实际逐页预览与独立原图评价，当前验收见 [R2报告](STANDALONE_REVIEW_R2_REPORT.md)。以下保留R1历史事实，不代表当前产品预览边界。
+
 在myserver当前测评分支上，从f2a1ebeba3df430ce36971e23a037f4d0f7b99e1增量实现；外层整册未提交工作保留。先写实施说明，再实现服务/任务/引擎三层，未重设计现有模板或项目格式。访问、配置、接口及启动步骤见[使用说明](STANDALONE_HTTP.md)，脱敏实测元数据见[evidence](evidence/standalone-http-validation.json)。
 
 ## 已实现

@@ -17,7 +17,7 @@ import uuid
 SCHEMA = "filetools-project-v1"
 FEEDBACK_SCHEMA = "filetools-artifact-feedback-v1"
 FORMATS = {"image", "pdf", "docx", "markdown", "json", "reference", "xlsx"}
-LOCATORS = {"document", "physical_page", "source_page", "block", "paragraph", "sheet_range"}
+LOCATORS = {"document", "physical_page", "source_page", "block", "paragraph", "sheet_range", "output_page"}
 
 
 def digest(path):
@@ -118,6 +118,7 @@ def locator_valid(locator, artifact):
         return
     allowed = {
         "physical_page": "page",
+        "output_page": "page",
         "source_page": "page",
         "block": "id",
         "paragraph": "id",
@@ -126,13 +127,17 @@ def locator_valid(locator, artifact):
     key = allowed[kind]
     if key not in locator:
         raise ValueError("locator target missing")
-    if kind in {"physical_page", "source_page"}:
+    if kind in {"physical_page", "source_page", "output_page"}:
         if type(locator[key]) is not int or locator[key] < 1:
             raise ValueError("invalid page")
-        if locator not in [p["locator"] for p in artifact.get("pages", [])]:
+        if locator not in [
+            p["locator"] for p in artifact.get("pages", []) + artifact.get("legacy_pages", [])
+        ]:
             raise ValueError("page not registered")
     elif kind in {"block", "paragraph"}:
-        if locator not in [p["locator"] for p in artifact.get("pages", [])]:
+        if locator not in [
+            p["locator"] for p in artifact.get("pages", []) + artifact.get("legacy_pages", [])
+        ]:
             raise ValueError("block not registered")
     elif artifact["format"] != "xlsx" or not locator.get("range"):
         raise ValueError("sheet range unavailable")
@@ -156,6 +161,14 @@ def validate_feedback(project, receipt):
         target = artifacts.get(comment.get("artifact_id"))
         if not target or comment.get("artifact_sha256") != target["sha256"]:
             raise ValueError("unknown artifact or stale hash")
+        object_type = comment.get("object_type", "artifact")
+        if object_type not in {"artifact", "source_page"}:
+            raise ValueError("unknown comment object")
+        if object_type == "source_page" and (
+            target["artifact_id"] != project.get("source_artifact_id")
+            or comment.get("locator", {}).get("kind") not in {"physical_page", "source_page"}
+        ):
+            raise ValueError("source comment must target registered original page")
         locator_valid(comment.get("locator"), target)
         reference = artifacts.get(comment.get("reference_artifact_id"))
         if comment.get("reference_artifact_id"):
@@ -170,7 +183,10 @@ def validate_feedback(project, receipt):
                 raise ValueError("timezone required")
         except (KeyError, TypeError, ValueError) as exc:
             raise ValueError("invalid update time") from exc
-        key = json.dumps([comment["artifact_id"], comment["locator"]], sort_keys=True)
+        key = json.dumps(
+            [comment.get("object_type", "artifact"), comment["artifact_id"], comment["locator"]],
+            sort_keys=True,
+        )
         if key in seen:
             raise ValueError("conflicting duplicate comment target")
         seen.add(key)
@@ -229,7 +245,10 @@ def import_feedback(root, receipt):
 def emit_feedback_script(root, record):
     review = Path(root) / "review"
     staging = review / ".feedback-script-next.js"
-    staging.write_text("window.PROJECT_FEEDBACK=" + json.dumps(record, ensure_ascii=True).replace("<", "\\u003c") + ";", encoding="utf-8")
+    staging.write_text(
+        "window.PROJECT_FEEDBACK=" + json.dumps(record, ensure_ascii=True).replace("<", "\\u003c") + ";",
+        encoding="utf-8",
+    )
     os.replace(staging, review / "feedback.js")
 
 
@@ -246,7 +265,13 @@ def emit_viewer(root, project):
             for key in ("image", "data", "pdf"):
                 if page.get(key):
                     resource = relative(root, page[key])
-                    page[key + "_sha256"] = digest(resource)
+                    if resource.is_file():
+                        page[key + "_sha256"] = digest(resource)
+                        page.pop(key + "_availability", None)
+                    else:
+                        # Retain the expected hash and location. Missing previews must not
+                        # prevent opening a project or silently erase source provenance.
+                        page[key + "_availability"] = "missing"
     write_json(root / "project.json", project)
     (root / "index.html").write_text(
         '<!doctype html><meta charset="utf-8"><title>项目首页</title><h1>'

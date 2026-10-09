@@ -25,6 +25,8 @@ from ..document_templates import TEMPLATE_ROOT
 from ..process_tree import ManagedChild
 from ..publication import publish
 from .config import snapshot
+from .previews import PreviewJobs, signature
+from .source_quality import migrate
 
 ACTIVE = {"QUEUED", "RUNNING", "CANCELLING"}
 
@@ -82,7 +84,7 @@ def inspect_file(path, config):
     return info
 
 
-class Projects:
+class Projects(PreviewJobs):
     def __init__(self, root, config, *, start_worker=True):
         self.root = Path(root).resolve()
         self.config = config
@@ -93,6 +95,7 @@ class Projects:
         self.stopping = threading.Event()
         self.cancels = {}
         self.child = None
+        self.preview_signature = signature()
         self.recover()
         self.thread = threading.Thread(target=self.loop, daemon=True)
         if start_worker:
@@ -115,8 +118,12 @@ class Projects:
     def list(self, trashed=False):
         with self.lock:
             return sorted(
-                (json.loads(p.read_text()) for p in (self.root / ("trash" if trashed else "projects")).glob("*/project.json")),
-                key=lambda project: project["created_at"], reverse=True,
+                (
+                    json.loads(p.read_text())
+                    for p in (self.root / ("trash" if trashed else "projects")).glob("*/project.json")
+                ),
+                key=lambda project: project["created_at"],
+                reverse=True,
             )
 
     def save(self, root, project):
@@ -126,6 +133,17 @@ class Projects:
                     for page in artifact["pages"]:
                         page["label"] = "上传图片（位置1；非原PDF页码）"
         atomic(root / "project.json", project)
+        if "source_quality_schema" in project:
+            atomic(
+                root / "review/source-assessments.json",
+                {
+                    "schema": project["source_quality_schema"],
+                    "project_id": project["project_id"],
+                    "source_artifact_id": project.get("source_artifact_id"),
+                    "evaluations": project.get("source_evaluations", []),
+                    "unbound_legacy_records": project.get("legacy_quality_records", []),
+                },
+            )
         # Same data backs HTTP and portable review; safe text inserted in generated local JS.
         (root / "review/project.js").write_text(
             "window.PROJECT=" + json.dumps(project, ensure_ascii=True).replace("<", "\\u003c") + ";",
@@ -136,6 +154,26 @@ class Projects:
         for file in (self.root / "projects").glob("*/project.json"):
             project = json.loads(file.read_text())
             changed = False
+            project.setdefault("project_kind", "historical-validation")
+            if "source_quality_schema" not in project:
+                backup = file.parent / "diagnostics/migrations/source-quality-v1"
+                backup.mkdir(parents=True, exist_ok=True)
+                if not (backup / "project-before.json").exists():
+                    shutil.copyfile(file, backup / "project-before.json")
+            migrate(file.parent, project)
+            for artifact in project["artifacts"]:
+                state = artifact.get("preview_render", {})
+                if state.get("status") in {"QUEUED", "RUNNING"}:
+                    state.update(
+                        status="INTERRUPTED",
+                        error={
+                            "stage": "preview",
+                            "code": "SERVICE_RESTART",
+                            "message": "Preview interrupted; explicit retry required.",
+                        },
+                    )
+            emit_viewer(file.parent, project)
+            changed = True
             for task in project.get("tasks", []):
                 if task["status"] in ACTIVE:
                     task.update(
@@ -200,6 +238,7 @@ class Projects:
         # Adopt chosen ID, independent of content SHA. Upload never reads all bytes into RAM.
         project["project_id"] = pid
         project["tasks"] = []
+        project["project_kind"] = "user"
         source = root / "sources" / name
         shutil.move(temp, source)
         artifact = register_artifact(
@@ -318,8 +357,10 @@ class Projects:
     def trash(self, pid):
         with self.lock:
             p = self.get(pid)
-            if any(t["status"] in ACTIVE for t in p.get("tasks", [])):
-                raise ValueError("cancel active task before trash")
+            if any(t["status"] in ACTIVE for t in p.get("tasks", [])) or any(
+                a.get("preview_render", {}).get("status") in ACTIVE for a in p["artifacts"]
+            ):
+                raise ValueError("wait for active conversion/preview before trash")
             os.replace(self.path(pid), self.root / "trash" / pid)
 
     def restore(self, pid):
@@ -338,8 +379,21 @@ class Projects:
             except queue.Empty:
                 continue
             try:
-                self.execute(pid, tid)
+                if tid.startswith("preview:"):
+                    self.execute_preview(pid, tid.split(":", 1)[1])
+                else:
+                    self.execute(pid, tid)
             except Exception as exc:
+                if tid.startswith("preview:"):
+                    with self.lock:
+                        p = self.get(pid)
+                        a = next(a for a in p["artifacts"] if a["artifact_id"] == tid.split(":", 1)[1])
+                        a["preview_render"].update(
+                            status="FAILED",
+                            error={"stage": "preview", "code": type(exc).__name__, "message": str(exc)[:300]},
+                        )
+                        self.save(self.path(pid), p)
+                    continue
                 with self.lock:
                     p = self.get(pid)
                     t = self.task(p, tid)
@@ -545,6 +599,7 @@ class Projects:
                 "result": str((directory / "result.json").relative_to(root)),
                 "image": str(image.relative_to(root)) if image else None,
                 "wall_seconds": result["wall_seconds"],
+                "finished_at": now(),
                 "error": result.get("error"),
                 "peak_rss_kib": result.get("peak_rss_kib"),
             }
@@ -767,8 +822,12 @@ class Projects:
             if format_error:
                 current_task["error"] = format_error
             # Comments live independently; no imported feedback is replaced.
+            migrate(root, latest)
             emit_viewer(root, latest)
             self.save(root, latest)
+        for artifact in latest["artifacts"]:
+            if artifact["artifact_id"] in created and artifact["format"] in {"docx", "pdf"}:
+                self.preview(pid, artifact["artifact_id"])
 
     def close(self):
         self.stopping.set()

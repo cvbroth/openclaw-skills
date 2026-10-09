@@ -118,6 +118,9 @@ class Handler(BaseHTTPRequestHandler):
         m = self.manager
         if method == "GET" and not parts:
             return self.stream(Path(__file__).parent / "assets/index.html")
+        if method == "GET" and len(parts) == 2 and parts[0] == "projects":
+            m.get(parts[1])
+            return self.stream(Path(__file__).parent / "assets/index.html")
         if method == "GET" and parts[0] == "assets" and len(parts) == 2 and parts[1] in {"app.js", "app.css"}:
             return self.stream(Path(__file__).parent / "assets" / parts[1])
         if method == "GET" and parts == ["api", "engines"]:
@@ -193,6 +196,9 @@ class Handler(BaseHTTPRequestHandler):
                 if parts[5] == "retry":
                     self.json_body()
                     return self.send_json(m.retry(pid, parts[4]), 202)
+            if len(parts) == 5 and parts[3] == "previews" and method == "POST":
+                data = self.json_body()
+                return self.send_json(m.preview(pid, parts[4], retry=data.get("retry", False)), 202)
             if len(parts) == 4 and parts[3] == "feedback":
                 feedback = root / "review/feedback.json"
                 if method == "GET":
@@ -210,13 +216,17 @@ class Handler(BaseHTTPRequestHandler):
                     raise FileNotFoundError("artifact is external reference, not downloadable")
                 return self.stream(relative(root, art["path"]), Path(art["path"]).name)
             if len(parts) == 4 and parts[3] == "export" and method == "GET":
-                if any(t["status"] in ACTIVE for t in project.get("tasks", [])):
+                if any(t["status"] in ACTIVE for t in project.get("tasks", [])) or any(
+                    a.get("preview_render", {}).get("status") in ACTIVE for a in project["artifacts"]
+                ):
                     raise ValueError("export requires terminal tasks")
                 with tempfile.TemporaryDirectory(dir=m.root) as temp:
                     package = Path(temp) / "project.zip"
                     with m.lock:
                         latest = m.get(pid)
-                        if any(t["status"] in ACTIVE for t in latest.get("tasks", [])):
+                        if any(t["status"] in ACTIVE for t in latest.get("tasks", [])) or any(
+                            a.get("preview_render", {}).get("status") in ACTIVE for a in latest["artifacts"]
+                        ):
                             raise ValueError("export requires terminal tasks")
                         emit_viewer(root, latest)
                         with zipfile.ZipFile(package, "w", zipfile.ZIP_DEFLATED) as archive:
@@ -227,6 +237,12 @@ class Handler(BaseHTTPRequestHandler):
         if method == "GET" and len(parts) >= 3 and parts[0] == "p":
             root = m.path(parts[1])
             path = relative(root, "/".join(parts[2:]))
+            if (
+                len(parts) == 4
+                and parts[2] == "review"
+                and parts[3] in {"index.html", "viewer.js", "viewer.css"}
+            ):
+                path = Path(__file__).parent.parent / "project_assets" / parts[3]
             if not path.is_file():
                 raise FileNotFoundError("resource unavailable")
             return self.stream(path)

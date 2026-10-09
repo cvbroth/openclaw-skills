@@ -1,0 +1,11 @@
+{
+  "browser": "140.0.7339.16",
+  "checks": [
+    "page12: offline actual DOCX/PDF image previews, two current images",
+    "document-sample: offline actual DOCX/PDF image previews, two current images",
+    "synthetic: offline actual DOCX/PDF image previews, two current images",
+    "history50: offline source-quality unknown14, current original image loads"
+  ],
+  "errors": [],
+  "http_server_required": false
+}

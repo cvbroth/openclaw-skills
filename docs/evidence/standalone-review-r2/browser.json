@@ -1,0 +1,15 @@
+{
+  "browser": "140.0.7339.16",
+  "checks": [
+    "list click -> independent detail URL -> reload -> browser back retains search",
+    "actual page12 DOCX/LibreOffice and original PDF raster images decoded, all 4 output pages viewed",
+    "Word versus PDF: independent 2/1 page selection, 175% zoom, both scroll directions and fixed toolbar; selection retained after detail return",
+    "50 source pages: good29 / unknown14; source quality invariant across output switching; remote error separate and not poor; only current images loaded",
+    "document sample: no quality = unknown5; actual DOCX10 / PDF9 pages independently locatable, no invented map",
+    "synthetic source/artifact comments isolated; save/reload/export/import/clear preserves other object; developer-agent attribution",
+    "existing preview request uses verified image cache, not repeat render",
+    "HTTP export unzipped and opened file:// offline: actual Word/PDF previews decode, two current images only"
+  ],
+  "page_errors": [],
+  "new_ocr_or_cloud_calls": 0
+}

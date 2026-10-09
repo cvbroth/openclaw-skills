@@ -1,0 +1,15 @@
+{
+  "server_directory": "/srv/storage/users/chen/FileTools-Deliveries/standalone-review-r2-20261009",
+  "server_file": "/srv/storage/users/chen/FileTools-Deliveries/standalone-review-r2-20261009/filetools-standalone-review-r2-20261009.zip",
+  "windows_path": "\\\\myserver\\Chen\\FileTools-Deliveries\\standalone-review-r2-20261009\\filetools-standalone-review-r2-20261009.zip",
+  "bytes": 126265815,
+  "sha256": "68c2bb3d478c390a7dddf3a47d40ba0a920ae4c1c364b7583364d51e49f0645f",
+  "shared_copy_verified": true,
+  "zip_crc_verified": true,
+  "not_in_incoming": true,
+  "production_mount_paths_readonly_checked": true,
+  "user_download_verified": false,
+  "http_url": "http://127.0.0.1:18971/",
+  "development_container": "filetools-http-dev-review-r2-final",
+  "private_evidence_root": "/home/chen/dev/openclaw-filetools-dev/runtime/standalone-http-r2"
+}

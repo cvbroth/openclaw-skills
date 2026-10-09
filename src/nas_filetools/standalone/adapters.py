@@ -10,7 +10,7 @@ import urllib.error
 import urllib.request
 
 PROMPT = """按图片阅读顺序逐字转写为Markdown，保留题号、题干、选项、数字和否定词。不解题、不润色、不根据知识纠错、不补全或重编号。难辨处标记【无法辨认】，不得静默跳过。"""
-QUALITY_PROMPT = """同时只根据图片可见情况评价原图，不以转写流畅证明清晰。输出严格两个标记段：<transcription_markdown>原样转写</transcription_markdown><quality_json>{"overall_quality":"good|usable_with_defects|poor|undetermined","suggested_action":"keep|check_original|request_clearer_source|undetermined","evidence":["最多3条可对照观察"],"uncertainty_note":"不确定处；这是未经校准的模型自评"}</quality_json>。good为正文直接可辨；usable_with_defects为部分有缺损需核对；poor为关键正文难辨；观察不足为undetermined。不要凭上下文猜字反推清晰。"""
+QUALITY_PROMPT = """同时只根据图片可见情况评价原图，不以转写流畅证明清晰。输出严格两个标记段：<transcription_markdown>原样转写</transcription_markdown><quality_json>{"overall_quality":"good|usable_with_defects|poor|undetermined","suggested_action":"keep|check_original|request_clearer_source|undetermined","evidence":["最多3条可对照观察"],"uncertainty_note":"不确定处；这是未经校准的模型自评"}</quality_json>。good为关键正文都可直接辨读；usable_with_defects为局部模糊或缺损需核对；poor为关键文字必须猜测而无法可靠辨读；观察或输入不足为undetermined。无法辨认处在正文明确标记，不允许凭常识补字再反推原图清晰。"""
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -222,9 +222,13 @@ def recognize(image, engine, params):
             "provider_internal_transform": "unknown",
         }
         result["request_body_sha256"] = hashlib.sha256(encoded_body).hexdigest()
+        if params["quality"]:
+            result["quality_policy"] = "source-legibility-v2; uncalibrated model self-assessment"
         request = urllib.request.Request(engine["endpoint"], encoded_body, headers)
         try:
-            with urllib.request.build_opener(NoRedirect()).open(request, timeout=engine["timeout"]) as response:
+            with urllib.request.build_opener(NoRedirect()).open(
+                request, timeout=engine["timeout"]
+            ) as response:
                 raw = response.read(8 * 1024 * 1024 + 1)
                 if len(raw) > 8 * 1024 * 1024:
                     raise ValueError("REMOTE_RESPONSE_LIMIT")

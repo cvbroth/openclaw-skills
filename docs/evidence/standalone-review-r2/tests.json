@@ -1,0 +1,15 @@
+{
+  "command": "pytest -q -p no:cacheprovider tests/test_review_r2.py tests/test_standalone_http.py tests/test_artifact_project.py tests/test_document_sample.py",
+  "passed": 37,
+  "failed": 0,
+  "seconds": 17.78,
+  "warnings": 5,
+  "warning_type": "existing SWIG DeprecationWarning",
+  "environment": "independent read-only Docker, network none, 2CPU/2GiB memory-swap 2GiB",
+  "actual": "mature-library synthetic PDF raster/cache, persistent HTTP/tasks and feedback",
+  "simulated": "engine responses, failure injection and protocol endpoints; no OCR/cloud calls",
+  "static": [
+    "ruff check passed",
+    "git diff --check passed"
+  ]
+}

@@ -278,3 +278,15 @@ GLM停止后，现有M3原PNG连接以种子2026100802固定50页（含12/23/136
 独立容器filetools-http-dev-ready，2CPU/4GiB无额外swap、只读根/UID1000、loopback18971；使用既有候选镜像ID及源码只读挂载，不修改生产Gateway/Worker/Skill/模板/额度。启动/架构/API见docs/STANDALONE_HTTP.md，实施说明与报告见STANDALONE_HTTP_IMPLEMENTATION.md及STANDALONE_HTTP_REPORT.md，脱敏实测与交付路径/SHA见docs/evidence/standalone-http-*.json。私有证据runtime/standalone-http-r1，真实项目802cf70a-e7da-429b-ac92-8d08204bef11。
 
 共享交付ZIP于10-09成功复制并校验，先前自动审批额度失败未执行，后经正常审批重试成功，没有绕过。Windows路径\\myserver\Chen\FileTools-Deliveries\standalone-http-20261008\filetools-standalone-http-20261008.zip，非Incoming。访问需ssh -N -L 18971:127.0.0.1:18971 chen@myserver，再开http://127.0.0.1:18971/。未部署生产/OpenClaw、未处理整册/永久保存/入库；等待用户查看，勿自动扩大收费调用或处理范围。
+
+## 独立HTTP评审R2（2026-10-09，用户验收问题修复）
+
+基于7adf92bc保留全部历史OCR、模板及外层整册改动。本轮零OCR/云调用/正文重生成。实施前说明STANDALONE_REVIEW_R2_PLAN.md；新增source_quality证据约束迁移及独立原图评价集合，缺失/异常不视为poor；第12页源展示2→1保留两任务来源，历史50页36有效/13保留旧格式异常/136服务失败无评价。评论显式source_page/artifact，旧回执默认artifact，output_page带render_key，原定位保留。
+
+新增串行受限后台预览及缓存：实际DOCX经LibreOffice7.4.7.2渲染后PyMuPDF1.25.5栅格；PDF直接栅格，120dpi、LO120秒/整体180秒。六份真实DOCX/PDF共27张新图片，坏PDF合成FileDataError和重试如实失败，正文不受影响。原件通用预览接口拒绝隐式全册渲染。缺图保留预期SHA/路径且项目可打开。LibreOffice现为独立开发服务Word预览运行依赖，纠正R1仅测试依赖及下载/object即对照通过的边界。
+
+轻量浅色UI重做，列表→/projects/:id独立详情；评审双侧独立页/缩放/滚动、固定工具栏、可折叠评论/诊断，原图质量只筛源页，错误另筛产物，最新版本优先。真实Chromium140检查刷新返回、四张第12页Word/PDF、Word对PDF独立2/1页、历史50质量名单稳定、无评价unknown、评论隔离/回执/窄屏草稿、缓存及离线四项目图片。37测试通过17.78秒，Ruff/diff通过；93个既有登记本地文件SHA不变。源码测试与合成截图入Git，真实图文/响应/反馈/截图留runtime/standalone-http-r2。历史50未重新推理或完整逐字核对；样例10Word/9PDF只验预览定位首图，本轮未重新看完其19页。旧第12页正文的待核对片段、MD字符/页脚数字/留白仍如实显示，不宣称文字排版重新通过。
+
+仅独立开发服务filetools-http-dev-review-r2-final运行，镜像sha256:3bf4eabd2e4cde9521c212568359f416c6ab9d06709f3d677e8cdaa84efe8530，2CPU/4GiB无额外swap、UID1000、只读根、loopback18971；未修改生产FileTools/OpenClaw/Skill/模板/额度。启动/访问同STANDALONE_HTTP.md；当前浏览器脚本browser_review_r2.py与_edges.py，不再用R1旧选择器脚本宣称R2通过。迁移与回退说明STANDALONE_REVIEW_R2_MIGRATION.md，结果STANDALONE_REVIEW_R2_REPORT.md。
+
+新共享包路径/大小/SHA及实测记录见docs/evidence/standalone-review-r2/delivery.json。根index.html包含第12页、历史50、原6–10页Word/PDF、合成边界项目；无Incoming挂载、无saved/知识库写入。用户下载和Windows客户端验收尚未完成；到此停止，等待用户查看，不扩大OCR或部署生产。

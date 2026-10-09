@@ -4,13 +4,13 @@
 
 ## 启动与访问
 
-依赖复用项目固定版本：Python 3.11/3.12、PyMuPDF 1.25.5、python-docx 1.1.2、Pillow 11.1.0；本地 OCR 另需 `rapidocr-onnxruntime==1.4.4`、`onnxruntime==1.20.1`、`numpy==1.26.4`。字体使用既有固定 Droid Sans Fallback。没有新增 Web 框架、浏览器运行依赖或办公套件。测试用 pytest/Chromium/LibreOffice/Poppler 不进入服务运行依赖。
+依赖复用项目固定版本：Python 3.11/3.12、PyMuPDF 1.25.5、python-docx 1.1.2、Pillow 11.1.0；本地 OCR 另需 `rapidocr-onnxruntime==1.4.4`、`onnxruntime==1.20.1`、`numpy==1.26.4`。字体使用既有固定 Droid Sans Fallback。没有新增 Web 框架或浏览器运行依赖。R2 的实际 Word 逐页预览新增 LibreOffice Writer 运行依赖（已实测7.4.7.2及既有中文字体）；PDF预览复用PyMuPDF。pytest/Chromium/Poppler/PDFium仅用于开发验证。详见 STANDALONE_REVIEW_R2_REPORT.md。
 
 复制 `deploy/standalone-http.example.json` 到私有目录，修改受信任的服务端配置。凭据从环境变量读取，不写入 JSON。可直接在独立虚拟环境启动；现有服务器推荐复用已固定候选镜像作为**新的开发容器**：
 
 ```bash
 scripts/launch_standalone_http.sh "$PRIVATE_STORE" "$PRIVATE_CONFIG" \
-  sha256:dc7bb036ba656c50c0bb4e6732eb6a81d688b3bd938a73e45c212fcd519c04cd \
+  sha256:3bf4eabd2e4cde9521c212568359f416c6ab9d06709f3d677e8cdaa84efe8530 \
   filetools-http-dev-example
 ```
 
@@ -29,11 +29,11 @@ ssh -N -L 18971:127.0.0.1:18971 chen@myserver
 1. 选择 PDF/PNG/JPEG/WebP、引擎及明确的物理页码列表，点击上传。默认仅首张，示例最多5张；上传64KiB分块落盘，成功返回202及项目/任务ID，识别在后台运行。关闭网页不取消任务。
 2. 项目默认以文件名命名。可改名、查看逐页进度、取消、只重试未成功页。切换引擎明确新建任务，保留原任务与全部产物。服务不会自动重试付费请求。取消只停止本地等待/子进程，不能保证远端未计费。
 3. “复用识别重新生成文档”不请求任何识别引擎，追加结果版本；适用于格式修复或改名后的重新排版。成功页不重跑。不会修改公共模板。
-4. 对照评审左右独立选择、定位与滚动；无分页映射时不推断对应关系。Word 没有浏览器原生预览，缺少真实预览时提供下载与文档级评论；PDF 提供内嵌及打开文件入口。
+4. 列表点击进入独立 `/projects/<id>` 详情，评审左右独立选择、翻页、缩放和滚动。PDF使用后台逐页图片；Word使用LibreOffice对实际DOCX渲染的图片，不借用独立PDF。预览失败显示真实错误并可重试，不能当作成功；导出包含已生成预览。无分页映射时不推断对应关系。
 5. 评论输入先存本地草稿，再保存到服务；版本冲突保留草稿并报错，不静默覆盖。清除产生空评论记录，历史回执仍保留。导入时校验项目、产物ID/哈希、定位和版本；草稿冲突需明确采用导入版本并先下载备份。切换参考不会让目标评论消失。关闭页面前应确认“已保存到服务”，或导出 JSON。
 6. 下载单产物或整个项目包。导出包可解压后离线打开 `review/index.html`；离线评论需导出再导入服务，浏览器不能直接写服务器。回收站仅移动项目，恢复后保留产物和评论；没有永久删除接口，也不访问/删除外部原件引用。
 
-模型质量是未经校准的自评，本地 RapidOCR 不提供视觉质量自评，其质量字段为未提供。筛选“未知”不等于错误。人工评论与模型评价分别存储，都不写入正式 Markdown/Word/PDF，也不构成人工验收。
+原图质量独立关联源页、实际传图哈希/尺寸、模型和任务，可查看多次记录。筛选“原图质量”只改变原件名单，不因右侧产物切换而变化。模型质量是未经校准的自评，本地 RapidOCR 不提供视觉质量自评且不覆盖已有评价。筛选“未提供评价”不等于错误或差。人工评论与模型评价分别存储，都不写入正式 Markdown/Word/PDF，也不构成人工验收。
 
 ## 配置与能力
 
@@ -67,7 +67,8 @@ projects/<project_id>/
   content/<task_id>/vN/   # 按页加载的评审文字
   templates/             # 实际用过的配置快照
   outputs/               # 兼容现有项目结构；注册路径才是实际产物入口
-  review/                # 同一份HTTP/离线评审数据、反馈及追加历史
+  review/                # 同一份HTTP/离线评审数据、原图评价镜像、反馈及追加历史
+  previews/<cache_key>/  # 按产物SHA/渲染器/参数缓存的图片及逐次诊断
   diagnostics/tasks/<task_id>/
     page-N/attempt-N/    # request(脱敏)/result/raw.md/原响应/日志
     generation-N/        # work及经校验的published产物
@@ -81,7 +82,9 @@ uploads/                # 暂存流式上传
 |---|---|
 | GET /api/engines | 脱敏清单、能力及凭据是否可用 |
 | POST /api/uploads?filename=...&engine=...&pages=1,2 | 原始文件body、单一Content-Length；202返回project_id/task_id |
+| GET /；GET /projects/:pid | 列表/独立详情HTML，可刷新、直接访问 |
 | GET /api/projects；GET /api/projects/:pid | 列表/详情、任务逐页状态 |
+| POST /api/projects/:pid/previews/:artifact_id | `{ "retry":true }`，仅DOCX/PDF产物后台预览；不隐式处理整份原件 |
 | PATCH /api/projects/:pid | JSON `{ "name": "文档名称" }` |
 | POST /api/projects/:pid/tasks | JSON `{ "engine":"local", "pages":[1] }`，新版本 |
 | POST /api/projects/:pid/tasks/:tid/cancel、retry、format | JSON `{}`；format只复用已有结果 |
@@ -101,3 +104,5 @@ uploads/                # 暂存流式上传
 见 `docs/STANDALONE_HTTP_REPORT.md`。测试用fixture仅在显式 `--testing` 中启用，不在普通配置中开放。`scripts/browser_smoke_standalone_http.py` 只启动本地OCR合成测试和缺凭据失败测试，不发云端请求；需开发侧Playwright/Chromium。实际PDF渲染仅在独立验证镜像完成，服务不会自动作全视觉验收。
 
 本轮未接OpenClaw、未配置守护服务/开机启动/公网认证；大文件容量、断电文件系统恢复、恶意PDF防护、多人并发冲突、全册性能尚未验收。API兼容实际厂商、收费/余额及客户端Word显示仍需独立确认。新增页码或点击M3是实际调用，不提供免费假设。
+
+R2布局、迁移与实测：STANDALONE_REVIEW_R2_PLAN.md / STANDALONE_REVIEW_R2_MIGRATION.md / STANDALONE_REVIEW_R2_REPORT.md。当前界面的浏览器回归入口为 scripts/browser_review_r2.py 和 browser_review_r2_edges.py；R1旧浏览器脚本仅为历史验证记录，其旧选择器不作为R2验收入口。

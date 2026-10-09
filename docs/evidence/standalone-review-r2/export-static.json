@@ -1,0 +1,6 @@
+{
+  "json_files_checked": 250,
+  "forbidden_credential_value_fields": 0,
+  "literal_secret_value_rescan": false,
+  "boundary": "Static credential field scan only; unchanged legacy response bytes previously value-scanned in R1; preview child receives no credential variable."
+}
