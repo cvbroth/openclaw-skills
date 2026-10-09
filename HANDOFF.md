@@ -301,3 +301,8 @@ GLM停止后，现有M3原PNG连接以种子2026100802固定50页（含12/23/136
 模板复用catalog/published/drafts，严格JSON、服务端字体/字形、不可覆盖版本、固定合成真实Word/PDF预览发布门控。私有开发模板markdown-readable/1.0.0和2.0.0；公共questions-zh-cn/1.0.0文件原SHA不变。第12页同一历史M3输入生成v6/v7两套排版（Word/PDF分别2页与3页）；合成两套分别3页与5页，独立实际渲染共26张。题目未核对的Markdown稿不称正式试题稿。
 
 59测试通过21.86秒，Ruff/diff通过，真实浏览器及最终file://包验证通过；83基线文件SHA、历史识别尝试保持。旧50页质量名单不因产物切换改变；只修改合成developer-agent评论。LO profile放外部临时目录清理，新包排除历史profile/锁/tmp，额外语义download_path副本解决file://实际下载名。共享交付大小/SHA见docs/evidence/standalone-review-r3/delivery.json。Windows实际解压、客户端Word字体替换、新PDF全部跨引擎行为未验证；无整册容量/任意模板承诺。真实图文和截图留本地忽略目录，Git只含合成截图与脱敏证据。SSH转发18971后访问主页与/templates；到此等待用户查看，不自动部署或扩大。
+
+
+## 独立HTTP上传容量512MiB（R3增量）
+
+示例与实际开发service.upload_bytes=536870912，PDF200页/单任务5页及其他资源不变；仅独立开发服务加载，生产不动。只读/api/limits与上传界面分别显示三项约束，超限413，仍64KiB流式/finally清理。真实HTTP合成512MiB登记202、+1字节413、断连/无效格式400、临时文件零遗留；enqueue替身零引擎调用，不代表转换验收。28测试通过20.16秒，浏览器显示/前端拒绝通过，详细报告STANDALONE_UPLOAD_512_REPORT.md。原R3包与记录保留，补交容量说明/源码快照；私有交付位置单独通知，Git只含脱敏报告。

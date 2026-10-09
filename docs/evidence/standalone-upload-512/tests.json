@@ -1,0 +1,16 @@
+{
+  "initial_related_tests": 28,
+  "initial_seconds": 20.16,
+  "final_related_tests": 28,
+  "final_seconds": 19.31,
+  "existing_pymupdf_deprecation_warnings": 5,
+  "ocr_calls": 0,
+  "cloud_calls": 0,
+  "production_changed": false,
+  "unchanged_limits": {
+    "pdf_pages": 200,
+    "task_pages": 5
+  },
+  "private_config_comparison": "Only service.upload_bytes changed; original private backup retained",
+  "scope": "Real HTTP upload/registration and browser display; enqueue is stubbed for capacity test, no conversion validation"
+}

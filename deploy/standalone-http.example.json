@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "service": {"upload_bytes": 104857600, "max_pages": 200, "max_pixels": 20000000, "bind": "127.0.0.1", "port": 18971},
+  "service": {"upload_bytes": 536870912, "max_pages": 200, "max_pixels": 20000000, "bind": "127.0.0.1", "port": 18971},
   "conversion": {"dpi": 220, "language": "zh", "quality": true, "max_selected_pages": 5, "generate_documents": true},
   "template": {"id": "questions-zh-cn", "version": "1.0.0"},
   "engines": {

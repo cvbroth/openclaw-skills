@@ -307,6 +307,53 @@ class HTTPTests(unittest.TestCase):
             self.upload()
         self.assertFalse(list((self.root / "data/uploads").iterdir()))
 
+    def test_upload_limits_boundary_and_incomplete_cleanup(self):
+        import http.client
+
+        limits = self.request("/api/limits")
+        self.assertEqual(limits, {"upload_bytes": 536870912, "max_pdf_pages": 200, "max_selected_pages": 5})
+        raw = self.image.read_bytes()
+        self.config["service"]["upload_bytes"] = len(raw)
+        accepted = self.upload()
+        self.assertIn("project_id", accepted)
+        with self.assertRaises(urllib.error.HTTPError) as raised:
+            self.request("/api/uploads?filename=synthetic.png&engine=fixture&pages=1", "POST", raw + b"x")
+        self.assertEqual(raised.exception.code, 413)
+        result = json.loads(raised.exception.read())
+        self.assertEqual(result["error"], "UPLOAD_TOO_LARGE")
+        self.assertEqual(result["limit_bytes"], len(raw))
+        connection = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=5)
+        connection.putrequest("POST", "/api/uploads?filename=incomplete.png&engine=fixture&pages=1")
+        connection.putheader("Content-Length", len(raw))
+        connection.endheaders()
+        connection.send(raw[:20])
+        connection.sock.shutdown(socket.SHUT_WR)
+        response = connection.getresponse()
+        self.assertEqual(response.status, 400)
+        self.assertIn("incomplete upload", response.read().decode())
+        connection.close()
+        self.assertEqual(list((self.root / "data/uploads").iterdir()), [])
+        # Keep PDF/selection checks even when byte size is allowed.
+        import fitz
+
+        self.config["service"]["upload_bytes"] = 536870912
+        doc = fitz.open()
+        for _ in range(6):
+            doc.new_page()
+        with self.assertRaises(urllib.error.HTTPError):
+            self.request(
+                "/api/uploads?filename=too-many-selected.pdf&engine=fixture&pages=1,2,3,4,5,6",
+                "POST",
+                doc.tobytes(),
+            )
+        self.config["service"]["max_pages"] = 5
+        with self.assertRaises(urllib.error.HTTPError):
+            self.request(
+                "/api/uploads?filename=too-many-pages.pdf&engine=fixture&pages=1", "POST", doc.tobytes()
+            )
+        self.assertEqual(list((self.root / "data/uploads").iterdir()), [])
+        doc.close()
+
     def test_restore_body_consumed_on_keepalive_connection(self):
         import http.client
 
@@ -351,13 +398,21 @@ class AdapterTests(unittest.TestCase):
         from nas_filetools.standalone import documents
         from unittest.mock import patch
         import fitz
+
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             font = root / "font.ttf"
             font.write_bytes(fitz.Font("cjk").buffer)
             text = "\n".join("未确认结构的长正文，保留换行与原文。" for _ in range(90))
             with patch.object(documents, "FONT_PATH", font):
-                documents.generate({"output": str(root), "template": {"id": "questions-zh-cn", "version": "1.0.0"}, "title": "合成格式验收", "pages": [{"physical_page": 1, "text": text}]})
+                documents.generate(
+                    {
+                        "output": str(root),
+                        "template": {"id": "questions-zh-cn", "version": "1.0.0"},
+                        "title": "合成格式验收",
+                        "pages": [{"physical_page": 1, "text": text}],
+                    }
+                )
             check = json.loads((root / "layout-validation.json").read_text())
             self.assertTrue(check["content_equal"])
             self.assertTrue(check["native_layout_boundaries"]["passed"])
@@ -387,9 +442,11 @@ class AdapterTests(unittest.TestCase):
 
     def test_remote_redirect_is_not_followed(self):
         calls = []
+
         class Provider(BaseHTTPRequestHandler):
             def log_message(self, *_):
                 pass
+
             def do_POST(self):
                 calls.append(self.path)
                 self.rfile.read(int(self.headers["Content-Length"]))
@@ -397,16 +454,28 @@ class AdapterTests(unittest.TestCase):
                 self.send_header("Location", "/must-not-follow")
                 self.send_header("Content-Length", "0")
                 self.end_headers()
+
         server = ThreadingHTTPServer(("127.0.0.1", 0), Provider)
         threading.Thread(target=server.serve_forever, daemon=True).start()
         try:
             with tempfile.TemporaryDirectory() as folder:
                 from PIL import Image
+
                 image = Path(folder) / "test.png"
                 Image.new("RGB", (100, 100), "white").save(image)
                 os.environ["FILETOOLS_TEST_KEY"] = "SYNTHETIC_PRIVATE_KEY"
                 try:
-                    result = recognize(image, {"type": "openai-vision", "model": "mock", "endpoint": f"http://127.0.0.1:{server.server_port}/start", "credential_env": "FILETOOLS_TEST_KEY", "timeout": 5}, {"language": "zh", "quality": False})
+                    result = recognize(
+                        image,
+                        {
+                            "type": "openai-vision",
+                            "model": "mock",
+                            "endpoint": f"http://127.0.0.1:{server.server_port}/start",
+                            "credential_env": "FILETOOLS_TEST_KEY",
+                            "timeout": 5,
+                        },
+                        {"language": "zh", "quality": False},
+                    )
                 finally:
                     os.environ.pop("FILETOOLS_TEST_KEY")
                 self.assertEqual(result["error"]["code"], 307)

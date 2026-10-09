@@ -106,3 +106,8 @@ uploads/                # 暂存流式上传
 本轮未接OpenClaw、未配置守护服务/开机启动/公网认证；大文件容量、断电文件系统恢复、恶意PDF防护、多人并发冲突、全册性能尚未验收。API兼容实际厂商、收费/余额及客户端Word显示仍需独立确认。新增页码或点击M3是实际调用，不提供免费假设。
 
 R2布局、迁移与实测：STANDALONE_REVIEW_R2_PLAN.md / STANDALONE_REVIEW_R2_MIGRATION.md / STANDALONE_REVIEW_R2_REPORT.md。当前界面的浏览器回归入口为 scripts/browser_review_r2.py 和 browser_review_r2_edges.py；R1旧浏览器脚本仅为历史验证记录，其旧选择器不作为R2验收入口。
+
+
+## 上传容量补充
+
+示例与独立开发配置单文件512MiB（536870912字节），PDF最多200页、单任务最多5页保持不变。GET /api/limits供界面显示分离限制，超限返回413并清理失败上传。保持64KiB流式写盘。大文件上传不等于整册转换通过；实测见STANDALONE_UPLOAD_512_REPORT.md。

@@ -23,6 +23,12 @@ from .export_policy import exportable, windows_safe, portable_manifest
 from .naming import decorate, project_title
 
 
+class BodyTooLarge(ValueError):
+    def __init__(self, limit):
+        self.limit = limit
+        super().__init__(f"单文件上传超过 {limit / (1024 * 1024):g} MiB 上限")
+
+
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
@@ -61,12 +67,16 @@ class Handler(BaseHTTPRequestHandler):
             raise ValueError("incomplete JSON")
         return json.loads(data)
 
-    def length(self, limit):
+    def length(self, limit, *, upload=False):
         if self.headers.get("Transfer-Encoding") or len(self.headers.get_all("Content-Length") or []) != 1:
             raise ValueError("single Content-Length required")
         n = int(self.headers["Content-Length"])
-        if not 0 < n <= limit:
+        if n > limit:
+            if upload:
+                raise BodyTooLarge(limit)
             raise ValueError("body size limit")
+        if n <= 0:
+            raise ValueError("positive Content-Length required")
         return n
 
     def stream(self, path, download=None):
@@ -132,6 +142,14 @@ class Handler(BaseHTTPRequestHandler):
             return self.stream(Path(__file__).parent / "assets" / parts[1])
         if method == "GET" and parts == ["templates"]:
             return self.stream(Path(__file__).parent / "assets/templates.html")
+        if method == "GET" and parts == ["api", "limits"]:
+            return self.send_json(
+                {
+                    "upload_bytes": m.config["service"]["upload_bytes"],
+                    "max_pdf_pages": m.config["service"]["max_pages"],
+                    "max_selected_pages": m.config["conversion"]["max_selected_pages"],
+                }
+            )
         if method == "GET" and parts == ["api", "templates"]:
             return self.send_json(
                 {
@@ -186,7 +204,7 @@ class Handler(BaseHTTPRequestHandler):
             pages = [int(x) for x in query.get("pages", ["1"])[0].split(",")]
             if engine not in m.config["engines"]:
                 raise ValueError("unknown engine")
-            length = self.length(m.config["service"]["upload_bytes"])
+            length = self.length(m.config["service"]["upload_bytes"], upload=True)
             if shutil.disk_usage(m.root).free < length + 512 * 1024 * 1024:
                 raise ValueError("insufficient disk reserve")
             path = m.root / "uploads" / (uuid.uuid4().hex + Path(name).suffix.lower())
@@ -329,6 +347,9 @@ class Handler(BaseHTTPRequestHandler):
             self.dispatch(self.command)
         except (BrokenPipeError, ConnectionResetError, socket.timeout):
             self.close_connection = True
+        except BodyTooLarge as exc:
+            self.close_connection = True
+            self.send_json({"error": "UPLOAD_TOO_LARGE", "reason": str(exc), "limit_bytes": exc.limit}, 413)
         except PermissionError:
             self.close_connection = True
             self.send_json({"error": "REQUEST_FORBIDDEN"}, 403)

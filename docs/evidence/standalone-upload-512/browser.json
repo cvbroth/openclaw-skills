@@ -1,0 +1,12 @@
+{
+  "browser": "140.0.7339.16",
+  "actual_development_limits": {
+    "upload_bytes": 536870912,
+    "max_pdf_pages": 200,
+    "max_selected_pages": 5
+  },
+  "upload_limit_text": "单文件上传上限：512 MiB；PDF最多 200 页；单任务最多处理 5 页。上传成功不代表整册转换完成。",
+  "frontend_oversize_descriptor_rejected": true,
+  "upload_requests": 0,
+  "js_errors": []
+}

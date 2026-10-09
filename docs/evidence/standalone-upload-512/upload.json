@@ -1,0 +1,19 @@
+{
+  "accepted_bytes": 536870912,
+  "accepted_status": 202,
+  "seconds": 2.615345360012725,
+  "file_sha256": "3d640c024b368e512c7a86d19374a3144ee1a861164f86afb0848f92a4539b6c",
+  "over_limit_bytes": 536870913,
+  "over_limit_status": 413,
+  "incomplete_status": 400,
+  "invalid_file_status": 400,
+  "temporary_upload_files_remaining": 0,
+  "process_peak_rss_kib": 61280,
+  "memory_scope": "isolated server and streaming client in same process, includes validation/hash",
+  "upload_read_chunk_bytes": 65536,
+  "pdf_max_pages": 200,
+  "task_max_selected_pages": 5,
+  "engine_calls": 0,
+  "conversion_verified": false,
+  "fixture": "32x32 PNG with inert trailing padding; byte-capacity test, not large-document conversion"
+}
