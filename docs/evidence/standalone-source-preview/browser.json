@@ -1,0 +1,38 @@
+{
+  "rendered_physical_pages": [
+    1,
+    16,
+    23,
+    169
+  ],
+  "browser_load_seconds": {
+    "1": 0.218,
+    "16": 0.095,
+    "23": 0.1,
+    "169": 0.1
+  },
+  "no_recognition_tasks": true,
+  "cache_reuse": true,
+  "late_response_does_not_replace_current_page": true,
+  "simulated_failure_real_retry": true,
+  "out_of_range_keeps_current_image": true,
+  "physical_comment_reload": true,
+  "independent_pages_scroll_fold_draft": true,
+  "narrow_review_overflow": false,
+  "poll_scroll_before_after": [
+    480,
+    480
+  ],
+  "artifact_button_heights": [
+    34,
+    34,
+    34,
+    34,
+    34,
+    34,
+    34
+  ],
+  "exact_artifact_word_pdf": true,
+  "narrow_project_overflow": false,
+  "javascript_errors": []
+}

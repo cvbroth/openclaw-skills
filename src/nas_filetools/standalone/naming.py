@@ -41,9 +41,22 @@ def decorate(project):
         if not physical_pages:
             physical_pages = sorted(int(n) for n in task.get("pages", {}))
         a["display_metadata"] = {
-            "method": "复用已有文字排版" if task.get("operation") == "format-artifact" else engine,
+            "method": "原始文件"
+            if source
+            else "复用已有文字排版"
+            if task.get("operation") == "format-artifact"
+            else engine,
             "version": str(a.get("version", "1")),
-            "template": a.get("template_label"),
+            "template": (
+                a.get("template_label")
+                or (
+                    task["template"]["id"] + "/" + task["template"]["version"]
+                    if task.get("template")
+                    else None
+                )
+            )
+            if not source and a["format"] in {"docx", "pdf"}
+            else None,
             "created_at": a.get("created_at") or task.get("created_at"),
             "source_pages": physical_pages,
         }
@@ -55,7 +68,7 @@ def decorate(project):
                 if a.get("content_nature") == "markdown-basic"
                 else "保真片段；未确认题目结构"
             )
-            if a["format"] in {"docx", "pdf"}
+            if not source and a["format"] in {"docx", "pdf"}
             else ""
         )
         title = project_title(project["name"])

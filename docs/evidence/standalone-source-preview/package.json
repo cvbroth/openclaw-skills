@@ -1,0 +1,16 @@
+{
+  "package": "filetools-source-preview-r6.zip",
+  "bytes": 2517905,
+  "sha256": "1d072204188f068f4754ce8cc950255b2ec30d5197f213ce267ae79d014cc9f2",
+  "zip_crc": "passed",
+  "private_settings_included": false,
+  "original169_offline_cached_pages": [
+    1,
+    16,
+    17,
+    23,
+    169
+  ],
+  "original169_offline_total_pages": 169,
+  "windows_actual_unzip": "not-tested"
+}

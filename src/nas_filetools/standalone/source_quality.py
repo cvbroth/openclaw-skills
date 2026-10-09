@@ -61,7 +61,7 @@ def migrate(root, project):
             return
         candidates = [
             p
-            for p in source["pages"]
+            for p in source["pages"] + source.get("legacy_pages", [])
             if p["locator"] == locator and p.get("image_sha256") == (submitted or {}).get("sha256")
         ]
         reason = None

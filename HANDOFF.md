@@ -319,3 +319,7 @@ GLM停止后，现有M3原PNG连接以种子2026100802固定50页（含12/23/136
 ## 独立 HTTP 批量与管理增量（2026-10-09）
 
 基于7611f3eb15a9c52645fa6a53c8f208585ccf1550增量。实施说明docs/STANDALONE_BATCH_PLAN.md，接口/迁移docs/STANDALONE_BATCH.md，真实/模拟边界docs/STANDALONE_BATCH_REPORT.md。示例与独立开发单任务选页现为1000，上传512MiB/PDF总1000及既有生产资源不变。严格范围解析、串行逐页、任务历史分页/阶段、产物短名称和可恢复管理、稳定ID评审深链已接入；旧5页描述按历史时点解释。仅合成千页调度，未实测云端千页或整册文档。本轮无真实OCR/云调用，真实两页直接提取；原件/公共模板/生产OpenClaw不变。私有交付位置另行回执，最终提交以Git为准。
+
+## 独立HTTP R6：完整原件分页与工作台
+
+基于R5 9ad211c4d0c40e64316db85b1eda339001665cd9增量，原件完整物理索引与图片缓存分离、独立单页预览通道、全宽任务/产物布局及紧凑评审。实施/使用/真实边界见docs/STANDALONE_SOURCE_PREVIEW_PLAN.md、STANDALONE_SOURCE_PREVIEW.md、STANDALONE_SOURCE_PREVIEW_REPORT.md。仅合成169页验证，无OCR/云调用，生产/OpenClaw/模板不变。在线全部页可选、离线仅已缓存页可看；未缓存页评论仍可定位。211旧文件与20旧任务记录保持。保留私有开发备份与旧包，最终SHA以Git为准。

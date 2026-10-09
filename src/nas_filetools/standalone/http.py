@@ -225,6 +225,9 @@ class Handler(BaseHTTPRequestHandler):
             pid = parts[2]
             project = m.get(pid)
             root = m.path(pid)
+            if len(parts) == 5 and parts[3] == "source-preview" and method == "POST":
+                data = self.json_body()
+                return self.send_json(m.source_preview(pid, int(parts[4]), retry=data.get("retry", False)))
             if len(parts) == 4 and parts[3] == "analysis" and method == "POST":
                 self.json_body()
                 return self.send_json(m.analyze(pid), 202)
@@ -292,7 +295,8 @@ class Handler(BaseHTTPRequestHandler):
                 )
             if len(parts) == 4 and parts[3] == "export" and method == "GET":
                 if (
-                    project.get("analysis", {}).get("status") in ACTIVE
+                    pid in m.active_source_previews
+                    or project.get("analysis", {}).get("status") in ACTIVE
                     or any(t["status"] in ACTIVE for t in project.get("tasks", []))
                     or any(a.get("preview_render", {}).get("status") in ACTIVE for a in project["artifacts"])
                 ):
@@ -302,7 +306,8 @@ class Handler(BaseHTTPRequestHandler):
                     with m.lock:
                         latest = m.get(pid)
                         if (
-                            latest.get("analysis", {}).get("status") in ACTIVE
+                            pid in m.active_source_previews
+                            or latest.get("analysis", {}).get("status") in ACTIVE
                             or any(t["status"] in ACTIVE for t in latest.get("tasks", []))
                             or any(
                                 a.get("preview_render", {}).get("status") in ACTIVE
@@ -351,6 +356,9 @@ class Handler(BaseHTTPRequestHandler):
                 path = Path(__file__).parent.parent / "project_assets" / parts[3]
             if not path.is_file():
                 raise FileNotFoundError("resource unavailable")
+            if parts[2:] == ["review", "project.js"]:
+                with m.lock:
+                    emit_viewer(root, m.get(parts[1]))
             return self.stream(path)
         raise FileNotFoundError("endpoint missing")
 

@@ -1,0 +1,28 @@
+{
+  "physical_page_count": 169,
+  "recognition_tasks": 0,
+  "source_sha256": "e72330b8de372d57dd232dbaceef306ab476d5641e08163dc9fb90c0af0cbda1",
+  "source_unchanged": true,
+  "cached_pages": [
+    1,
+    16,
+    17,
+    23,
+    169
+  ],
+  "cold_worker_elapsed_seconds": {
+    "1": 0.027608048054389656,
+    "16": 0.02729151293169707,
+    "17": 0.02745343593414873,
+    "23": 0.027800014009699225,
+    "169": 0.02802188601344824
+  },
+  "renderer": {
+    "schema": "source-page-v1",
+    "pymupdf": "1.25.5",
+    "dpi": 120,
+    "alpha": false,
+    "max_pixels": 20000000
+  },
+  "note": "Native child elapsed excludes HTTP/hash/wait; final browser timings are cache-load observations."
+}

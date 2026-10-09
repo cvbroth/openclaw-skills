@@ -1,3 +1,7 @@
+# 当前增量：R6 原件完整分页
+
+参见[原件分页与工作台](STANDALONE_SOURCE_PREVIEW.md)和[验证报告](STANDALONE_SOURCE_PREVIEW_REPORT.md)。在线按需浏览全部登记物理页，离线仅已缓存页；以下历史章节按各轮时点解释。
+
 # 独立 HTTP 文件项目（开发版）
 
 最新批量任务与管理行为见 [批量提取说明](STANDALONE_BATCH.md)：单任务选页1000，打印机式范围，产物回收/任务归档及稳定ID评审链接。历史报告中的5页是原阶段限制。

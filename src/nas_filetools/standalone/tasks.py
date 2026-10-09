@@ -34,6 +34,7 @@ from .source_quality import migrate
 from .analysis_jobs import AnalysisJobs
 from .engine_settings import EngineSettings
 from .artifact_management import ArtifactManagement
+from .source_preview import SourcePreviewJobs, index_source, preview_slot
 
 ACTIVE = {"QUEUED", "RUNNING", "CANCELLING"}
 
@@ -105,7 +106,7 @@ def inspect_file(path, config):
     return info
 
 
-class Projects(PreviewJobs, FormatJobs, AnalysisJobs, ArtifactManagement):
+class Projects(SourcePreviewJobs, PreviewJobs, FormatJobs, AnalysisJobs, ArtifactManagement):
     def __init__(self, root, config, *, start_worker=True):
         self.root = Path(root).resolve()
         self.config = config
@@ -121,6 +122,8 @@ class Projects(PreviewJobs, FormatJobs, AnalysisJobs, ArtifactManagement):
         self.cancels = {}
         self.child = None
         self.preview_signature = signature()
+        self.source_preview_slot = preview_slot()
+        self.active_source_previews = set()
         self.recover()
         self.thread = threading.Thread(target=self.loop, daemon=True)
         if start_worker:
@@ -158,6 +161,8 @@ class Projects(PreviewJobs, FormatJobs, AnalysisJobs, ArtifactManagement):
                     p.setdefault("source_info", {}).setdefault("bytes", file.stat().st_size)
                     if p["source_info"].get("bytes") is None:
                         p["source_info"]["bytes"] = file.stat().st_size
+            if index_source(root, p):
+                self.save(root, p)
             return p
 
     def list(self, trashed=False):
@@ -172,6 +177,7 @@ class Projects(PreviewJobs, FormatJobs, AnalysisJobs, ArtifactManagement):
             )
 
     def save(self, root, project):
+        index_source(root, project)
         if project.get("source_info", {}).get("kind") == "image":
             for artifact in project["artifacts"]:
                 if artifact["artifact_id"] == project["source_artifact_id"]:

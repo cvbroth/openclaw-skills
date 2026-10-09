@@ -54,10 +54,17 @@ def render(request):
     with fitz.open(pdf) as document:
         if not 0 < len(document) <= 1000:
             raise ValueError("PREVIEW_PAGE_LIMIT")
-        for n, page in enumerate(document, 1):
+        selected = request.get("physical_page")
+        if selected is not None and (
+            isinstance(selected, bool) or not isinstance(selected, int) or not 1 <= selected <= len(document)
+        ):
+            raise ValueError("PHYSICAL_PAGE_OUT_OF_RANGE")
+        indices = [selected - 1] if selected is not None else range(len(document))
+        for index in indices:
+            n, page = index + 1, document[index]
             if page.rect.width * page.rect.height * (120 / 72) ** 2 > 20_000_000:
                 raise ValueError("PREVIEW_PIXEL_LIMIT")
-            path = out / f"page-{n}.png"
+            path = out / ("page.png" if selected is not None else f"page-{n}.png")
             page.get_pixmap(matrix=fitz.Matrix(120 / 72, 120 / 72), alpha=False).save(path)
             pages.append(
                 {

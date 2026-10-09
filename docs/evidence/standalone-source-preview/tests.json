@@ -1,0 +1,17 @@
+{
+  "related_suite": {
+    "passed": 111,
+    "warnings": 5,
+    "elapsed_seconds": 67.71
+  },
+  "after_minimal_environment_change": {
+    "passed": 21,
+    "warnings": 5,
+    "elapsed_seconds": 27.73
+  },
+  "runtime": "isolated fixed development image; network none; 2CPU/4GiB; no extra swap; read-only root",
+  "ruff": "passed",
+  "diff_check": "passed",
+  "real_cloud_requests": 0,
+  "real_ocr_requests": 0
+}
