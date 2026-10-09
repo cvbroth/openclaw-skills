@@ -57,7 +57,7 @@ async function saveRevision(format){
   requestId=requestId||uuid();let result=await post(revisionURL+'/text-revisions',{request_id:requestId,parent_artifact_id:editInfo.artifact_id,parent_sha256:editInfo.sha256,head_id:editInfo.head_id,head_sha256:editInfo.head_sha256,locator:loc,text:editText,reviewer_type:$('#reviewer').value});
   editDirty=false;editOriginal=editText;editing=false;await installProject(result.artifact_id,loc);state(result.no_change?'无变化，未创建重复版本':'已保存修订版');
   if(format){if(!template){formatState('修订已保存；未选择模板，请返回项目选择模板后排版。');return true;}
-   try{let job=await post(revisionURL+'/format',{source_artifact_id:result.artifact_id,template});formatState('修订已保存 · 排版排队中');watchFormat(job.task_id);}catch(e){formatState('修订已保存；排版启动失败，可单独重试：'+e.message);}}
+   try{let job=await post(revisionURL+'/format',{source_artifact_id:result.artifact_id,template,pagination:P.selected_pagination||{mode:"continuous"}});formatState('修订已保存 · 排版排队中');watchFormat(job.task_id);}catch(e){formatState('修订已保存；排版启动失败，可单独重试：'+e.message);}}
   return true;
  }catch(e){state('保存失败：'+e.message+'；草稿仍保留。');return false;}finally{editBusy=false;lockTextNavigation(false);$('#textMode').disabled=!editInfo;if($('#textEditor'))$('#textEditor').readOnly=editInfo.head_id!==editInfo.artifact_id;}
 }

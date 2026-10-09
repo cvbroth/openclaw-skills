@@ -1,0 +1,28 @@
+{
+  "synthetic": true,
+  "screens": [],
+  "collapsed_main_height": 659,
+  "expanded_main_height": 568,
+  "saved_template": {
+    "id": "r8-browser-1791564008",
+    "version": "1.0.0"
+  },
+  "style.docx": {
+    "id": "word-style-ce5addd5",
+    "version": "1.0.0",
+    "section": 0
+  },
+  "style.dotx": {
+    "id": "word-style-f7be2d06",
+    "version": "1.0.0",
+    "section": 0
+  },
+  "multisection.docx": {
+    "id": "word-style-4e028978",
+    "version": "1.0.0",
+    "section": 1
+  },
+  "preview_project_url": "/projects/ab9deb01-9534-498f-b969-40cbf39bc47f",
+  "browser": "140.0.7339.16",
+  "page_errors": []
+}

@@ -86,3 +86,5 @@ python3 filetools/bin/pdf_split.py split 大.pdf --every 50  # 拆分/取页/合
 - [使用、接口与数据迁移](docs/STANDALONE_TEXT_REVISIONS.md)
 - [计划及数据约定](docs/STANDALONE_TEXT_REVISIONS_PLAN.md)
 - [真实浏览器、合成故障与未验证边界](docs/STANDALONE_TEXT_REVISIONS_REPORT.md)
+
+独立HTTP R8：默认专注对照、可靠来源页定位、分组模板编辑、无宏DOCX/DOTX样式导入及可选保留原件分页。见[使用与边界](docs/STANDALONE_WORKBENCH_R8.md)、[实施计划](docs/STANDALONE_WORKBENCH_R8_PLAN.md)、[真实验证报告](docs/STANDALONE_WORKBENCH_R8_REPORT.md)。仅独立开发服务，未部署生产。

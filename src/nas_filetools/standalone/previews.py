@@ -21,7 +21,12 @@ class PreviewJobs:
         with self.lock:
             project = self.get(pid)
             artifact = next((a for a in project["artifacts"] if a["artifact_id"] == aid), None)
-            if not artifact or artifact.get("recycled") or artifact["format"] not in {"pdf", "docx"} or not artifact["path"]:
+            if (
+                not artifact
+                or artifact.get("recycled")
+                or artifact["format"] not in {"pdf", "docx"}
+                or not artifact["path"]
+            ):
                 raise ValueError("preview requires registered local DOCX/PDF")
             if aid == project.get("source_artifact_id"):
                 raise ValueError("原件仅预览显式处理的物理页；不触发整份原件渲染")
@@ -115,6 +120,12 @@ class PreviewJobs:
             if result["status"] == "SUCCEEDED":
                 artifact.setdefault("legacy_pages", artifact["pages"])
                 artifact["pages"] = result["views"]
+                mapping = artifact.get("source_output_mapping")
+                if mapping:
+                    for view in artifact["pages"]:
+                        view["source_pages"] = [
+                            g["source_page"] for g in mapping if view["output_page"] in g["output_pages"]
+                        ]
                 artifact["preview"] = {
                     "label": "DOCX经LibreOffice实际渲染（不是独立生成PDF）"
                     if artifact["format"] == "docx"

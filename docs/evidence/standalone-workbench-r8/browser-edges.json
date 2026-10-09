@@ -1,0 +1,12 @@
+{
+  "synthetic": true,
+  "synthetic_long_quality_panel": true,
+  "quality_source_only": true,
+  "filtered_mapping_explicit": true,
+  "scroll_preserved": {
+    "left": 190,
+    "right": 250
+  },
+  "offline_previews": true,
+  "page_errors": []
+}

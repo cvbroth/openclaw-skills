@@ -45,9 +45,12 @@ D. 不编造答案。
 
 
 class FormatJobs:
-    def format_artifact(self, pid, aid, choice, allow_draft=False):
+    def format_artifact(self, pid, aid, choice, allow_draft=False, pagination=None):
         from .tasks import ACTIVE, now
 
+        from .source_pagination import options
+
+        policy = options(pagination)
         with self.lock:
             project = self.get(pid)
             if any(t["status"] in ACTIVE for t in project.get("tasks", [])):
@@ -55,6 +58,16 @@ class FormatJobs:
             artifact = next(a for a in project["artifacts"] if a["artifact_id"] == aid)
             if artifact.get("recycled") or artifact["format"] != "markdown" or not artifact["path"]:
                 raise ValueError("source_artifact_id: registered Markdown required")
+            if policy["mode"] == "source-pages":
+                from .text_revisions import mapped_text
+
+                mapped_text(self.path(pid), artifact)
+                if not artifact.get("pages") or any(
+                    type(v.get("source_page")) is not int
+                    or not 1 <= v["source_page"] <= project.get("source_info", {}).get("units", 0)
+                    for v in artifact["pages"]
+                ):
+                    raise ValueError("SOURCE_PAGE_MAPPING_REQUIRED: 保留原件分页需要每个片段的明确来源页")
             template = self.library.load(choice["id"], choice["version"], allow_draft)
             tid = str(uuid.uuid4())
             task = {
@@ -64,6 +77,7 @@ class FormatJobs:
                 "source_artifact_id": aid,
                 "engine": {"model": "none"},
                 "parameters": {},
+                "pagination": policy,
                 "pages": {},
                 "result_versions": [],
                 "template": choice,
@@ -75,6 +89,7 @@ class FormatJobs:
             }
             if not allow_draft:
                 project["selected_template"] = dict(choice)
+                project["selected_pagination"] = policy
             project.setdefault("tasks", []).append(task)
             self.cancels[tid] = threading.Event()
             self.save(self.path(pid), project)
@@ -176,6 +191,7 @@ class FormatJobs:
         result = self.run_child(
             {
                 "pages": pages,
+                "pagination": t.get("pagination"),
                 "title": p["name"],
                 "template": t["template"],
                 "template_data": t["template_data"],
@@ -205,6 +221,7 @@ class FormatJobs:
                             "content-structure.json",
                             "layout-validation.json",
                         ]
+                        + (["pagination-report.json"] if (work / "pagination-report.json").is_file() else [])
                     ],
                 )
                 # A new immutable version derives from this exact source/template pair.
@@ -248,6 +265,19 @@ class FormatJobs:
                         role="result" if fmt in {"docx", "pdf"} else "diagnostic",
                     )
                     created.append(item["artifact_id"])
+                if (work / "pagination-report.json").is_file():
+                    paging = json.loads((work / "pagination-report.json").read_text())
+                    for item in p["artifacts"]:
+                        if item["artifact_id"] in created and item["format"] in {"docx", "pdf"}:
+                            item["source_output_mapping"] = paging["groups"]
+                    register_artifact(
+                        root,
+                        p,
+                        name="分页适配记录",
+                        format="json",
+                        path=str((directory / "published/pagination-report.json").relative_to(root)),
+                        parents=[a["artifact_id"]],
+                    )
                 choice = t["template"]
                 entry = t["template_data"]["record"]
                 if not any(
@@ -256,6 +286,14 @@ class FormatJobs:
                     snapshot_template(
                         root, p, self.library.path(entry), template_id=choice["id"], version=choice["version"]
                     )
+                imported = t["template_data"].get("document", {}).get("import_source")
+                if imported:
+                    import shutil
+
+                    origin = self.library.root / "imports" / imported["import_id"]
+                    dest = root / "templates" / ("import-" + imported["import_id"])
+                    if not dest.exists():
+                        shutil.copytree(origin, dest)
                 t["result_versions"].append({"version": version, "artifacts": created, "created_at": now()})
             t.update(
                 status=result["status"],
@@ -264,6 +302,8 @@ class FormatJobs:
             )
             if result.get("error"):
                 t["error"] = result["error"]
+                if (work / "pagination-report.json").is_file():
+                    t["pagination_report"] = str((work / "pagination-report.json").relative_to(root))
             emit_viewer(root, p)
             self.save(root, p)
         for item in p["artifacts"]:

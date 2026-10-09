@@ -160,6 +160,34 @@ class Handler(BaseHTTPRequestHandler):
                     "fonts": [{"name": f["name"], "sha256": f["sha256"]} for f in m.library.fonts.values()],
                 }
             )
+        if method == "POST" and parts == ["api", "template-imports"]:
+            name = filename(parse_qs(url.query).get("filename", [""])[0], {".docx", ".dotx"})
+            if Path(name).suffix.lower() not in {".docx", ".dotx"}:
+                raise ValueError("仅支持无宏.docx和.dotx")
+            size = self.length(20 * 1024 * 1024)
+            temp = m.root / "uploads" / (uuid.uuid4().hex + Path(name).suffix.lower())
+            try:
+                with temp.open("xb") as f:
+                    while size:
+                        chunk = self.rfile.read(min(size, 65536))
+                        if not chunk:
+                            raise ValueError("incomplete upload")
+                        f.write(chunk)
+                        size -= len(chunk)
+                with m.lock:
+                    return self.send_json(m.library.import_word(temp, name), 201)
+            finally:
+                temp.unlink(missing_ok=True)
+        if len(parts) == 4 and parts[:2] == ["api", "template-imports"]:
+            iid = str(uuid.UUID(parts[2]))
+            if parts[3] == "select" and method == "POST":
+                data = self.json_body()
+                with m.lock:
+                    return self.send_json(
+                        m.library.select_word_import(iid, data.get("section_index"), data.get("font_family"))
+                    )
+            if method == "GET" and parts[3] == "report":
+                return self.stream(m.library.root / "imports" / iid / "report.json")
         if method == "POST" and parts == ["api", "templates"]:
             with m.lock:
                 result = m.library.save(self.json_body())
@@ -257,7 +285,10 @@ class Handler(BaseHTTPRequestHandler):
             if len(parts) == 4 and parts[3] == "format" and method == "POST":
                 data = self.json_body()
                 return self.send_json(
-                    m.format_artifact(pid, data["source_artifact_id"], data["template"]), 202
+                    m.format_artifact(
+                        pid, data["source_artifact_id"], data["template"], pagination=data.get("pagination")
+                    ),
+                    202,
                 )
             if len(parts) == 4 and parts[3] == "template" and method == "POST":
                 data = self.json_body()
@@ -365,7 +396,7 @@ class Handler(BaseHTTPRequestHandler):
             if (
                 len(parts) == 4
                 and parts[2] == "review"
-                and parts[3] in {"index.html", "viewer.js", "viewer.css", "editor.js"}
+                and parts[3] in {"index.html", "viewer.js", "viewer.css", "editor.js", "workbench.js"}
             ):
                 path = Path(__file__).parent.parent / "project_assets" / parts[3]
             if not path.is_file():

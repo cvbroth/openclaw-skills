@@ -1,4 +1,8 @@
-# 当前增量：R6 原件完整分页
+# 当前增量：R8 对照与模板
+
+参见[工作台、Word样式导入与来源分页](STANDALONE_WORKBENCH_R8.md)和[真实验证报告](STANDALONE_WORKBENCH_R8_REPORT.md)。R7人工修订继续保留；以下历史描述按阶段解释。生产环境不变。
+
+# 历史R6：原件完整分页
 
 参见[原件分页与工作台](STANDALONE_SOURCE_PREVIEW.md)和[验证报告](STANDALONE_SOURCE_PREVIEW_REPORT.md)。在线按需浏览全部登记物理页，离线仅已缓存页；以下历史章节按各轮时点解释。
 

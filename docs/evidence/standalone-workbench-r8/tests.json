@@ -1,0 +1,25 @@
+{
+  "baseline": "3535ae73897d577af220f6523f365453e61a1212",
+  "related_regressions": {
+    "passed": 122,
+    "seconds": 112.11
+  },
+  "subsequent_style_revision": {
+    "passed": 48,
+    "seconds": 56.24
+  },
+  "new_tests_final": {
+    "passed": 9,
+    "seconds": 17.44
+  },
+  "final_complete": {
+    "passed": 125,
+    "seconds": 116.9
+  },
+  "warnings": "5 existing SWIG deprecations",
+  "scope": "offline 2CPU/4GiB; no cloud; inherited synthetic/mock cases distinguished in report",
+  "font_hint_final": {
+    "passed": 2,
+    "scope": "inheritance, fixed spacing, font hint exclusion and multisection selection"
+  }
+}

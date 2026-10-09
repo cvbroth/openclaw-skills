@@ -1,0 +1,8 @@
+{
+  "status": 400,
+  "response": {
+    "error": "INVALID_REQUEST",
+    "reason": "Word样本无效：压缩包或必需XML不完整"
+  },
+  "temporary_cleanup": true
+}

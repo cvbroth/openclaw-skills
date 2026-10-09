@@ -1,0 +1,62 @@
+[
+  {
+    "path": "before-r7.png",
+    "sha256": "7c81449c23c11e0f97a8f9a0d063524a86ad5c0c836c6eff5eec913dbdc3f97a",
+    "scope": "synthetic only"
+  },
+  {
+    "path": "offline-word-pdf.png",
+    "sha256": "8bd944877a412a7f3aa4a28bb42abb7f582c8372d94b452d05d985bc224e49ae",
+    "scope": "synthetic only"
+  },
+  {
+    "path": "published-word-template.png",
+    "sha256": "d44f736cdff5fbd72a1e06ad63c2d1f22d72da9265f54ebf439549d924b29295",
+    "scope": "synthetic only"
+  },
+  {
+    "path": "quality-panel-bounded.png",
+    "sha256": "11db53164ba2388250af54c1bdfe3720ad16fe4333ef8b1c2b55e6319b4f5ad3",
+    "scope": "synthetic only"
+  },
+  {
+    "path": "template-layout.png",
+    "sha256": "5f90f8093cd73f11d4ca842d230e4e1b4ba648da33ac943d75eba1a3eb73fbc7",
+    "scope": "synthetic only"
+  },
+  {
+    "path": "template-narrow.png",
+    "sha256": "d4d64c28299b1662e07d39ab95f612adf66b524c62638b7352dcc253d8764d15",
+    "scope": "synthetic only"
+  },
+  {
+    "path": "word-import-multisection.png",
+    "sha256": "5751a3bbf5aa8f970f2ecd3c293424093b791aa7256a5a0a6ace329574f4bbad",
+    "scope": "synthetic only"
+  },
+  {
+    "path": "word-pdf-independent.png",
+    "sha256": "03fd5ece301af7fdd6d9f4e4e6f59304bd5f8b4e4b0a23891ecf46efd250a257",
+    "scope": "synthetic only"
+  },
+  {
+    "path": "workbench-1920.png",
+    "sha256": "3648ccb28de503652d73fcded1225989e6ec0e48595a95bb00517b8b19975597",
+    "scope": "synthetic only"
+  },
+  {
+    "path": "workbench-collapsed-1440.png",
+    "sha256": "65b6053df31895c24c72d1780a179fa7fef2a30fa7f2d8b7b57cb9015f791754",
+    "scope": "synthetic only"
+  },
+  {
+    "path": "workbench-expanded-1440.png",
+    "sha256": "65a1b7cc4f45406cce1dd1a4a84e2cae3c71e9639e761ca7cc80ba0ab3b0c787",
+    "scope": "synthetic only"
+  },
+  {
+    "path": "workbench-narrow.png",
+    "sha256": "025f378f5b8e83720343cf3f1e87a50d53a89e89b7b0d795c9d11ce1d1bdebc6",
+    "scope": "synthetic only"
+  }
+]

@@ -9,6 +9,8 @@ import shutil
 import subprocess
 from ..document_templates import TEMPLATE_ROOT, validate_parameters
 from ..artifact_project import digest
+from .word_import import WordImports
+from .word_styles import validate_styles
 
 
 def installed_fonts():
@@ -25,7 +27,7 @@ def installed_fonts():
     return fonts
 
 
-class TemplateLibrary:
+class TemplateLibrary(WordImports):
     def __init__(self, root):
         self.root = Path(root)
         if not self.root.exists():
@@ -44,10 +46,14 @@ class TemplateLibrary:
         if not isinstance(doc, dict):
             raise ValueError("template: object required")
         expected = {"schema_version", "id", "version", "name", "description", "content_types", "parameters"}
+        if doc.get("schema_version") == 3:
+            expected.add("word_styles")
+            if "import_source" in doc:
+                expected.add("import_source")
         if set(doc) != expected:
             raise ValueError("template fields: " + str(sorted(set(doc) ^ expected)))
-        if doc["schema_version"] != 2:
-            raise ValueError("schema_version: expected 2")
+        if doc["schema_version"] not in {2, 3}:
+            raise ValueError("schema_version: expected 2 or 3")
         for k, pattern in [("id", r"[a-z0-9][a-z0-9-]{0,63}"), ("version", r"\d+\.\d+\.\d+")]:
             if not isinstance(doc[k], str) or len(doc[k]) > 64 or not re.fullmatch(pattern, doc[k]):
                 raise ValueError(k + ": invalid")
@@ -57,6 +63,7 @@ class TemplateLibrary:
         if (
             not isinstance(doc["content_types"], list)
             or not doc["content_types"]
+            or not all(isinstance(t, str) for t in doc["content_types"])
             or not set(doc["content_types"]) <= {"markdown-basic", "reviewed-single-choice"}
         ):
             raise ValueError("content_types: unsupported")
@@ -72,7 +79,58 @@ class TemplateLibrary:
         if family not in self.fonts:
             raise ValueError("parameters.font_family: not installed")
         # Same parameter schema as the package, with a server-proven font choice.
-        validate_parameters({**params, "font_family": "Droid Sans Fallback"})
+        if (
+            all(type(params.get(k)) in {int, float} for k in ["footer_distance_cm", "margin_cm"])
+            and params["footer_distance_cm"] >= params["margin_cm"]
+        ):
+            raise ValueError("parameters.footer_distance_cm: 页脚距离须小于统一边距（cm）")
+        if (
+            all(type(params.get(k)) in {int, float} for k in ["option_hanging_cm", "option_indent_cm"])
+            and params["option_hanging_cm"] > params["option_indent_cm"]
+        ):
+            raise ValueError("parameters.option_hanging_cm: 悬挂须不大于选项缩进（cm）")
+        try:
+            validate_parameters({**params, "font_family": "Droid Sans Fallback"})
+        except ValueError as exc:
+            key = str(exc).partition(": ")[2]
+            if key in rules:
+                rule = rules[key]
+                limits = (
+                    f"{rule.get('minimum')}–{rule.get('maximum')}"
+                    if "minimum" in rule
+                    else str(rule.get("enum", rule["type"]))
+                )
+                raise ValueError(f"parameters.{key}: 无效值；允许范围/类型 {limits}（单位见字段）") from exc
+            raise
+        if doc["schema_version"] == 3:
+            validate_styles(doc["word_styles"])
+            if "import_source" in doc:
+                import uuid
+
+                source = doc["import_source"]
+                if not isinstance(source, dict) or set(source) != {
+                    "import_id",
+                    "sha256",
+                    "section_index",
+                    "font_selection_confirmed",
+                }:
+                    raise ValueError("import_source: 导入来源字段不完整或未知")
+                iid = str(uuid.UUID(source["import_id"]))
+                record = json.loads((self.root / "imports" / iid / "report.json").read_text())
+                original = (
+                    self.root / "imports" / iid / ("original" + Path(record["filename"]).suffix.lower())
+                )
+                if not original.is_file() or digest(original) != record["file_sha256"]:
+                    raise ValueError("import_source.sha256: 原始导入文件变化")
+                if (
+                    source.get("sha256") != record["file_sha256"]
+                    or source.get("font_selection_confirmed") is not True
+                ):
+                    raise ValueError("import_source.font_selection_confirmed: 请明确选择统一服务器字体")
+                if type(source.get("section_index")) is not int or not 0 <= source["section_index"] < len(
+                    record["sections"]
+                ):
+                    raise ValueError("import_source.section_index: 请选择适用节")
         return copy.deepcopy(doc)
 
     def path(self, entry):
@@ -111,6 +169,7 @@ class TemplateLibrary:
             "document": doc,
             "parameters": params,
             "font": self.fonts[params["font_family"]],
+            "word_styles": doc.get("word_styles"),
         }
 
     def save(self, doc):

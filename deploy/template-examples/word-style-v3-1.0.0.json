@@ -1,0 +1,68 @@
+{
+  "schema_version": 3,
+  "id": "word-style-example",
+  "version": "1.0.0",
+  "name": "Word样式扩展示例",
+  "description": "声明式样式；先保存草稿并查看真实预览",
+  "content_types": [
+    "markdown-basic",
+    "reviewed-single-choice"
+  ],
+  "parameters": {
+    "font_family": "Droid Sans Fallback",
+    "body_pt": 11.5,
+    "line_spacing": 1.35,
+    "space_after_pt": 6,
+    "margin_cm": 2,
+    "width_cm": 21,
+    "height_cm": 29.7,
+    "title_pt": 16,
+    "part_pt": 14,
+    "chapter_pt": 13,
+    "subject_pt": 13,
+    "type_pt": 11.5,
+    "source_pt": 9,
+    "footer_pt": 9,
+    "heading_before_pt": 3,
+    "option_indent_cm": 0.65,
+    "option_hanging_cm": 0.35,
+    "short_question_max_fraction": 0.3,
+    "short_option_max_lines": 3,
+    "short_stem_max_lines": 3,
+    "minimum_start_lines": 2,
+    "footer_distance_cm": 1,
+    "max_pages": 50
+  },
+  "word_styles": {
+    "section": {
+      "width_cm": 21,
+      "height_cm": 29.7,
+      "top_cm": 2,
+      "bottom_cm": 2,
+      "left_cm": 2.2,
+      "right_cm": 2.2,
+      "header_distance_cm": 1,
+      "footer_distance_cm": 1
+    },
+    "paragraphs": {
+      "Normal": {
+        "size_pt": 11.5,
+        "line_mode": "exact",
+        "line_value": 17,
+        "space_before_pt": 0,
+        "space_after_pt": 4,
+        "first_line_cm": 0
+      },
+      "Heading 1": {
+        "size_pt": 15,
+        "bold": true,
+        "space_before_pt": 8,
+        "space_after_pt": 6
+      },
+      "Option": {
+        "left_cm": 0.8,
+        "first_line_cm": -0.3
+      }
+    }
+  }
+}

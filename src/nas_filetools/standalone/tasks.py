@@ -54,7 +54,7 @@ def atomic(path, data):
     os.replace(temp, path)
 
 
-def filename(value):
+def filename(value, extensions=None):
     if (
         not isinstance(value, str)
         or not 1 <= len(value) <= 180
@@ -64,8 +64,8 @@ def filename(value):
         or any(ord(c) < 32 or c in '<>:"|?*' for c in value)
     ):
         raise ValueError("invalid filename")
-    if Path(value).suffix.lower() not in {".pdf", ".png", ".jpg", ".jpeg", ".webp"}:
-        raise ValueError("only PDF, PNG, JPEG and WebP supported")
+    if Path(value).suffix.lower() not in (extensions or {".pdf", ".png", ".jpg", ".jpeg", ".webp"}):
+        raise ValueError("仅支持无宏DOCX/DOTX" if extensions else "only PDF, PNG, JPEG and WebP supported")
     return value
 
 

@@ -1,0 +1,42 @@
+{
+  "http_synthetic_source_pages": {
+    "source_pages": [
+      23,
+      24
+    ],
+    "output_pages": 2,
+    "elapsed_seconds": 3.8699720409931615,
+    "process_peak_rss_kib": 93572,
+    "engine_calls": 0
+  },
+  "real_existing_page6": {
+    "origin": "previously reviewed structure, not new OCR",
+    "source_pdf_sha256": "0007677dc510b01ffed36bd1250fafd8a7b0101f383e3603257b45e379a6f28b",
+    "existing_structure_sha256": "200863834cde1d56cb7406c43635f827fcbe9b83d7db57a032655f28847ea196",
+    "original_ocr_sha256": "9ca6e82cd2749b68ab3dffbd09735c235a7cccff5b59a1802a67eaf233a39f70",
+    "physical_page": 6,
+    "blocks": 9,
+    "questions": 5,
+    "input_characters": 1035,
+    "output_pages": 1,
+    "attempt_page_counts": [
+      2,
+      2,
+      1
+    ],
+    "font_floor_pt": 9,
+    "font_fit_explicit": true,
+    "elapsed_seconds": 5.4936089309630916,
+    "process_peak_rss_kib": 93612,
+    "docx": {
+      "bytes": 39767,
+      "sha256": "793a3d1269d6583bb2071260a9127c1bc0b6a1218d45d6cc9785e2d16cfc90f4"
+    },
+    "pdf": {
+      "bytes": 43396,
+      "sha256": "062ed87b2d7507b79f4ab69b73cf56045eb8dd9e71182b3cad790f1132144500"
+    }
+  },
+  "visual_scope": "actual LO DOCX and PDF raster; 3+2 synthetic and 1 real page; image-pair hashes equal; developer visual review, not user confirmation",
+  "resource_scope": "script process RSS; not whole container or wholebook peak"
+}

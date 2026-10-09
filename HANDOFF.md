@@ -329,3 +329,9 @@ GLM停止后，现有M3原PNG连接以种子2026100802固定50页（含12/23/136
 基于R6增量；见 docs/STANDALONE_TEXT_REVISIONS_PLAN.md、STANDALONE_TEXT_REVISIONS.md、STANDALONE_TEXT_REVISIONS_REPORT.md。独立HTTP新增TextRevisions模块、注册Markdown逐位置编辑、不可变完整修订、同步结构/阅读视图、幂等与链头冲突、历史差异/恢复、保存后复用format_artifact。原稿/质量/评论不覆盖，旧坐标不冒充修订字坐标。
 
 右栏编辑只加载当前映射位置；左栏独立。未保存切换有保存/放弃/取消，浏览器关闭/刷新原生保护；离线只读。缺映射拒绝，不猜页。真实合成23页编辑后生成Word/PDF并实际预览，零识别/云请求；旧216登记文件和21项目任务记录不变。相关124项回归及最终32项专项通过。私有证据runtime/standalone-r7，公开合成证据docs/evidence/standalone-text-revisions。只更新独立开发服务；生产、OpenClaw、模板均未改。
+
+## 2026-10-10 R8：对照定位与Word样式模板
+
+基于3535ae73897d577af220f6523f365453e61a1212增量，见docs/STANDALONE_WORKBENCH_R8_PLAN.md、STANDALONE_WORKBENCH_R8.md、STANDALONE_WORKBENCH_R8_REPORT.md。每次默认折叠仍可输入两侧位置、登记来源定位接R7保护；响应式模板UI和未保存门控；无宏DOCX/DOTX有界样式提取，显式节/字体选择，兼容v3执行设置、原样本与提取报告关联。独立来源分页使用真实逐组DOCX渲染、有限适配与最终逐页比对，冲突不掩盖；连续模式PDF也从DOCX导出。公共模板1.0.0、生产生成器/配置均不改。
+
+真实浏览器三视口、合成169页/片段18来源23、质量筛选与R7草稿保护、实际Word/PDF及移动目录离线验证。真实第6页复用既有核实文字，显式9磅后1页；不是合成第23页，不是整册。零OCR/云请求，只更新独立开发HTTP。公开合成证据docs/evidence/standalone-workbench-r8，私有runtime/standalone-r8；Windows/桌面Word与大容量来源分页仍未验证。最终提交/共享包回执以Git与实际交付为准。

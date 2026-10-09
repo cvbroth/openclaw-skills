@@ -1,0 +1,13 @@
+{
+  "file": "filetools-workbench-r8-20261010.zip",
+  "bytes": 4994696,
+  "sha256": "42a90436913f16021d4ea388b3fc40f47d4ad663af0cd260abd7321252f3e0fb",
+  "members": 302,
+  "longest_relative_path_characters": 113,
+  "zip_crc": "passed",
+  "windows_actual_extraction": "unverified",
+  "business_text_in_git": false,
+  "combined_offline_browser": "same exported project verified in final package check; final amendment changes only font hint filtering and documentation",
+  "production_deployed": false,
+  "project_resources_identical_to_browser_verified_package": true
+}
