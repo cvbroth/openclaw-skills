@@ -6,8 +6,36 @@ from pathlib import Path
 import subprocess
 import sys
 import time
+import tempfile
 import fitz
 from ..artifact_project import digest
+
+
+def export_docx(source, out, timeout=120):
+    """Actual office renderer, isolated temporary profile; no alternative PDF substitution."""
+    source, out = Path(source), Path(out)
+    out.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="filetools-lo-") as temp:
+        profile = Path(temp) / "profile"
+        subprocess.run(
+            [
+                "libreoffice",
+                "-env:UserInstallation=" + profile.resolve().as_uri(),
+                "--headless",
+                "--convert-to",
+                "pdf",
+                "--outdir",
+                str(out),
+                str(source),
+            ],
+            check=True,
+            timeout=timeout,
+            env={**os.environ, "HOME": temp, "XDG_CACHE_HOME": temp, "GSETTINGS_BACKEND": "memory"},
+        )
+    pdf = out / (source.stem + ".pdf")
+    if not pdf.is_file():
+        raise ValueError("DOCX_RENDER_PDF_MISSING")
+    return pdf
 
 
 def render(request):
@@ -18,26 +46,7 @@ def render(request):
     pdf = source
     engine = {"pdf_raster": fitz.version, "dpi": 120}
     if request["format"] == "docx":
-        profile = out / "lo-profile"
-        command = [
-            "libreoffice",
-            "-env:UserInstallation=" + profile.resolve().as_uri(),
-            "--headless",
-            "--convert-to",
-            "pdf",
-            "--outdir",
-            str(out),
-            str(source),
-        ]
-        subprocess.run(
-            command,
-            check=True,
-            timeout=120,
-            env={**os.environ, "HOME": "/tmp", "XDG_CACHE_HOME": "/tmp", "GSETTINGS_BACKEND": "memory"},
-        )
-        pdf = out / (source.stem + ".pdf")
-        if not pdf.is_file():
-            raise ValueError("DOCX_RENDER_PDF_MISSING")
+        pdf = export_docx(source, out)
         engine["docx_renderer"] = subprocess.check_output(
             ["libreoffice", "--version"], text=True, timeout=10
         ).strip()

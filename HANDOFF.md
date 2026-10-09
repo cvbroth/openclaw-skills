@@ -290,3 +290,14 @@ GLM停止后，现有M3原PNG连接以种子2026100802固定50页（含12/23/136
 仅独立开发服务filetools-http-dev-review-r2-final运行，镜像sha256:3bf4eabd2e4cde9521c212568359f416c6ab9d06709f3d677e8cdaa84efe8530，2CPU/4GiB无额外swap、UID1000、只读根、loopback18971；未修改生产FileTools/OpenClaw/Skill/模板/额度。启动/访问同STANDALONE_HTTP.md；当前浏览器脚本browser_review_r2.py与_edges.py，不再用R1旧选择器脚本宣称R2通过。迁移与回退说明STANDALONE_REVIEW_R2_MIGRATION.md，结果STANDALONE_REVIEW_R2_REPORT.md。
 
 新共享包路径/大小/SHA及实测记录见docs/evidence/standalone-review-r2/delivery.json。根index.html包含第12页、历史50、原6–10页Word/PDF、合成边界项目；无Incoming挂载、无saved/知识库写入。用户下载和Windows客户端验收尚未完成；到此停止，等待用户查看，不扩大OCR或部署生产。
+
+
+## 独立HTTP评审R3：工具栏、Markdown派生结构与模板（2026-10-09）
+
+基于9579d184889e179f21b0adf78a56037e18d84290，实施说明STANDALONE_REVIEW_R3_PLAN.md，使用/迁移STANDALONE_REVIEW_R3.md，真实结果STANDALONE_REVIEW_R3_REPORT.md。未发起OCR或云请求，未改生产/部署Skill/原件。外层整册未提交改动保留。仅更新独立开发服务，保留原安全与资源约束；镜像ID、容器名及共享位置保留私有记录，不公开内部部署元数据。未注入云凭据，本轮仅已有内容重新排版与评审。
+
+工具栏按项目折叠/专注、窄屏切换保留草稿与定位。Chromium实测1600×1000视口正文高度从569.53增至725.13（+155.59px），独立滚动/缩放/页码保持。语义展示与下载名分离ID/哈希/缓存，最新按格式/引擎/模板分组、旧版折叠。CommonMark3.0.0解析到独立来源结构，标题/段落/换行/原号列表/粗斜体及字面符号测试；原Markdown不改，歧义不猜归属。仅Regular中文字体下Story实际粗斜体未生效的初次结果保留；最终基础Markdown PDF改为实际DOCX经既有LibreOffice导出，记录renderer，不冒称原生Story强调通过。
+
+模板复用catalog/published/drafts，严格JSON、服务端字体/字形、不可覆盖版本、固定合成真实Word/PDF预览发布门控。私有开发模板markdown-readable/1.0.0和2.0.0；公共questions-zh-cn/1.0.0文件原SHA不变。第12页同一历史M3输入生成v6/v7两套排版（Word/PDF分别2页与3页）；合成两套分别3页与5页，独立实际渲染共26张。题目未核对的Markdown稿不称正式试题稿。
+
+59测试通过21.86秒，Ruff/diff通过，真实浏览器及最终file://包验证通过；83基线文件SHA、历史识别尝试保持。旧50页质量名单不因产物切换改变；只修改合成developer-agent评论。LO profile放外部临时目录清理，新包排除历史profile/锁/tmp，额外语义download_path副本解决file://实际下载名。共享交付大小/SHA见docs/evidence/standalone-review-r3/delivery.json。Windows实际解压、客户端Word字体替换、新PDF全部跨引擎行为未验证；无整册容量/任意模板承诺。真实图文和截图留本地忽略目录，Git只含合成截图与脱敏证据。SSH转发18971后访问主页与/templates；到此等待用户查看，不自动部署或扩大。

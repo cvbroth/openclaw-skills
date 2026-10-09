@@ -1,0 +1,29 @@
+{
+  "related_tests_passed": 59,
+  "seconds": 21.86,
+  "new_ocr_calls": 0,
+  "new_cloud_calls": 0,
+  "browser": "Chromium 140.0.7339.16",
+  "word_renderer": "LibreOffice 7.4.7.2",
+  "pdf_raster": "PyMuPDF 1.25.5",
+  "markdown": "markdown-it-py 3.0.0 / mdurl 0.1.2",
+  "existing_registered_files_unchanged": 83,
+  "historical_recognition_attempt_records_unchanged": true,
+  "public_template_1_0_0_sha256": "eb5804259d000e6348b597e25487cba3bf8f7215987fffd09cf38851e1331df7",
+  "development_container_memory_peak_bytes": 289714176,
+  "container_peak_scope": "container since latest restart; not production or full-book requirement",
+  "attempts_not_accepted": [
+    {
+      "stage": "original test invocation",
+      "reason": "incorrect container working directory; then tmpfs disk-reserve rejection; corrected test cwd and disk-backed test temp; limits unchanged"
+    },
+    {
+      "stage": "native Story PDF emphasis",
+      "reason": "regular Chinese font did not synthesize bold/italic; old outputs retained, derived PDF switched to installed office renderer"
+    },
+    {
+      "stage": "offline semantic download",
+      "reason": "actual Chromium file:// suggested document.docx despite semantic download attribute; portable aliases added and actual download reverified"
+    }
+  ]
+}

@@ -310,6 +310,7 @@ def item_groups(items):
 
 class StoryLayout:
     """Actual Story measurements and drawing; no speculative break-* CSS."""
+
     def __init__(self, font_path, template=None):
         self.template = template_config(template)
         self.font_path = Path(font_path) if font_path else None
@@ -320,27 +321,38 @@ class StoryLayout:
         self.line = t["body_pt"] * t["line_spacing"]
         self.short_limit = self.where.height * t["short_question_max_fraction"]
         self.cache = {}
-        face = f'@font-face {{font-family: sample; src: url({self.font_path.name});}}' if self.font_path else ""
-        self.css = face + f'''
-        body {{font-family: sample; font-size:{t['body_pt']}pt; line-height:{t['line_spacing']}; margin:0; color:#000;}}
-        p {{margin:0 0 {t['space_after_pt']}pt 0;}}
-        .title {{font-size:{t['title_pt']}pt;}}
-        .heading-1 {{font-size:{t['part_pt']}pt; font-weight:bold;}}
-        .heading-2 {{font-size:{t['chapter_pt']}pt; font-weight:bold;}}
-        .heading-3 {{font-size:{t['type_pt']}pt; font-weight:bold;}}
-        .subject {{font-size:{t['subject_pt']}pt;}}
-        .option,.point,.continuation {{margin-left:{t['option_indent_cm'] * 72 / 2.54}pt;}}
-        .option,.point {{text-indent:{-t['option_hanging_cm'] * 72 / 2.54}pt;}}
-        .source {{font-size:{t['source_pt']}pt;}}
-        '''
+        face = (
+            f"@font-face {{font-family: sample; src: url({self.font_path.name});}}" if self.font_path else ""
+        )
+        self.css = (
+            face
+            + f"""
+        body {{font-family: sample; font-size:{t["body_pt"]}pt; line-height:{t["line_spacing"]}; margin:0; color:#000;}}
+        p {{margin:{t.get("space_before_pt", 0)}pt 0 {t["space_after_pt"]}pt 0;}}
+        .title {{font-size:{t["title_pt"]}pt;}}
+        .heading-1 {{font-size:{t["part_pt"]}pt; font-weight:bold;}}
+        .heading-2 {{font-size:{t["chapter_pt"]}pt; font-weight:bold;}}
+        .heading-3 {{font-size:{t["type_pt"]}pt; font-weight:bold;}}
+        .subject {{font-size:{t["subject_pt"]}pt;}}
+        .option,.point,.continuation {{margin-left:{t["option_indent_cm"] * 72 / 2.54}pt;}}
+        .option,.point {{text-indent:{-t["option_hanging_cm"] * 72 / 2.54}pt;}}
+        .source {{font-size:{t["source_pt"]}pt;}}
+        """
+        )
 
     def story(self, items):
-        content = "".join(f'<p class="{style.lower().replace(" ", "-")}">{html.escape(text).replace(chr(10), "<br>")}</p>' for style, text in items)
-        return fitz.Story("<html><body>" + content + "</body></html>", user_css=self.css,
-                          archive=fitz.Archive(str(self.font_path.parent)) if self.font_path else None)
+        content = "".join(
+            f'<p class="{style.lower().replace(" ", "-")}">{getattr(text, "safe_html", html.escape(text).replace(chr(10), "<br>"))}</p>'
+            for style, text in items
+        )
+        return fitz.Story(
+            "<html><body>" + content + "</body></html>",
+            user_css=self.css,
+            archive=fitz.Archive(str(self.font_path.parent)) if self.font_path else None,
+        )
 
     def height(self, items):
-        key = tuple(items)
+        key = tuple((style, text, getattr(text, "safe_html", None)) for style, text in items)
         if key not in self.cache:
             more, filled = self.story(items).place(fitz.Rect(0, 0, self.where.width, 100000))
             if more:
@@ -370,7 +382,13 @@ class StoryLayout:
                 low = size + 1
         cut = len(text) - low
         # Do not insert a semantic space or cut an ASCII word if avoidable.
-        while cut > 0 and text[cut - 1].isascii() and text[cut - 1].isalnum() and text[cut].isascii() and text[cut].isalnum():
+        while (
+            cut > 0
+            and text[cut - 1].isascii()
+            and text[cut - 1].isalnum()
+            and text[cut].isascii()
+            and text[cut].isalnum()
+        ):
             cut -= 1
         if cut == 0:
             raise ValueError("UNBREAKABLE_LONG_OPTION_TAIL")
@@ -379,6 +397,7 @@ class StoryLayout:
 
 def _font_style(style, size, template):
     from docx.shared import RGBColor
+
     t = template
     style.font.name = t["font_family"]
     style.font.size = Pt(size)
@@ -392,7 +411,7 @@ def _font_style(style, size, template):
         fonts.attrib.pop(qn("w:" + key + "Theme"), None)
     style.paragraph_format.line_spacing = t["line_spacing"]
     style.paragraph_format.space_after = Pt(t["space_after_pt"])
-    style.paragraph_format.space_before = Pt(0)
+    style.paragraph_format.space_before = Pt(t.get("space_before_pt", 0))
     style.paragraph_format.widow_control = True
     borders = style.element.get_or_add_pPr().find(qn("w:pBdr"))
     if borders is not None:
@@ -402,19 +421,37 @@ def _font_style(style, size, template):
 def write_docx(path, items, font_path=None, template=None):
     from docx.enum.text import WD_ALIGN_PARAGRAPH
     from docx.oxml import OxmlElement
+
     layout = StoryLayout(font_path, template)
     t = layout.template
     document = Document()
     section = document.sections[0]
     section.page_width, section.page_height = Cm(t["width_cm"]), Cm(t["height_cm"])
-    section.top_margin = section.bottom_margin = section.left_margin = section.right_margin = Cm(t["margin_cm"])
+    section.top_margin = section.bottom_margin = section.left_margin = section.right_margin = Cm(
+        t["margin_cm"]
+    )
     section.footer_distance = Cm(t["footer_distance_cm"])
-    sizes = {"Normal": t["body_pt"], "Title": t["title_pt"], "Subject": t["subject_pt"],
-             "Heading 1": t["part_pt"], "Heading 2": t["chapter_pt"], "Heading 3": t["type_pt"],
-             "Question": t["body_pt"], "Option": t["body_pt"], "Point": t["body_pt"],
-             "Source": t["source_pt"], "Unresolved": t["body_pt"], "Material": t["body_pt"], "Footer": t["footer_pt"]}
+    sizes = {
+        "Normal": t["body_pt"],
+        "Title": t["title_pt"],
+        "Subject": t["subject_pt"],
+        "Heading 1": t["part_pt"],
+        "Heading 2": t["chapter_pt"],
+        "Heading 3": t["type_pt"],
+        "Question": t["body_pt"],
+        "Option": t["body_pt"],
+        "Point": t["body_pt"],
+        "Source": t["source_pt"],
+        "Unresolved": t["body_pt"],
+        "Material": t["body_pt"],
+        "Footer": t["footer_pt"],
+    }
     for name, size in sizes.items():
-        style = document.styles[name] if name in document.styles else document.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+        style = (
+            document.styles[name]
+            if name in document.styles
+            else document.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+        )
         _font_style(style, size, t)
         if name.startswith("Heading"):
             style.font.bold = True
@@ -424,9 +461,21 @@ def write_docx(path, items, font_path=None, template=None):
             style.paragraph_format.first_line_indent = Cm(-t["option_hanging_cm"])
     added = []
     for style, text in items:
-        paragraph = document.add_paragraph(text, style)
+        paragraph = document.add_paragraph(style=style)
+        for part in getattr(text, "runs", [{"text": str(text)}]):
+            run = paragraph.add_run(part["text"])
+            if "bold" in part:
+                run.bold = True if part["bold"] else None
+            if "italic" in part:
+                run.italic = True if part["italic"] else None
         paragraph.paragraph_format.keep_together = False
-        paragraph.paragraph_format.keep_with_next = style in ("Title", "Subject", "Heading 1", "Heading 2", "Heading 3")
+        paragraph.paragraph_format.keep_with_next = style in (
+            "Title",
+            "Subject",
+            "Heading 1",
+            "Heading 2",
+            "Heading 3",
+        )
         added.append(paragraph)
     for start, end, group in item_groups(items):
         if group[0][0] != "Question":
@@ -434,7 +483,9 @@ def write_docx(path, items, font_path=None, template=None):
         short = layout.question_short(group)
         for offset, item in enumerate(group):
             paragraph = added[start + offset]
-            is_short_option = item[0] in ("Option", "Point") and layout.short_paragraph(item, t["short_option_max_lines"])
+            is_short_option = item[0] in ("Option", "Point") and layout.short_paragraph(
+                item, t["short_option_max_lines"]
+            )
             paragraph.paragraph_format.keep_together = short or is_short_option
             paragraph.paragraph_format.keep_with_next = short and offset < len(group) - 1
         if not short:
@@ -448,7 +499,7 @@ def write_docx(path, items, font_path=None, template=None):
     footer = section.footer.paragraphs[0]
     footer.style = document.styles["Footer"]
     footer.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    footer.add_run("文档第 ")
+    footer.add_run("文档第 " if t.get("page_numbers", True) else "")
     field = OxmlElement("w:fldSimple")
     field.set(qn("w:instr"), "PAGE")
     run = OxmlElement("w:r")
@@ -456,8 +507,9 @@ def write_docx(path, items, font_path=None, template=None):
     value.text = "1"
     run.append(value)
     field.append(run)
-    footer._p.append(field)
-    footer.add_run(" 页")
+    if t.get("page_numbers", True):
+        footer._p.append(field)
+    footer.add_run(" 页" if t.get("page_numbers", True) else "")
     if not t["show_source_labels"]:
         # Word/Writer can split a keepNext chain ending on an option. A bounded
         # one-cell row has an actual native cannot-split property. Only measured
@@ -482,8 +534,11 @@ def write_docx(path, items, font_path=None, template=None):
             added[start]._p.addprevious(table._tbl)
             # A real empty paragraph separates adjacent tables so readers cannot
             # merge them into one large layout unit. It carries no source text.
-            separator = document.add_paragraph(style="QuestionBoundary" if "QuestionBoundary" in document.styles
-                                               else document.styles.add_style("QuestionBoundary", WD_STYLE_TYPE.PARAGRAPH))
+            separator = document.add_paragraph(
+                style="QuestionBoundary"
+                if "QuestionBoundary" in document.styles
+                else document.styles.add_style("QuestionBoundary", WD_STYLE_TYPE.PARAGRAPH)
+            )
             separator.paragraph_format.space_before = Pt(0)
             separator.paragraph_format.space_after = Pt(0)
             separator.paragraph_format.line_spacing = Pt(1)
@@ -501,7 +556,14 @@ def write_pdf(path, items, font_path, template=None):
     if not Path(font_path).is_file():
         raise ValueError("FONT_FILE_UNAVAILABLE")
     font = fitz.Font(fontfile=str(font_path))
-    missing = sorted({c for _, text in items + [("Footer", "文档第 0123456789 页")] for c in text if not c.isspace() and not font.has_glyph(ord(c))})
+    missing = sorted(
+        {
+            c
+            for _, text in items + [("Footer", "文档第 0123456789 页")]
+            for c in text
+            if not c.isspace() and not font.has_glyph(ord(c))
+        }
+    )
     if missing:
         raise ValueError("FONT_MISSING_GLYPHS: " + "".join(missing))
     writer = fitz.DocumentWriter(str(path))
@@ -541,13 +603,15 @@ def write_pdf(path, items, font_path, template=None):
             if group[0][0] != "Question":
                 reserve = 0
                 if group[0][0] in ("Title", "Subject", "Heading 1", "Heading 2", "Heading 3"):
-                    for _, _, following in groups[group_index + 1:]:
+                    for _, _, following in groups[group_index + 1 :]:
                         if following[0][0] != "Question":
                             height = layout.height(following)
                             if following[0][0] in ("Title", "Subject", "Heading 1", "Heading 2", "Heading 3"):
                                 reserve += height
                                 continue
-                            reserve += min(height, t["minimum_start_lines"] * layout.line + t["space_after_pt"])
+                            reserve += min(
+                                height, t["minimum_start_lines"] * layout.line + t["space_after_pt"]
+                            )
                             break
                         if layout.question_short(following):
                             reserve += layout.height(following)
@@ -556,13 +620,17 @@ def write_pdf(path, items, font_path, template=None):
                         break
                 height = layout.height(group)
                 bounded = height <= layout.short_limit
-                minimum = height + reserve if group[0][0] != "Normal" else min(
-                    height, t["minimum_start_lines"] * layout.line + t["space_after_pt"]
+                minimum = (
+                    height + reserve
+                    if group[0][0] != "Normal"
+                    else min(height, t["minimum_start_lines"] * layout.line + t["space_after_pt"])
                 )
                 draw_unit(group, keep=bounded, minimum=minimum)
                 continue
             short = layout.question_short(group)
-            decisions.append({"start_item": start, "end_item": end, "short": short, "measured_pt": layout.height(group)})
+            decisions.append(
+                {"start_item": start, "end_item": end, "short": short, "measured_pt": layout.height(group)}
+            )
             if short:
                 draw_unit(group, keep=True)
                 continue
@@ -572,7 +640,9 @@ def write_pdf(path, items, font_path, template=None):
             while index < len(prefix):
                 item = prefix[index]
                 unit = [item]
-                keep = item[0] in ("Option", "Point") and layout.short_paragraph(item, t["short_option_max_lines"])
+                keep = item[0] in ("Option", "Point") and layout.short_paragraph(
+                    item, t["short_option_max_lines"]
+                )
                 if index == 0 and len(prefix) > 1 and layout.short_paragraph(item, t["short_stem_max_lines"]):
                     unit.append(prefix[1])
                     # A short stem stays with the next semantic part only if bounded.
@@ -582,7 +652,12 @@ def write_pdf(path, items, font_path, template=None):
                     else:
                         unit.pop()
                 minimum = t["minimum_start_lines"] * layout.line + t["space_after_pt"]
-                if index == 0 and len(prefix) > 1 and len(unit) == 1 and layout.short_paragraph(item, t["short_stem_max_lines"]):
+                if (
+                    index == 0
+                    and len(prefix) > 1
+                    and len(unit) == 1
+                    and layout.short_paragraph(item, t["short_stem_max_lines"])
+                ):
                     minimum += layout.height(unit)  # Reserve two lines of a long first option.
                 draw_unit(unit, keep=keep, minimum=minimum)
                 index += 1
@@ -602,10 +677,18 @@ def write_pdf(path, items, font_path, template=None):
     # Mature Page text API adds the document's own page number in the footer band.
     with fitz.open(path) as pdf:
         for number, page in enumerate(pdf, 1):
+            if not t.get("page_numbers", True):
+                continue
             label = f"文档第 {number} 页"
             width = font.text_length(label, fontsize=t["footer_pt"])
-            page.insert_text(((page.rect.width - width) / 2, page.rect.height - t["footer_distance_cm"] * 72 / 2.54),
-                             label, fontname="sample-footer", fontfile=str(font_path), fontsize=t["footer_pt"], color=(0, 0, 0))
+            page.insert_text(
+                ((page.rect.width - width) / 2, page.rect.height - t["footer_distance_cm"] * 72 / 2.54),
+                label,
+                fontname="sample-footer",
+                fontfile=str(font_path),
+                fontsize=t["footer_pt"],
+                color=(0, 0, 0),
+            )
         # Finalize font resources once after every Story and footer has drawn.
         # Native MuPDF subsetting requires no fontTools runtime dependency.
         # Full rewrite compresses streams and collects/merges duplicate objects;
@@ -629,6 +712,8 @@ def page_body(page, number, template=None):
     t = template_config(template)
     bottom = page.rect.height - t["margin_cm"] * 72 / 2.54
     footer = page.get_text(clip=fitz.Rect(0, bottom + 1, page.rect.width, page.rect.height), sort=True)
+    if not t.get("page_numbers", True):
+        return page.get_text(sort=True)
     if canonical(footer) != canonical(f"文档第 {number} 页"):
         raise ValueError("DOCUMENT_FOOTER_MISMATCH")
     return page.get_text(clip=fitz.Rect(0, 0, page.rect.width, bottom + 1), sort=True)
@@ -659,11 +744,19 @@ def validate_pair(docx_path, pdf_path, items, template=None):
                 if not page.rect.contains(fitz.Rect(span["bbox"])):
                     raise ValueError("PDF_TEXT_CROPPED")
                 for codepoint, glyph, origin, bbox in span["chars"]:
-                    if codepoint == 0xfffd or (glyph == 0 and not chr(codepoint).isspace()):
+                    if codepoint == 0xFFFD or (glyph == 0 and not chr(codepoint).isspace()):
                         raise ValueError("PDF_MISSING_GLYPH")
             geometry.append({"page": number, "words": len(page.get_text("words"))})
-    return {"content_equal": True, "pdf_pages": geometry, "docx_paragraphs": len(document_paragraphs(document)),
-            "document_page_numbers": "checked", "visual_review": "required", "word_render": "not-checked-by-this-function"}
+    return {
+        "content_equal": True,
+        "pdf_pages": geometry,
+        "docx_paragraphs": len(document_paragraphs(document)),
+        "document_page_numbers": "checked"
+        if template_config(template).get("page_numbers", True)
+        else "disabled-by-template; absence-checked",
+        "visual_review": "required",
+        "word_render": "not-checked-by-this-function",
+    }
 
 
 def generate_sample(input_path, output_dir, font_path, title="合成验证样本（非用户原册）", pages=(6, 10), template=None):

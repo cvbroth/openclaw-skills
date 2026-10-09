@@ -120,6 +120,16 @@
     "show_source_labels": {
       "type": "boolean",
       "default": true
+    },
+    "space_before_pt": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 48,
+      "default": 0
+    },
+    "page_numbers": {
+      "type": "boolean",
+      "default": true
     }
   }
 }

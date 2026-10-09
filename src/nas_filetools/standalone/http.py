@@ -19,6 +19,8 @@ import zipfile
 from ..artifact_project import emit_viewer, import_feedback, relative, validate_feedback
 from .config import capabilities, load, snapshot
 from .tasks import ACTIVE, Projects, filename
+from .export_policy import exportable, windows_safe, portable_manifest
+from .naming import decorate, project_title
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -121,8 +123,42 @@ class Handler(BaseHTTPRequestHandler):
         if method == "GET" and len(parts) == 2 and parts[0] == "projects":
             m.get(parts[1])
             return self.stream(Path(__file__).parent / "assets/index.html")
-        if method == "GET" and parts[0] == "assets" and len(parts) == 2 and parts[1] in {"app.js", "app.css"}:
+        if (
+            method == "GET"
+            and parts[0] == "assets"
+            and len(parts) == 2
+            and parts[1] in {"app.js", "app.css", "templates.js"}
+        ):
             return self.stream(Path(__file__).parent / "assets" / parts[1])
+        if method == "GET" and parts == ["templates"]:
+            return self.stream(Path(__file__).parent / "assets/templates.html")
+        if method == "GET" and parts == ["api", "templates"]:
+            return self.send_json(
+                {
+                    "catalog": m.library.catalog(),
+                    "fonts": [{"name": f["name"], "sha256": f["sha256"]} for f in m.library.fonts.values()],
+                }
+            )
+        if method == "POST" and parts == ["api", "templates"]:
+            with m.lock:
+                result = m.library.save(self.json_body())
+            return self.send_json(result, 201)
+        if len(parts) >= 4 and parts[:2] == ["api", "templates"]:
+            tid, version = parts[2:4]
+            if len(parts) == 4 and method == "GET":
+                return self.send_json(m.library.load(tid, version, True)["document"])
+            if len(parts) == 5 and method == "POST":
+                self.json_body()
+                if parts[4] == "preview":
+                    return self.send_json(m.template_preview(tid, version), 202)
+                if parts[4] == "publish":
+                    with m.lock:
+                        entry = m.library.load(tid, version, True)["record"]
+                        if not entry.get("preview_project_id"):
+                            raise ValueError("preview: generate first")
+                        return self.send_json(
+                            m.library.publish(tid, version, m.get(entry["preview_project_id"]))
+                        )
         if method == "GET" and parts == ["api", "engines"]:
             return self.send_json(
                 {
@@ -182,6 +218,19 @@ class Handler(BaseHTTPRequestHandler):
                 if method == "DELETE":
                     m.trash(pid)
                     return self.send_json({"status": "trashed"})
+            if len(parts) == 4 and parts[3] == "format" and method == "POST":
+                data = self.json_body()
+                return self.send_json(
+                    m.format_artifact(pid, data["source_artifact_id"], data["template"]), 202
+                )
+            if len(parts) == 4 and parts[3] == "template" and method == "POST":
+                data = self.json_body()
+                m.library.load(data["id"], data["version"])
+                with m.lock:
+                    latest = m.get(pid)
+                    latest["selected_template"] = {"id": data["id"], "version": data["version"]}
+                    m.save(root, latest)
+                return self.send_json(m.get(pid))
             if len(parts) == 4 and parts[3] == "tasks" and method == "POST":
                 data = self.json_body()
                 return self.send_json(m.enqueue(pid, data["engine"], data["pages"]), 202)
@@ -214,7 +263,10 @@ class Handler(BaseHTTPRequestHandler):
                 art = next((a for a in project["artifacts"] if a["artifact_id"] == parts[4]), None)
                 if not art or not art["path"]:
                     raise FileNotFoundError("artifact is external reference, not downloadable")
-                return self.stream(relative(root, art["path"]), Path(art["path"]).name)
+                return self.stream(
+                    relative(root, art["path"]),
+                    decorate(project)["artifacts"][project["artifacts"].index(art)]["download_name"],
+                )
             if len(parts) == 4 and parts[3] == "export" and method == "GET":
                 if any(t["status"] in ACTIVE for t in project.get("tasks", [])) or any(
                     a.get("preview_render", {}).get("status") in ACTIVE for a in project["artifacts"]
@@ -229,11 +281,35 @@ class Handler(BaseHTTPRequestHandler):
                         ):
                             raise ValueError("export requires terminal tasks")
                         emit_viewer(root, latest)
+                        portable, aliases = portable_manifest(latest)
                         with zipfile.ZipFile(package, "w", zipfile.ZIP_DEFLATED) as archive:
                             for file in root.rglob("*"):
-                                if file.is_file() and not file.is_symlink() and not file.name.startswith("."):
-                                    archive.write(file, file.relative_to(root))
-                    return self.stream(package, project["project_id"] + ".zip")
+                                if (
+                                    file.is_file()
+                                    and not file.is_symlink()
+                                    and exportable(file.relative_to(root))
+                                ):
+                                    if not windows_safe(file.relative_to(root)):
+                                        raise ValueError(
+                                            "export path not Windows portable: " + str(file.relative_to(root))
+                                        )
+                                    if file.relative_to(root).as_posix() not in {
+                                        "project.json",
+                                        "review/project.js",
+                                    }:
+                                        archive.write(file, file.relative_to(root))
+                            archive.writestr(
+                                "project.json", json.dumps(portable, ensure_ascii=False, indent=2)
+                            )
+                            archive.writestr(
+                                "review/project.js",
+                                "window.PROJECT="
+                                + json.dumps(portable, ensure_ascii=True).replace("<", "\\u003c")
+                                + ";",
+                            )
+                            for original, alias in aliases:
+                                archive.write(relative(root, original), alias)
+                    return self.stream(package, project_title(project["name"]) + "_离线项目.zip")
         if method == "GET" and len(parts) >= 3 and parts[0] == "p":
             root = m.path(parts[1])
             path = relative(root, "/".join(parts[2:]))

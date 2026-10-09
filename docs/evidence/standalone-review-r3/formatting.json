@@ -1,0 +1,174 @@
+[
+  {
+    "project_id": "fc57342a-93fd-4f88-8412-59e70575bb2b",
+    "task_id": "d08741ad-b4cf-4fc8-a2f7-5d19c67e15f2",
+    "template": {
+      "id": "markdown-readable",
+      "version": "1.0.0"
+    },
+    "metrics": {
+      "elapsed_seconds": 1.476969340001233,
+      "peak_rss_kib": 77052
+    },
+    "status": "SUCCEEDED",
+    "artifacts": [
+      {
+        "artifact_id": "cd5d8f35-43e6-4cb8-be2b-c9d0c0de7339",
+        "format": "docx",
+        "bytes": 38439,
+        "sha256": "9d2929aea5d4c943cf88efaa356b2cbc1ef95def3c819eeed84ab648a89c277d",
+        "pages": 3
+      },
+      {
+        "artifact_id": "b8ba232c-acdb-4d88-b76a-670ba6a59601",
+        "format": "pdf",
+        "bytes": 17512,
+        "sha256": "dd2b03dfe7e0e1f41b2c0e4126a8eda7a07b3ff8af24b759afca716dcc1b67f9",
+        "pages": 3
+      },
+      {
+        "artifact_id": "949072de-fa19-42cd-9830-dec0a1676131",
+        "format": "json",
+        "bytes": 46392,
+        "sha256": "9e269099bb91f7dc0b70ff2c260c34ff8f840233c1bf030520bf8d512a95c0b7",
+        "pages": 0
+      },
+      {
+        "artifact_id": "17e53ea4-a3a9-4cf5-ae2b-5b12f748cae5",
+        "format": "json",
+        "bytes": 18389,
+        "sha256": "b47b56f43e6d9a33a2931cb08f818871ea77199f8a9a7d9af060d77ef93cdbbc",
+        "pages": 0
+      }
+    ]
+  },
+  {
+    "project_id": "802cf70a-e7da-429b-ac92-8d08204bef11",
+    "task_id": "51913185-eadc-42f3-9aa9-8fe512285cff",
+    "template": {
+      "id": "markdown-readable",
+      "version": "1.0.0"
+    },
+    "metrics": {
+      "elapsed_seconds": 1.4252690349239856,
+      "peak_rss_kib": 77632
+    },
+    "status": "SUCCEEDED",
+    "artifacts": [
+      {
+        "artifact_id": "bc72ed70-6941-4a2e-b532-840229f4891a",
+        "format": "docx",
+        "bytes": 40175,
+        "sha256": "e1d12c5ee00bd720d14eb275c3e7c0d320187b3e29d584626088529835849ec8",
+        "pages": 2
+      },
+      {
+        "artifact_id": "1e21a9c3-2b93-4651-9051-75ad447e0715",
+        "format": "pdf",
+        "bytes": 56205,
+        "sha256": "d9d19b79ce6b62d554a8458423f156b786b8729cec16f7d2ebf9964c4951b79a",
+        "pages": 2
+      },
+      {
+        "artifact_id": "1967e4a4-5b7a-463f-9b93-a463bfa6cb62",
+        "format": "json",
+        "bytes": 25273,
+        "sha256": "f39d0e106a7e1f025adee88cc96df52ccf7ab4aa6a169b7a42fb38bda0c93a82",
+        "pages": 0
+      },
+      {
+        "artifact_id": "7e3bd49b-a364-417d-a745-3dfc98f0e442",
+        "format": "json",
+        "bytes": 9575,
+        "sha256": "c84d4e1332a3534f8bd83751a9eb4cfb1c5d9bab03b93dc9819131df3c3516b5",
+        "pages": 0
+      }
+    ]
+  },
+  {
+    "project_id": "b3289e08-f561-4f40-bc71-d947d5b52c48",
+    "task_id": "14a64955-1249-49e4-a8e1-84c157494b1c",
+    "template": {
+      "id": "markdown-readable",
+      "version": "2.0.0"
+    },
+    "metrics": {
+      "elapsed_seconds": 1.4763513959478587,
+      "peak_rss_kib": 76756
+    },
+    "status": "SUCCEEDED",
+    "artifacts": [
+      {
+        "artifact_id": "f6aa74f2-c358-463b-8259-cdbedd1f6084",
+        "format": "docx",
+        "bytes": 38427,
+        "sha256": "213b6ccc1fdf4ee4b29dae1aba1dd4f317eb1313321827be3590b0d47134359a",
+        "pages": 5
+      },
+      {
+        "artifact_id": "52b50d65-3534-4e3c-aea9-f7ee8108e79f",
+        "format": "pdf",
+        "bytes": 18538,
+        "sha256": "cba3325df66e7c05e916501473dba6a09ec5ed450938a2957fa222d92b5d26fd",
+        "pages": 5
+      },
+      {
+        "artifact_id": "346dedab-bfc9-49cb-8082-a762ca15df6f",
+        "format": "json",
+        "bytes": 46392,
+        "sha256": "7edcc9c89708137fdead22fe760ba4ba0b62b3d09dae909efbcf733d14530675",
+        "pages": 0
+      },
+      {
+        "artifact_id": "8e407292-2cd6-4e13-841b-b52178c3033a",
+        "format": "json",
+        "bytes": 20123,
+        "sha256": "17034ed131017a26f5a4a31aeca52dd5497e7aab6e16b1d6f4794094e7fb7d27",
+        "pages": 0
+      }
+    ]
+  },
+  {
+    "project_id": "802cf70a-e7da-429b-ac92-8d08204bef11",
+    "task_id": "0b854064-04b7-47d3-b3e2-ad83398e7591",
+    "template": {
+      "id": "markdown-readable",
+      "version": "2.0.0"
+    },
+    "metrics": {
+      "elapsed_seconds": 1.4333877799799666,
+      "peak_rss_kib": 77204
+    },
+    "status": "SUCCEEDED",
+    "artifacts": [
+      {
+        "artifact_id": "212b61a4-97db-418e-a73e-b2cb49eda37d",
+        "format": "docx",
+        "bytes": 40164,
+        "sha256": "96a28bb302a9d479a768f6b938ca0689abebb008e380246e4c2e27598dad0221",
+        "pages": 3
+      },
+      {
+        "artifact_id": "8d82367c-95de-4043-9c4e-9414a5314e56",
+        "format": "pdf",
+        "bytes": 56605,
+        "sha256": "14b75853d30bbafb29675ed102d7780cc98ff25f1507f9d7aba604ee0e56a708",
+        "pages": 3
+      },
+      {
+        "artifact_id": "5e9bcc60-039a-4266-8f15-3d607ff62035",
+        "format": "json",
+        "bytes": 25273,
+        "sha256": "f39d0e106a7e1f025adee88cc96df52ccf7ab4aa6a169b7a42fb38bda0c93a82",
+        "pages": 0
+      },
+      {
+        "artifact_id": "1b916f0d-49fa-4083-a5b0-378a193a43d3",
+        "format": "json",
+        "bytes": 11272,
+        "sha256": "c47f551c78617fc6484fc5cbd697b61f3f6f62dc09b516be3b608349b02f96be",
+        "pages": 0
+      }
+    ]
+  }
+]

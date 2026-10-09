@@ -1,0 +1,6 @@
+# Independent HTTP development only. Never replace a production Worker.
+ARG BASE_IMAGE=filetools-document-validation:20261006-pagination
+FROM ${BASE_IMAGE}
+USER root
+RUN /opt/nas-filetools/.venv/bin/python -m pip install --no-cache-dir --index-url https://pypi.org/simple markdown-it-py==3.0.0 mdurl==0.1.2
+USER 1000:1000

@@ -1,0 +1,19 @@
+{
+  "toolbar": {
+    "expanded_height": 569.53125,
+    "collapsed_height": 725.125,
+    "gain": 155.59375,
+    "state_preserved": true
+  },
+  "independent_scroll": true,
+  "synthetic_markdown_and_draft": true,
+  "mobile": true,
+  "template_browser_import_rejected": true,
+  "template_browser_copy_export": true,
+  "rename_hash_cache_and_download": true,
+  "history50_quality_stable": true,
+  "existing_document_previews": true,
+  "offline_word_pdf": true,
+  "browser": "140.0.7339.16",
+  "js_errors": []
+}

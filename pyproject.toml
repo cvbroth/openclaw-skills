@@ -10,6 +10,7 @@ requires-python = ">=3.11,<3.13"
 dependencies = ["PyMuPDF==1.25.5", "python-docx==1.1.2", "Pillow==11.1.0", "openpyxl==3.1.5"]
 
 [project.optional-dependencies]
+standalone = ["markdown-it-py==3.0.0", "mdurl==0.1.2"]
 engines = ["rapidocr-onnxruntime==1.4.4", "onnxruntime==1.20.1", "numpy==1.26.4", "faster-whisper==1.1.1", "requests==2.32.5"]
 test = ["pytest==8.3.5", "ruff==0.11.2"]
 

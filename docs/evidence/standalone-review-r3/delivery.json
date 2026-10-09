@@ -1,0 +1,10 @@
+{
+  "bytes": 136164332,
+  "sha256": "c3e6b72cc16e4948fd9b251eca1c806465dab58f4015d2d23a0b563464d4a5ce",
+  "copy_verified": true,
+  "existing_files_overwritten": false,
+  "windows_extraction": "not verified; Linux relocated offline check passed",
+  "entrypoint": "Unzip, then FileTools-R3/index.html",
+  "filename": "filetools-standalone-review-r3-20261009.zip",
+  "location": "Private delivery location supplied separately to the user; not published to GitHub."
+}

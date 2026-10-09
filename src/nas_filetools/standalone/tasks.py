@@ -26,6 +26,10 @@ from ..process_tree import ManagedChild
 from ..publication import publish
 from .config import snapshot
 from .previews import PreviewJobs, signature
+from .format_jobs import FormatJobs
+from .template_library import TemplateLibrary
+from .naming import decorate
+from .content_structure import parse_markdown, reading_html
 from .source_quality import migrate
 
 ACTIVE = {"QUEUED", "RUNNING", "CANCELLING"}
@@ -84,13 +88,14 @@ def inspect_file(path, config):
     return info
 
 
-class Projects(PreviewJobs):
+class Projects(PreviewJobs, FormatJobs):
     def __init__(self, root, config, *, start_worker=True):
         self.root = Path(root).resolve()
         self.config = config
         self.lock = threading.RLock()
         for name in ["projects", "trash", "uploads"]:
             (self.root / name).mkdir(parents=True, exist_ok=True)
+        self.library = TemplateLibrary(self.root / "template-library")
         self.queue = queue.Queue()
         self.stopping = threading.Event()
         self.cancels = {}
@@ -132,6 +137,7 @@ class Projects(PreviewJobs):
                 if artifact["artifact_id"] == project["source_artifact_id"]:
                     for page in artifact["pages"]:
                         page["label"] = "上传图片（位置1；非原PDF页码）"
+        decorate(project)
         atomic(root / "project.json", project)
         if "source_quality_schema" in project:
             atomic(
@@ -172,6 +178,15 @@ class Projects(PreviewJobs):
                             "message": "Preview interrupted; explicit retry required.",
                         },
                     )
+            for artifact in project["artifacts"]:
+                if artifact["format"] == "markdown":
+                    for view in artifact["pages"]:
+                        if view.get("data") and (file.parent / view["data"]).is_file():
+                            raw = (file.parent / view["data"]).read_text()
+                            payload = json.loads(raw.split("=", 1)[1].rstrip(";\n"))
+                            payload["reading_html"] = reading_html(parse_markdown(payload.get("text", "")))
+                            page_data(file.parent, view["data"], payload)
+            decorate(project)
             emit_viewer(file.parent, project)
             changed = True
             for task in project.get("tasks", []):
@@ -352,6 +367,8 @@ class Projects(PreviewJobs):
         with self.lock:
             p = self.get(pid)
             p["name"] = name.strip()
+            decorate(p)
+            emit_viewer(self.path(pid), p)
             self.save(self.path(pid), p)
 
     def trash(self, pid):
@@ -381,6 +398,8 @@ class Projects(PreviewJobs):
             try:
                 if tid.startswith("preview:"):
                     self.execute_preview(pid, tid.split(":", 1)[1])
+                elif self.task(self.get(pid), tid).get("operation") == "format-artifact":
+                    self.execute_format(pid, tid)
                 else:
                     self.execute(pid, tid)
             except Exception as exc:
@@ -404,7 +423,9 @@ class Projects(PreviewJobs):
                             "category": "local",
                             "stage": "executor",
                             "code": type(exc).__name__,
-                            "message": "Executor failure; see persisted page diagnostics.",
+                            "message": str(exc)[:300]
+                            if t.get("operation") == "format-artifact"
+                            else "Executor failure; see persisted page diagnostics.",
                         },
                     )
                     for page in t["pages"].values():
@@ -725,6 +746,7 @@ class Projects(PreviewJobs):
                         "pages": pages,
                         "title": p["name"],
                         "template": t["template"],
+                        "template_data": self.library.load(t["template"]["id"], t["template"]["version"]),
                         "output": str(work),
                         "engine": {"cpu_threads": 2},
                     },
@@ -735,7 +757,13 @@ class Projects(PreviewJobs):
                 )
                 if result["status"] != "SUCCEEDED":
                     raise ValueError("DOCUMENT_GENERATION_FAILED")
-                files += ["document.docx", "document.pdf", "layout-validation.json", "generation-result.json"]
+                files += [
+                    "document.docx",
+                    "document.pdf",
+                    "content-structure.json",
+                    "layout-validation.json",
+                    "generation-result.json",
+                ]
                 choice = t["template"]
                 if not any(
                     x["id"] == choice["id"] and x["version"] == choice["version"] for x in p["templates"]
@@ -771,7 +799,14 @@ class Projects(PreviewJobs):
                     data_path = f"content/{tid}/v{version}/page-{n}.js"
                     q = next(x["quality"] for x in quality if x["physical_page"] == n)
                     page_data(
-                        root, data_path, {"text": page["text"], "quality": q, "raw_path": page["diagnostic"]}
+                        root,
+                        data_path,
+                        {
+                            "text": page["text"],
+                            "reading_html": reading_html(parse_markdown(page["text"])),
+                            "quality": q,
+                            "raw_path": page["diagnostic"],
+                        },
                     )
                     views.append(
                         {
