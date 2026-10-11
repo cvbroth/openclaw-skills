@@ -1,0 +1,26 @@
+{
+  "service": "filetools-http-dev-review-r3",
+  "port": 18971,
+  "application_commit": "7047a0b84052de60e1de66cac197f500215caafb",
+  "preserved_existing_registered_files": 188,
+  "changed_existing_files": 0,
+  "metadata_backups": 38,
+  "browser": {
+    "browser": "140.0.7339.16",
+    "project_id": "78ec370a-4ee4-4159-a54d-e298fdad555a",
+    "checks": [
+      "browser upload -> direct PDF text extraction: only pages 6-10, no Office output",
+      "original page input, quality filtering, artifact comment save",
+      "unsaved export cancel retains draft; save creates revision and selects it in dialog",
+      "desktop/narrow dialog fits; page11 rejected; revised text Word-only real export",
+      "independent Word preview/download/rename/recycle/restore",
+      "discard preserves saved version; history UI -> exact historical PDF-only pages7-9",
+      "comparison excludes exports; offline package updated, original/text hashes retained, offline export disabled"
+    ],
+    "page_errors": [],
+    "paid_model_calls": 0,
+    "CSP_bypass": false
+  },
+  "paid_model_calls": 0,
+  "unrelated_services_changed": false
+}

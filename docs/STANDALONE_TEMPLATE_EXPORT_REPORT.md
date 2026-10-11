@@ -33,3 +33,5 @@
 独立测试服务监听 `127.0.0.1:18981`，容器 `filetools-http-dev-template-export-20261011`，数据根在忽略目录 `runtime/template-export-delivery-20261011/store`。已有18971开发服务和NAS/OpenClaw服务未改动。本轮交付代码，更新已有开发服务时请按[页面更新说明](STANDALONE_TEMPLATE_EXPORT.md)保留其数据根。
 
 未验证：Windows桌面Word/其他浏览器、真实大模型或付费OCR、169页整册识别/导出、生产NAS/OpenClaw部署。本轮没有付费模型调用；导出验证使用直接PDF文字提取和合成文字/故障。LibreOffice与真实下载验证不代表所有客户端字体替换及任意复杂文档均已验收。
+
+后续部署：用户确认直接部署后，已更新日常18971服务，详情见[日常部署记录](STANDALONE_DAILY_DEPLOYMENT.md)。上文“已有18971服务未改动”描述的是首次隔离验证交付时的状态。
