@@ -1,0 +1,79 @@
+{
+  "python": "3.12.10",
+  "linux": "Linux-7.0.0-34-generic-x86_64-with-glibc2.36",
+  "pymupdf": "1.25.5",
+  "office": "LibreOffice 7.4.7.2 40(Build:2)",
+  "font_path": "/usr/share/fonts/truetype/filetools/DroidSansFallback.ttf",
+  "font_sha256": "ee38813ea00c3e32add4268fff7fff9e39417b4913cb13be2415164a47807cc2",
+  "python_ast_files": 57,
+  "exports": [
+    {
+      "format": "docx",
+      "sha256": "64fce3cc6cac9cb1a9f2b13eb1f73b8ce86742023c2876a83de7472fcec9296b",
+      "download_matches": true,
+      "preview": "SUCCEEDED",
+      "origin": {
+        "artifact_id": "cfe2a333-6f56-406e-9b0f-912faa0769f8",
+        "sha256": "08d6f8380f33aad4112a1f8369437ee5cd67766dceb0ed7bfd1ce8f0fef31d91",
+        "version": "2",
+        "template": {
+          "id": "questions-zh-cn",
+          "version": "1.0.0"
+        },
+        "template_sha256": "eb5804259d000e6348b597e25487cba3bf8f7215987fffd09cf38851e1331df7",
+        "source_pages": [
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "requested_source_pages": null,
+        "source_page_mapping_complete": true,
+        "template_snapshot": "diagnostics/format/24de2375-e854-412b-b34a-9b4cf1e265e9/template.json",
+        "pagination": {
+          "mode": "continuous",
+          "font_fit": false,
+          "minimum_font_pt": 9,
+          "allow_continuation": false
+        }
+      },
+      "excluded_comment_diagnostic_sentinels": true
+    },
+    {
+      "format": "pdf",
+      "sha256": "f5b3ef24fb09f4a38b4508ca63987c735b16989a90b4b973b9f80ea5c77f22f5",
+      "download_matches": true,
+      "preview": "SUCCEEDED",
+      "origin": {
+        "artifact_id": "f5365f0d-e458-4601-b525-73f9fd0ae5cc",
+        "sha256": "3ee84982114e2582ad3bd19aa4e33d68518e92e339a9b5ab1dd9e11a7296774b",
+        "version": "1",
+        "template": {
+          "id": "questions-zh-cn",
+          "version": "1.0.0"
+        },
+        "template_sha256": "eb5804259d000e6348b597e25487cba3bf8f7215987fffd09cf38851e1331df7",
+        "source_pages": [
+          7,
+          8,
+          9
+        ],
+        "requested_source_pages": [
+          7,
+          8,
+          9
+        ],
+        "source_page_mapping_complete": true,
+        "template_snapshot": "diagnostics/format/036969c2-5916-4a05-8494-3e1499793b7d/template.json",
+        "pagination": {
+          "mode": "continuous",
+          "font_fit": false,
+          "minimum_font_pt": 9,
+          "allow_continuation": false
+        }
+      },
+      "excluded_comment_diagnostic_sentinels": true
+    }
+  ]
+}

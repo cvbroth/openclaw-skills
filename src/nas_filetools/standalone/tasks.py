@@ -9,6 +9,7 @@ import queue
 import shutil
 import sys
 import threading
+import tempfile
 import time
 import uuid
 
@@ -46,12 +47,21 @@ def now():
 
 def atomic(path, data):
     path = Path(path)
-    temp = path.with_name(path.name + ".next")
-    with temp.open("w", encoding="utf-8") as stream:
-        json.dump(data, stream, ensure_ascii=False, indent=2, allow_nan=False)
-        stream.flush()
-        os.fsync(stream.fileno())
-    os.replace(temp, path)
+    # Analysis, previews and user actions can persist concurrently. Each writer
+    # needs its own staging file; a shared .next name can be renamed by another.
+    temp = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=path.parent, prefix=path.name + ".", suffix=".next", delete=False
+        ) as stream:
+            temp = Path(stream.name)
+            json.dump(data, stream, ensure_ascii=False, indent=2, allow_nan=False)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temp, path)
+    finally:
+        if temp is not None:
+            temp.unlink(missing_ok=True)
 
 
 def filename(value, extensions=None):
@@ -360,13 +370,16 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
                 "engine_id": engine,
                 "engine": snapshot(self.settings.engine(engine)),
                 "engine_name": self.settings.public()[engine]["name"],
-                "parameters": parameters or copy.deepcopy(self.config["conversion"]),
+                "parameters": {**copy.deepcopy(self.config["conversion"]), **(parameters or {})},
                 "template": self.config["template"],
                 "status": "QUEUED",
                 "created_at": now(),
                 "pages": {str(n): {"status": "QUEUED", "attempts": []} for n in pages},
                 "result_versions": [],
             }
+            if not parameters or "generate_documents" not in parameters:
+                # User extraction ends at text. Office files require an explicit export action.
+                task["parameters"]["generate_documents"] = False
             project.setdefault("tasks", []).append(task)
             self.save(root, project)
             self.runtime_engines[tid] = self.settings.engine(engine)

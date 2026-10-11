@@ -24,7 +24,7 @@ def decorate(project):
         purpose = (
             "原件"
             if source
-            else {"markdown": "提取文字", "docx": "Word排版稿", "pdf": "PDF排版稿"}.get(
+            else {"markdown": "提取文字", "docx": "Word导出文件", "pdf": "PDF导出文件"}.get(
                 a["format"],
                 "原图评价"
                 if a.get("role") == "quality"
@@ -42,10 +42,12 @@ def decorate(project):
         )
         if not physical_pages:
             physical_pages = sorted(int(n) for n in task.get("pages", {}))
+        if not physical_pages and a.get("export_source"):
+            physical_pages = a["export_source"].get("source_pages") or []
         a["display_metadata"] = {
             "method": "原始文件"
             if source
-            else "复用已有文字排版"
+            else "模板导出"
             if task.get("operation") == "format-artifact"
             else "人工文字修订"
             if a.get("text_revision")

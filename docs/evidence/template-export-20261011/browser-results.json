@@ -1,0 +1,16 @@
+{
+  "browser": "140.0.7339.16",
+  "project_id": "3164a753-fb5c-43fa-a360-65cf86c09198",
+  "checks": [
+    "browser upload -> direct PDF text extraction: only pages 6-10, no Office output",
+    "original page input, quality filtering, artifact comment save",
+    "unsaved export cancel retains draft; save creates revision and selects it in dialog",
+    "desktop/narrow dialog fits; page11 rejected; revised text Word-only real export",
+    "independent Word preview/download/rename/recycle/restore",
+    "discard preserves saved version; history UI -> exact historical PDF-only pages7-9",
+    "comparison excludes exports; offline package updated, original/text hashes retained, offline export disabled"
+  ],
+  "page_errors": [],
+  "paid_model_calls": 0,
+  "CSP_bypass": false
+}

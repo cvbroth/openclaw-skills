@@ -81,10 +81,12 @@ python3 filetools/bin/pdf_split.py split 大.pdf --every 50  # 拆分/取页/合
 
 ## 独立 HTTP R7 人工文字修补（开发服务）
 
-有明确映射的文字稿支持逐页编辑、不可变修订、版本差异与恢复，保存后复用既有模板生成Word/PDF；不重新OCR。原件、质量评价、评论和历史稿保持独立。仅独立开发服务，未接入生产OpenClaw。
+有明确映射的文字稿支持逐页编辑、不可变修订、版本差异与恢复，保存后可从“导出”选择模板与Word/PDF；不重新OCR。原件、质量评价、评论和历史稿保持独立。仅独立开发服务，未接入生产OpenClaw。
 
 - [使用、接口与数据迁移](docs/STANDALONE_TEXT_REVISIONS.md)
 - [计划及数据约定](docs/STANDALONE_TEXT_REVISIONS_PLAN.md)
 - [真实浏览器、合成故障与未验证边界](docs/STANDALONE_TEXT_REVISIONS_REPORT.md)
 
 独立HTTP R8：默认专注对照、可靠来源页定位、分组模板编辑、无宏DOCX/DOTX样式导入及可选保留原件分页。见[使用与边界](docs/STANDALONE_WORKBENCH_R8.md)、[实施计划](docs/STANDALONE_WORKBENCH_R8_PLAN.md)、[真实验证报告](docs/STANDALONE_WORKBENCH_R8_REPORT.md)。仅独立开发服务，未部署生产。
+
+独立HTTP模板导出：新提取任务默认仅生成文字，原件/文字版本/导出文件分区展示；支持当前及历史文字版、来源页范围与独立文件预览。见[流程与更新方式](docs/STANDALONE_TEMPLATE_EXPORT.md)。

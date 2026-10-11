@@ -1,0 +1,9 @@
+{
+  "checks": [
+    "older on-disk review assets served as current online assets",
+    "new ZIP refreshes viewer/editor/HTML",
+    "all registered original/text/export/diagnostic bytes unchanged",
+    "previously downloaded offline ZIP unchanged"
+  ],
+  "registered_files_verified": 16
+}

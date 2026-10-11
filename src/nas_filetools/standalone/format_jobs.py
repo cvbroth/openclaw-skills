@@ -45,7 +45,24 @@ D. 不编造答案。
 
 
 class FormatJobs:
-    def format_artifact(self, pid, aid, choice, allow_draft=False, pagination=None):
+    def export_documents(self, pid, data):
+        from .document_exports import export_options
+
+        with self.lock:
+            project = self.get(pid)
+            if not isinstance(data, dict):
+                raise ValueError("导出设置必须是对象")
+            artifact = next(a for a in project["artifacts"] if a["artifact_id"] == data["source_artifact_id"])
+            options = export_options(data, project, artifact)
+            return self.format_artifact(
+                pid,
+                artifact["artifact_id"],
+                data["template"],
+                pagination=data.get("pagination"),
+                export=options,
+            )
+
+    def format_artifact(self, pid, aid, choice, allow_draft=False, pagination=None, export=None):
         from .tasks import ACTIVE, now
 
         from .source_pagination import options
@@ -87,6 +104,42 @@ class FormatJobs:
                 "phase": "generation",
                 "created_at": now(),
             }
+            snapshot = self.path(pid) / "diagnostics/format" / tid / "template.json"
+            snapshot.parent.mkdir(parents=True, exist_ok=True)
+            raw = self.library.path(template["record"]).read_bytes()
+            import hashlib
+
+            if hashlib.sha256(raw).hexdigest() != task["template_sha256"]:
+                raise ValueError("TEMPLATE_HASH_CHANGED")
+            snapshot.write_bytes(raw)
+            task["template_snapshot"] = str(snapshot.relative_to(self.path(pid)))
+            if export is not None:
+                # Validate full assembly now, before accepting a range that could omit fragments.
+                from .text_revisions import mapped_text
+
+                if export["source_pages"] is not None or any(
+                    v.get("data") for v in artifact.get("pages", [])
+                ):
+                    mapped_text(self.path(pid), artifact)
+                task["document_export"] = {
+                    **export,
+                    "source_artifact_id": aid,
+                    "source_sha256": artifact["sha256"],
+                    "source_version": artifact["version"],
+                    "source_page_mapping_complete": bool(artifact.get("pages"))
+                    and all(type(v.get("source_page")) is int for v in artifact["pages"]),
+                    "included_source_pages": sorted(
+                        {
+                            v["source_page"]
+                            for v in artifact.get("pages", [])
+                            if type(v.get("source_page")) is int
+                            and (export["source_pages"] is None or v["source_page"] in export["source_pages"])
+                        }
+                    )
+                    if artifact.get("pages")
+                    and all(type(v.get("source_page")) is int for v in artifact["pages"])
+                    else None,
+                }
             if not allow_draft:
                 project["selected_template"] = dict(choice)
                 project["selected_pagination"] = policy
@@ -152,14 +205,25 @@ class FormatJobs:
             t["status"] = "RUNNING"
             self.save(root, p)
         a = next(a for a in p["artifacts"] if a["artifact_id"] == t["source_artifact_id"])
+        if t.get("document_export", {}).get("source_sha256", a["sha256"]) != a["sha256"]:
+            raise ValueError("SOURCE_ARTIFACT_HASH_CHANGED")
         if digest(root / a["path"]) != a["sha256"]:
             raise ValueError("SOURCE_ARTIFACT_HASH_CHANGED")
         registered_text = (root / a["path"]).read_text()
+        if t.get("document_export") and (
+            t["document_export"]["source_pages"] is not None or any(v.get("data") for v in a.get("pages", []))
+        ):
+            from .text_revisions import mapped_text
+
+            mapped_text(root, a)
         pages = []
         source = next(x for x in p["artifacts"] if x["artifact_id"] == p["source_artifact_id"])
         provenance = root / "sources/pdf-provenance.json"
         proven = json.loads(provenance.read_text()) if provenance.is_file() else {}
         for view in a["pages"]:
+            selected = t.get("document_export", {}).get("source_pages")
+            if selected is not None and view.get("source_page") not in selected:
+                continue
             if view.get("data"):
                 if view.get("data_sha256") and digest(root / view["data"]) != view["data_sha256"]:
                     raise ValueError("SOURCE_VIEW_HASH_CHANGED")
@@ -183,6 +247,8 @@ class FormatJobs:
                         else view.get("source_page"),
                     }
                 )
+        if not pages and t.get("document_export", {}).get("source_pages") is not None:
+            raise ValueError("所选原件页没有可导出的文字内容")
         if not pages:
             pages = [{"physical_page": 1, "text": (root / a["path"]).read_text()}]
         directory = root / "diagnostics/format" / tid
@@ -209,6 +275,8 @@ class FormatJobs:
         with self.lock:
             p = self.get(pid)
             t = self.task(p, tid)
+            if self.cancels[tid].is_set() or self.stopping.is_set():
+                result = {"status": "CANCELLED"}
             if result["status"] == "SUCCEEDED":
                 published = publish(
                     work,
@@ -264,6 +332,25 @@ class FormatJobs:
                         template_label=t["template"]["id"] + "/" + t["template"]["version"],
                         role="result" if fmt in {"docx", "pdf"} else "diagnostic",
                     )
+                    if fmt in {"docx", "pdf"}:
+                        item["role"] = "export"
+                        item["export_source"] = {
+                            "artifact_id": a["artifact_id"],
+                            "sha256": a["sha256"],
+                            "version": a["version"],
+                            "template": t["template"],
+                            "template_sha256": t["template_sha256"],
+                            "source_pages": t.get("document_export", {}).get("included_source_pages"),
+                            "requested_source_pages": t.get("document_export", {}).get("source_pages"),
+                            "source_page_mapping_complete": t.get("document_export", {}).get(
+                                "source_page_mapping_complete", False
+                            ),
+                            "template_snapshot": t.get("template_snapshot"),
+                            "pagination": t.get("pagination"),
+                        }
+                        if fmt not in t.get("document_export", {}).get("formats", ["docx", "pdf"]):
+                            # Both formats are rendered for validation; expose only the requested files.
+                            item["role"] = "diagnostic"
                     created.append(item["artifact_id"])
                 if (work / "pagination-report.json").is_file():
                     paging = json.loads((work / "pagination-report.json").read_text())
@@ -279,12 +366,15 @@ class FormatJobs:
                         parents=[a["artifact_id"]],
                     )
                 choice = t["template"]
-                entry = t["template_data"]["record"]
                 if not any(
                     x["id"] == choice["id"] and x["version"] == choice["version"] for x in p["templates"]
                 ):
                     snapshot_template(
-                        root, p, self.library.path(entry), template_id=choice["id"], version=choice["version"]
+                        root,
+                        p,
+                        root / t["template_snapshot"],
+                        template_id=choice["id"],
+                        version=choice["version"],
                     )
                 imported = t["template_data"].get("document", {}).get("import_source")
                 if imported:
@@ -307,5 +397,9 @@ class FormatJobs:
             emit_viewer(root, p)
             self.save(root, p)
         for item in p["artifacts"]:
-            if item["artifact_id"] in created and item["format"] in {"docx", "pdf"}:
+            if (
+                item["artifact_id"] in created
+                and item["format"] in {"docx", "pdf"}
+                and item.get("role") != "diagnostic"
+            ):
                 self.preview(pid, item["artifact_id"])

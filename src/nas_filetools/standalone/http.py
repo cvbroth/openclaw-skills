@@ -138,7 +138,7 @@ class Handler(BaseHTTPRequestHandler):
             method == "GET"
             and parts[0] == "assets"
             and len(parts) == 2
-            and parts[1] in {"app.js", "management.js", "app.css", "templates.js", "engines.js"}
+            and parts[1] in {"app.js", "management.js", "document-exports.js", "app.css", "templates.js", "engines.js"}
         ):
             return self.stream(Path(__file__).parent / "assets" / parts[1])
         if method == "GET" and parts == ["engines"]:
@@ -282,6 +282,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_json(m.save_text_revision(pid, self.json_body()))
             if len(parts) == 5 and parts[3] == "text-diff" and method == "GET":
                 return self.send_json(m.text_diff(pid, parts[4], parse_qs(url.query)["against"][0]))
+            if len(parts) == 4 and parts[3] == "document-exports" and method == "POST":
+                return self.send_json(m.export_documents(pid, self.json_body()), 202)
             if len(parts) == 4 and parts[3] == "format" and method == "POST":
                 data = self.json_body()
                 return self.send_json(

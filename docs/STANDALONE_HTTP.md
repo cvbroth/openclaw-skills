@@ -1,3 +1,7 @@
+# 当前流程：文字修订后显式导出
+
+上传创建项目 → 提取文字 → 对照修改 → 选择模板 → 导出 Word/PDF。新任务默认仅生成文字；导出窗口和来源范围约定见 [模板导出说明](STANDALONE_TEMPLATE_EXPORT.md)。旧格式接口继续兼容。
+
 # 当前增量：R8 对照与模板
 
 参见[工作台、Word样式导入与来源分页](STANDALONE_WORKBENCH_R8.md)和[真实验证报告](STANDALONE_WORKBENCH_R8_REPORT.md)。R7人工修订继续保留；以下历史描述按阶段解释。生产环境不变。
@@ -38,7 +42,7 @@ ssh -N -L 18971:127.0.0.1:18971 chen@myserver
 
 1. 首页只选择 PDF/PNG/JPEG/WebP 及可选项目名，上传创建项目；不自动识别或排版。后台原件分析单独显示状态。进入详情后明确选择方法和物理页，最多1000页/转换任务。上传与分析契约、限制及设置见 [上传与分析说明](STANDALONE_UPLOAD_ANALYSIS.md)。
 2. 项目默认以文件名命名。可改名、查看逐页进度、取消、只重试未成功页。切换引擎明确新建任务，保留原任务与全部产物。服务不会自动重试付费请求。取消只停止本地等待/子进程，不能保证远端未计费。
-3. “复用识别重新生成文档”不请求任何识别引擎，追加结果版本；适用于格式修复或改名后的重新排版。成功页不重跑。不会修改公共模板。
+3. 从文字版本或对照页点击“导出”，选择文字版本、模板、Word/PDF、原件页范围和分页方式。导出复用已有文字，不重新 OCR、不调用模型；每次追加独立文件。未保存文字必须选择保存、放弃或取消。
 4. 列表点击进入独立 `/projects/<id>` 详情，评审左右独立选择、翻页、缩放和滚动。PDF使用后台逐页图片；Word使用LibreOffice对实际DOCX渲染的图片，不借用独立PDF。预览失败显示真实错误并可重试，不能当作成功；导出包含已生成预览。无分页映射时不推断对应关系。
 5. 评论输入先存本地草稿，再保存到服务；版本冲突保留草稿并报错，不静默覆盖。清除产生空评论记录，历史回执仍保留。导入时校验项目、产物ID/哈希、定位和版本；草稿冲突需明确采用导入版本并先下载备份。切换参考不会让目标评论消失。关闭页面前应确认“已保存到服务”，或导出 JSON。
 6. 下载单产物或整个项目包。导出包可解压后离线打开 `review/index.html`；离线评论需导出再导入服务，浏览器不能直接写服务器。回收站仅移动项目，恢复后保留产物和评论；没有永久删除接口，也不访问/删除外部原件引用。
@@ -96,6 +100,7 @@ uploads/                # 暂存流式上传
 | GET /api/projects；GET /api/projects/:pid | 列表/详情、任务逐页状态 |
 | POST /api/projects/:pid/previews/:artifact_id | `{ "retry":true }`，仅DOCX/PDF产物后台预览；不隐式处理整份原件 |
 | PATCH /api/projects/:pid | JSON `{ "name": "文档名称" }` |
+| POST /api/projects/:pid/document-exports | 文字版本、模板、格式、来源页范围、分页设置；202返回独立导出任务 |
 | POST /api/projects/:pid/tasks | JSON `{ "engine":"local", "pages":[1] }`，新版本 |
 | POST /api/projects/:pid/tasks/:tid/cancel、retry、format | JSON `{}`；format只复用已有结果 |
 | GET/POST /api/projects/:pid/feedback | 版本化评语回执，不修改正文 |
