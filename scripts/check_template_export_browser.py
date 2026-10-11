@@ -78,7 +78,8 @@ with sync_playwright() as pw:
     review = base + "/p/" + pid + "/review/index.html?right=" + old["artifact_id"]
     page.goto(review)
     page.wait_for_selector("#textMode:not([disabled])")
-    page.click("#toggleToolbar")
+    page.click("#toggleAux")
+    page.click('[data-panel="source"]')
     page.fill("#leftPageInput", "169")
     page.press("#leftPageInput", "Enter")
     assert page.input_value("#leftPageInput") == "169"
@@ -88,7 +89,7 @@ with sync_playwright() as pw:
     page.select_option("#quality", "unknown")
     assert page.locator("#sourcePosition option").count() == 169
     page.select_option("#quality", "")
-    page.click("#commentPanel summary")
+    page.click('[data-panel="comments"]')
     page.select_option("#reviewer", "developer-agent")
     page.fill("#comment", "COMMENT_SENTINEL_不应写入正文")
     page.click("#saveServer")
@@ -149,6 +150,9 @@ with sync_playwright() as pw:
     row = page.locator('[data-artifact-id="' + word["artifact_id"] + '"]')
     row.get_by_role("button", name="预览", exact=True).click()
     page.wait_for_selector("#exportPreview img")
+    page.wait_for_function(
+        "() => [...document.querySelectorAll('#exportPreview img')].every(i=>i.complete&&i.naturalWidth>0)"
+    )
     page.screenshot(path=str(out / "word-export-preview.png"))
     with page.expect_download() as downloading:
         page.locator("#exportPreviewBody a").click()
@@ -182,8 +186,9 @@ with sync_playwright() as pw:
     assert page.input_value("#formatSource") == new
     page.click("#closeDocumentExport")
     page.goto(base + "/p/" + pid + "/review/index.html?right=" + new)
-    page.wait_for_selector("#textHistory:not([disabled])")
-    page.click("#textHistory")
+    page.wait_for_selector("#textMode:not([disabled])")
+    page.click("#toggleAux")
+    page.click('[data-panel="versions"]')
     page.select_option("#revisionHistory", old["artifact_id"])
     page.get_by_role("button", name="查看所选版本", exact=True).click()
     page.wait_for_function("() => document.querySelector('#textState').textContent.includes('历史版本只读')")
@@ -208,6 +213,9 @@ with sync_playwright() as pw:
         "button", name="预览", exact=True
     ).click()
     page.wait_for_selector("#exportPreview img")
+    page.wait_for_function(
+        "() => [...document.querySelectorAll('#exportPreview img')].every(i=>i.complete&&i.naturalWidth>0)"
+    )
     page.screenshot(path=str(out / "pdf-export-preview.png"))
     with page.expect_download() as downloading:
         page.locator("#exportPreviewBody a").click()
@@ -218,6 +226,9 @@ with sync_playwright() as pw:
     page.wait_for_selector("#rightArtifact")
     choices = page.locator("#rightArtifact option").evaluate_all("(els)=>els.map(e=>e.value)")
     assert word["artifact_id"] not in choices and pdf["artifact_id"] not in choices
+    page.wait_for_function(
+        "() => [...document.querySelectorAll('#leftContent img')].some(i=>i.complete&&i.naturalWidth>0)&&!!document.querySelector('#rightContent .reading,#rightContent pre')"
+    )
     page.screenshot(path=str(out / "comparison-page.png"))
     p = settled(pid)
     assert hashes.items() <= {a["artifact_id"]: a["sha256"] for a in p["artifacts"] if a.get("path")}.items()

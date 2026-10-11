@@ -1,0 +1,58 @@
+{
+  "browser": "140.0.7339.16",
+  "metrics": [
+    {
+      "width": 1366,
+      "height": 768,
+      "body": 1366,
+      "main": 683,
+      "header": 84
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "body": 1920,
+      "main": 1016,
+      "header": 63
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "body": 1024,
+      "main": 683,
+      "header": 84
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "body": 768,
+      "main": 773,
+      "header": 126
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "body": 390,
+      "main": 720,
+      "header": 123
+    },
+    {
+      "width": 320,
+      "height": 640,
+      "body": 320,
+      "main": 516,
+      "header": 123
+    }
+  ],
+  "checks": [
+    "six viewport sizes; no horizontal overflow/overlay; desktop body >=80%; all auxiliary groups reachable",
+    "auxiliary open/close retains both scroll positions; left wheel does not move right",
+    "panel and independent left navigation retain editor; page/file/error filter/cancel mode all protect dirty draft",
+    "registered source-page navigation, absent source keeps selection, error/quality filters",
+    "artifact/source comments, JSON round trip, comment filters, original download hash",
+    "history read-only -> restore as new -> edit/save immutable revision; each entry defaults reading/panel closed",
+    "failed save retains draft; narrow screen navigation/editor/panel remain usable"
+  ],
+  "errors": [],
+  "paid_model_calls": 0
+}
