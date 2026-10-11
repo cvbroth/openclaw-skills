@@ -240,14 +240,9 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
                             "message": "Preview interrupted; explicit retry required.",
                         },
                     )
-            for artifact in project["artifacts"]:
-                if artifact["format"] == "markdown":
-                    for view in artifact["pages"]:
-                        if view.get("data") and (file.parent / view["data"]).is_file():
-                            raw = (file.parent / view["data"]).read_text()
-                            payload = json.loads(raw.split("=", 1)[1].rstrip(";\n"))
-                            payload["reading_html"] = reading_html(parse_markdown(payload.get("text", "")))
-                            page_data(file.parent, view["data"], payload)
+            # Registered text resources are immutable evidence. Older resources
+            # without reading_html use the viewer's plain-text fallback; adding
+            # presentation metadata here would silently change their byte hash.
             decorate(project)
             emit_viewer(file.parent, project)
             changed = True
