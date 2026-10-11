@@ -45,8 +45,13 @@ function drawArtifacts(p){
  if(jobs.length>10)jobBody.append(el('p','仅显示最近10条记录，完整记录保留在项目技术详情中。','muted'));
  for(const [id] of groups)if(!areas[id].children.length){if(id==='recycled')areas[id].parentElement.hidden=true;else areas[id].append(el('p',id==='exports'?'尚未导出 Word/PDF。':'暂无文字版本。','muted'));}
 }
+let previewRequest=0;
 async function previewExport(a){
+ const request=++previewRequest;
  const dialog=$('#exportPreview'),body=$('#exportPreviewBody');body.replaceChildren();$('#exportPreviewTitle').textContent=a.display_name||a.name;dialog.showModal();
+ // List rows may hold the pre-render snapshot even after the background job finishes.
+ try{const latest=await api('/api/projects/'+pid);a=latest.artifacts.find(item=>item.artifact_id===a.artifact_id)||a;}catch(e){if(request!==previewRequest||!dialog.open)return;body.append(el('p','读取最新预览状态失败：'+e.message,'muted'));}
+ if(request!==previewRequest||!dialog.open)return;
  const download=el('a','下载 '+(a.format==='docx'?'Word':'PDF'),'button primary');download.href='/api/projects/'+pid+'/download/'+a.artifact_id;body.append(download);
  if(a.preview_render?.status==='SUCCEEDED'&&(a.pages||[]).some(p=>p.image)){
   const scroll=el('div',undefined,'export-preview-pages');for(const p of a.pages){if(!p.image)continue;const image=el('img');image.src='/p/'+pid+'/'+p.image;image.alt='导出文档第'+(p.output_page||p.locator?.page||'')+'页';image.loading='lazy';scroll.append(image);}body.append(scroll);

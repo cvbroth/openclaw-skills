@@ -221,6 +221,16 @@ with sync_playwright() as pw:
         page.locator("#exportPreviewBody a").click()
     downloading.value.save_as(str(out / "historical-pages7-9.pdf"))
     page.click("#closeExportPreview")
+    stale_pdf = json.loads(json.dumps(pdf))
+    stale_pdf["preview_render"] = {"status": "RUNNING"}
+    stale_pdf["pages"] = []
+    page.evaluate("(artifact) => previewExport(artifact)", stale_pdf)
+    page.wait_for_selector("#exportPreview img")
+    page.wait_for_function(
+        "() => [...document.querySelectorAll('#exportPreview img')].every(i=>i.complete&&i.naturalWidth>0)"
+    )
+    page.click("#closeExportPreview")
+    record("opening an export from a stale rendering snapshot fetches its finished preview")
     page.screenshot(path=str(out / "project-page.png"), full_page=True)
     page.goto(review)
     page.wait_for_selector("#rightArtifact")
