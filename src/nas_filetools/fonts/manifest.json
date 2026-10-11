@@ -1,0 +1,21 @@
+{
+  "schema": "supplementary-fonts-v1",
+  "fonts": [
+    {
+      "file": "NotoSans-Regular.ttf",
+      "name": "Noto Sans",
+      "source": "https://github.com/notofonts/noto-fonts",
+      "upstream_commit": "ffebf8c1ee449e544955a7e813c54f9b73848eac",
+      "license": "OFL.txt",
+      "sha256": "b85c38ecea8a7cfb39c24e395a4007474fa5a4fc864f6ee33309eb4948d232d5"
+    },
+    {
+      "file": "NotoEmoji.ttf",
+      "name": "Noto Emoji",
+      "source": "https://github.com/google/fonts/tree/main/ofl/notoemoji",
+      "upstream_commit": "bd8f81ddb5c74d5c8897b36ad88b440266245103",
+      "license": "OFL-NotoEmoji.txt",
+      "sha256": "de6c18832938afc99caf132b39d6a30a19bac7f2e812e28db2535b4608d27551"
+    }
+  ]
+}

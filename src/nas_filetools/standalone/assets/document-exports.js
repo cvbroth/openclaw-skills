@@ -1,4 +1,14 @@
 'use strict';
+function exportFailureMessage(task){
+ const error=task.error||{},message=error.message||'';
+ if(message.startsWith('FONT_MISSING_GLYPHS:')){
+  const detail=message.slice('FONT_MISSING_GLYPHS:'.length).trim();
+  if(detail.includes('字体缺少'))return detail;
+  const characters=[...new Set([...detail].filter(c=>!c.trim()?false:true))].map(c=>'“'+c+'”(U+'+c.codePointAt(0).toString(16).toUpperCase().padStart(4,'0')+')').join('、');
+  return '当时模板字体“'+(task.template_data?.font?.name||task.template_data?.parameters?.font_family||'未记录')+'”缺少 '+characters+'。本次更新已提供可追溯补充字体，请保留文字版本重新导出。调整分页或允许续页不能解决字体缺字。';
+ }
+ return message.replace(/^SOURCE_PAGE_OVERFLOW:\s*/, '')||error.code||'导出失败，请查看技术详情。';
+}
 function openDocumentExport(aid){
  if(aid){if(![...$('#formatSource').options].some(o=>o.value===aid)){message('所选文字版本不可用，请重新选择。');return;}$('#formatSource').value=aid;}
  if(!$('#formatTemplate').value){message('暂无可用模板，请先在模板管理中发布模板。');return;}
@@ -41,7 +51,7 @@ function drawArtifacts(p){
  }
  const jobs=[...(p.tasks||[])].reverse().filter(t=>t.operation==='format-artifact'&&!t.archived);
  const history=el('details',undefined,'export-history');history.id='export-history';history.open=open.has(history.id);history.append(el('summary','导出记录（'+jobs.length+'）'));const jobBody=el('div');history.append(jobBody);if(jobs.length)areas.exports.prepend(history);
- for(const t of [...jobs.filter(active),...jobs.filter(t=>!active(t)).slice(0,10)]){const row=el('div',undefined,'export-job');row.append(el('span','模板导出 · '+chineseTime(t.created_at)),badge(t.status));if(t.error)row.append(el('p',t.error.code+'：'+t.error.message,'muted'));if(active(t))row.append(button('取消',()=>api(`/api/projects/${pid}/tasks/${t.task_id}/cancel`,json('POST',{})).then(detail)));(active(t)?areas.exports:jobBody).append(row);}
+ for(const t of [...jobs.filter(active),...jobs.filter(t=>!active(t)).slice(0,10)]){const row=el('div',undefined,'export-job');row.append(el('span','模板导出 · '+chineseTime(t.created_at)),badge(t.status));if(t.error)row.append(el('p',exportFailureMessage(t),'muted'));if(active(t))row.append(button('取消',()=>api(`/api/projects/${pid}/tasks/${t.task_id}/cancel`,json('POST',{})).then(detail)));(active(t)?areas.exports:jobBody).append(row);}
  if(jobs.length>10)jobBody.append(el('p','仅显示最近10条记录，完整记录保留在项目技术详情中。','muted'));
  for(const [id] of groups)if(!areas[id].children.length){if(id==='recycled')areas[id].parentElement.hidden=true;else areas[id].append(el('p',id==='exports'?'尚未导出 Word/PDF。':'暂无文字版本。','muted'));}
 }

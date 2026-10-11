@@ -11,6 +11,7 @@ from ..document_templates import TEMPLATE_ROOT, validate_parameters
 from ..artifact_project import digest
 from .word_import import WordImports
 from .word_styles import validate_styles
+from ..document_fonts import fallback_records
 
 
 def installed_fonts():
@@ -170,6 +171,7 @@ class TemplateLibrary(WordImports):
             "parameters": params,
             "font": self.fonts[params["font_family"]],
             "word_styles": doc.get("word_styles"),
+            "font_fallbacks": fallback_records(),
         }
 
     def save(self, doc):

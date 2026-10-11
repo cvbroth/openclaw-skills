@@ -418,12 +418,53 @@ def _font_style(style, size, template):
         borders.getparent().remove(borders)
 
 
+_LAYOUT_OPTION = r"[^\S\n]*(?:[-+*•][^\S\n]+)?([A-DＡ-Ｄ])[.．、:：)）]"
+
+def option_layout_items(items):
+    """Split only explicit A/B/C/D lines for presentation; preserve rich runs."""
+    result = []
+
+    def trim_breaks(value):
+        end = len(value)
+        while end and value[end-1] == "\n":
+            end -= 1
+        return value[:end]
+
+    spaced = []
+    for style, text in items:
+        start = 0
+        for gap in re.finditer(r"\n[^\S\n]*\n+", str(text)):
+            if text[start:gap.start()].strip():
+                spaced.append((style, text[start:gap.start()]))
+            start = gap.end()
+        if text[start:].strip():
+            spaced.append((style, text[start:]))
+    for style, text in spaced:
+        matches = list(re.finditer(r"(?m)^" + _LAYOUT_OPTION, str(text)))
+        if len(matches) == 1 and not str(text[:matches[0].start()]).strip():
+            result.append(("Option", trim_breaks(text)))
+            continue
+        if [unicodedata.normalize("NFKC", m.group(1)) for m in matches] != list("ABCD"):
+            result.append((style, text))
+            continue
+        prefix = trim_breaks(text[:matches[0].start()])
+        if prefix.strip():
+            result.append((style, prefix))
+        for i, m in enumerate(matches):
+            result.append(("Option", trim_breaks(text[m.start():matches[i+1].start() if i < 3 else len(text)])))
+    return result or [("Normal", "")]
+
+
 def write_docx(path, items, font_path=None, template=None):
     from docx.enum.text import WD_ALIGN_PARAGRAPH
     from docx.oxml import OxmlElement
 
+    from .document_fonts import font_runs, apply_run_font, embed_fonts
+
     layout = StoryLayout(font_path, template)
     t = layout.template
+    if t.get("option_columns", 1) == 2:
+        items = option_layout_items(items)
     document = Document()
     section = document.sections[0]
     section.page_width, section.page_height = Cm(t["width_cm"]), Cm(t["height_cm"])
@@ -440,6 +481,7 @@ def write_docx(path, items, font_path=None, template=None):
         "Heading 3": t["type_pt"],
         "Question": t["body_pt"],
         "Option": t["body_pt"],
+        "OptionPair": t["body_pt"],
         "Point": t["body_pt"],
         "Source": t["source_pt"],
         "Unresolved": t["body_pt"],
@@ -463,11 +505,14 @@ def write_docx(path, items, font_path=None, template=None):
     for style, text in items:
         paragraph = document.add_paragraph(style=style)
         for part in getattr(text, "runs", [{"text": str(text)}]):
-            run = paragraph.add_run(part["text"])
-            if "bold" in part:
-                run.bold = True if part["bold"] else None
-            if "italic" in part:
-                run.italic = True if part["italic"] else None
+            for name, span in (font_runs(part["text"], layout.font_path) if layout.font_path else [(None, part["text"])]):
+                run = paragraph.add_run(span)
+                if name:
+                    apply_run_font(run, name)
+                if "bold" in part:
+                    run.bold = True if part["bold"] else None
+                if "italic" in part:
+                    run.italic = True if part["italic"] else None
         paragraph.paragraph_format.keep_together = False
         paragraph.paragraph_format.keep_with_next = style in (
             "Title",
@@ -510,7 +555,7 @@ def write_docx(path, items, font_path=None, template=None):
     if t.get("page_numbers", True):
         footer._p.append(field)
     footer.add_run(" 页" if t.get("page_numbers", True) else "")
-    if not t["show_source_labels"]:
+    if not t["show_source_labels"] and t.get("option_columns", 1) == 1:
         # Word/Writer can split a keepNext chain ending on an option. A bounded
         # one-cell row has an actual native cannot-split property. Only measured
         # short groups use this; long questions remain ordinary flowing paragraphs.
@@ -546,8 +591,44 @@ def write_docx(path, items, font_path=None, template=None):
             table._tbl.addnext(separator._p)
             for paragraph in added[start:end]:
                 cell._tc.append(paragraph._p)
-    document.core_properties.title = items[0][1]
+    if t.get("option_columns", 1) == 2:
+        font = fitz.Font(fontfile=str(font_path))
+        width = t["width_cm"] - 2 * t["margin_cm"]
+        limit = (width / 2 - 0.25) * 72 / 2.54
+        i = 0
+        while i + 1 < len(items):
+            pair = items[i:i+2]
+            labels = [re.match(_LAYOUT_OPTION, str(text)) for _, text in pair]
+            aligned = all(labels) and [unicodedata.normalize("NFKC", m.group(1)) for m in labels] in [["A", "B"], ["C", "D"]]
+            if aligned and all(style == "Option" and font.text_length(str(text).rstrip(), fontsize=t["body_pt"]) <= limit for style, text in pair):
+                table = document.add_table(rows=1, cols=2)
+                table.autofit = False
+                for column in table.columns:
+                    column.width = Cm(width / 2)
+                added[i]._p.addprevious(table._tbl)
+                table.rows[0]._tr.get_or_add_trPr().append(OxmlElement("w:cantSplit"))
+                for j, cell in enumerate(table.rows[0].cells):
+                    cell.width = Cm(width / 2)
+                    cell._tc.remove(cell.paragraphs[0]._p)
+                    margins = OxmlElement("w:tcMar")
+                    for side in ("top", "left", "bottom", "right"):
+                        element = OxmlElement("w:" + side)
+                        element.set(qn("w:w"), "0")
+                        element.set(qn("w:type"), "dxa")
+                        margins.append(element)
+                    cell._tc.get_or_add_tcPr().append(margins)
+                    paragraph = added[i+j]
+                    paragraph.style = document.styles["OptionPair"]
+                    paragraph.paragraph_format.left_indent = Cm(0)
+                    paragraph.paragraph_format.first_line_indent = Cm(0)
+                    paragraph.paragraph_format.keep_with_next = False
+                    cell._tc.append(paragraph._p)
+                i += 2
+            else:
+                i += 1
+    document.core_properties.title = str(items[0][1])[:255] if items[0][0] == "Title" else "FileTools 导出文档"
     document.save(path)
+    embed_fonts(path)
 
 
 def write_pdf(path, items, font_path, template=None):

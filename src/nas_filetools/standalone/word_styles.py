@@ -99,7 +99,7 @@ def apply_styles(path, extension, *, compact=False, font_scale=1, min_pt=6, mate
 
     paragraphs_styles = deepcopy(extension["paragraphs"])
     if "Normal" in paragraphs_styles:
-        for body_style in ["Question", "Option", "Point", "Unresolved", "Material"]:
+        for body_style in ["Question", "Option", "OptionPair", "Point", "Unresolved", "Material"]:
             paragraphs_styles[body_style] = {
                 **paragraphs_styles["Normal"],
                 **paragraphs_styles.get(body_style, {}),
@@ -184,7 +184,7 @@ def apply_styles(path, extension, *, compact=False, font_scale=1, min_pt=6, mate
                 for attr in ["bold", "italic"]:
                     if getattr(run.font, attr) is None:
                         setattr(run.font, attr, getattr(style.font, attr))
-                if style.font.name:
+                if style.font.name and not run.font.name:
                     run.font.name = style.font.name
                     run._element.get_or_add_rPr().get_or_add_rFonts().set(qn("w:eastAsia"), style.font.name)
     doc.save(path)

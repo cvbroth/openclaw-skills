@@ -75,10 +75,14 @@ def generate(request):
                 }
             )
         grouped.append({**page, "items": items[begin:]})
-    font = fitz.Font(fontfile=str(font_path))
-    missing = sorted({c for _, text in items for c in text if not c.isspace() and not font.has_glyph(ord(c))})
-    if missing:
-        raise ValueError("FONT_MISSING_GLYPHS: " + "".join(missing))
+    from ..document_fonts import font_audit
+
+    fonts = font_audit(grouped, font_path)
+    if template.get("font", {}).get("sha256") and template["font"]["sha256"] != fonts["primary_sha256"]:
+        raise ValueError("模板主字体与快照哈希不一致，请重新部署正确字体后导出。")
+    if template.get("font_fallbacks") is not None and template["font_fallbacks"] != fonts["fallbacks"]:
+        raise ValueError("补充字体与任务模板快照不一致；请重新选择模板建立新导出任务，旧记录保留。")
+    (output / "font-resolution.json").write_text(json.dumps(fonts, ensure_ascii=False, indent=2))
     pagination_report = None
     if policy["mode"] == "source-pages":
         pagination_report = generate_source_pages(output, grouped, template, font_path, policy)
@@ -91,7 +95,8 @@ def generate(request):
     with fitz.open(output / "document.pdf") as pdf:
         if not 0 < len(pdf) <= template["parameters"]["max_pages"]:
             raise ValueError("TEMPLATE_PDF_PAGE_LIMIT")
-    if pagination_report or template.get("word_styles"):
+    native_layout = bool(pagination_report or template.get("word_styles") or template["parameters"].get("option_columns", 1) == 2)
+    if native_layout:
         from docx import Document
         import re
         from .source_pagination import body_text
@@ -122,7 +127,7 @@ def generate(request):
         )
     # Imported geometry is checked against the actual rendered document, not
     # Story's separate template approximation.
-    if template.get("word_styles") or pagination_report:
+    if native_layout:
         with fitz.open(output / "document.pdf") as rendered:
             missing_glyphs = [
                 i + 1
@@ -170,6 +175,7 @@ def generate(request):
         json.dumps(
             {
                 **checks,
+                "font_resolution": fonts,
                 "mapping": mappings,
                 "source_output_mapping": pagination_report["groups"] if pagination_report else None,
                 "native_layout_boundaries": boundaries,
@@ -178,7 +184,7 @@ def generate(request):
                 "visual_acceptance": "not performed; native checks insufficient",
                 "quality_and_comments_in_body": False,
                 "pdf_renderer": pdf_renderer,
-                "formatter_version": "standalone-format-v2-markdown-office",
+                "formatter_version": "standalone-format-v3-fontchain-compact",
             },
             ensure_ascii=False,
             indent=2,

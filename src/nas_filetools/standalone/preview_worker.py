@@ -17,6 +17,17 @@ def export_docx(source, out, timeout=120):
     out.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="filetools-lo-") as temp:
         profile = Path(temp) / "profile"
+        from ..document_fonts import ROOT
+        from xml.sax.saxutils import escape
+
+        fontconfig = Path(temp) / "fonts.conf"
+        fontconfig.write_text(
+            '<fontconfig><include ignore_missing="yes">/etc/fonts/fonts.conf</include><dir>'
+            + escape(str(ROOT))
+            + "</dir><cachedir>"
+            + escape(temp)
+            + "/font-cache</cachedir></fontconfig>"
+        )
         subprocess.run(
             [
                 "libreoffice",
@@ -30,7 +41,13 @@ def export_docx(source, out, timeout=120):
             ],
             check=True,
             timeout=timeout,
-            env={**os.environ, "HOME": temp, "XDG_CACHE_HOME": temp, "GSETTINGS_BACKEND": "memory"},
+            env={
+                **os.environ,
+                "HOME": temp,
+                "XDG_CACHE_HOME": temp,
+                "GSETTINGS_BACKEND": "memory",
+                "FONTCONFIG_FILE": str(fontconfig),
+            },
         )
     pdf = out / (source.stem + ".pdf")
     if not pdf.is_file():

@@ -4,7 +4,6 @@ from copy import deepcopy
 import json
 import re
 from docx import Document
-from docx.enum.text import WD_BREAK
 import fitz
 from ..document_sample import write_docx
 from .word_styles import apply_styles
@@ -79,19 +78,19 @@ def generate_source_pages(output, pages, template, font_path, policy):
     for i, group in enumerate(groups):
         entry = {"source_page": group["source_page"], "attempts": [], "blank": not group["items"]}
         report["groups"].append(entry)
+        base = (template.get("word_styles") or {}).get("paragraphs", {}).get("Normal", {}).get("size_pt", template["parameters"]["body_pt"])
         attempts = [(False, 1.0)]
         if group["items"]:
             attempts.append((True, 1.0))
             if policy["font_fit"]:
-                base = (
-                    (template.get("word_styles") or {})
-                    .get("paragraphs", {})
-                    .get("Normal", {})
-                    .get("size_pt", template["parameters"]["body_pt"])
-                )
                 if policy["minimum_font_pt"] > base:
                     raise ValueError("pagination.minimum_font_pt: 下限不能高于正文字号")
-                attempts.append((True, policy["minimum_font_pt"] / base))
+                size = base - 0.5
+                while size > policy["minimum_font_pt"]:
+                    attempts.append((True, size / base))
+                    size -= 0.5
+                if base > policy["minimum_font_pt"]:
+                    attempts.append((True, policy["minimum_font_pt"] / base))
         for attempt, (compact, scale) in enumerate(attempts):
             directory = output / "pagination-work" / f"group-{i + 1}-attempt-{attempt + 1}"
             directory.mkdir(parents=True, exist_ok=True)
@@ -112,6 +111,7 @@ def generate_source_pages(output, pages, template, font_path, policy):
                 {
                     "reduce_spacing": compact,
                     "font_scale": scale,
+                    "body_pt": round(max(policy["minimum_font_pt"], base * scale) if scale != 1 else base, 3),
                     "minimum_font_pt": policy["minimum_font_pt"],
                     "actual_output_pages": len(texts),
                 }
@@ -125,20 +125,39 @@ def generate_source_pages(output, pages, template, font_path, policy):
             raise ValueError(
                 f"SOURCE_PAGE_OVERFLOW: 原件第{group['source_page']}页实际需要{len(texts)}个输出页；请调整模板或明确允许续页"
             )
+        if "".join(texts) != re.sub(r"\s", "", "".join(str(t) for _, t in group["items"])):
+            raise ValueError(
+                f"SOURCE_PAGE_CONTENT_MISMATCH: 原件第{group['source_page']}页输出正文或顺序不一致"
+            )
+        entry["content_equal"] = True
         entry["output_pages"] = list(range(counter, counter + len(texts)))
         counter += len(texts)
         expected_text.extend(texts)
         chosen.append(path)
     merged = Document(chosen[0])
     for path in chosen[1:]:
-        paragraph = merged.add_paragraph()
-        paragraph.add_run().add_break(WD_BREAK.PAGE)
-        for child in Document(path).element.body:
-            if child.tag.endswith("}sectPr"):
-                continue
-            merged.element.body.insert(len(merged.element.body) - 1, deepcopy(child))
+        body = [deepcopy(c) for c in Document(path).element.body if not c.tag.endswith("}sectPr")]
+        # Break before the next real paragraph, not on a new blank body line.
+        # The old separator consumed a full line and could invalidate a fitted page.
+        from docx.oxml import OxmlElement
+        from docx.oxml.ns import qn
+
+        if body[0].tag == qn("w:p"):
+            first = body[0]
+        else:
+            first = body[0].find(".//" + qn("w:p"))
+        props = first.find(qn("w:pPr"))
+        if props is None:
+            props = OxmlElement("w:pPr")
+            first.insert(0, props)
+        props.append(OxmlElement("w:pageBreakBefore"))
+        for child in body:
+            merged.element.body.insert(len(merged.element.body) - 1, child)
     result = output / "document.docx"
     merged.save(result)
+    from ..document_fonts import embed_fonts
+
+    embed_fonts(result)
     pdf = export_docx(result, output, timeout=35)
     with fitz.open(pdf) as document:
         actual = [body_text(p, template["parameters"].get("page_numbers", True)) for p in document]

@@ -130,6 +130,12 @@
     "page_numbers": {
       "type": "boolean",
       "default": true
+    },
+    "option_columns": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2,
+      "default": 1
     }
   }
 }

@@ -267,7 +267,7 @@ class FormatJobs:
                 "engine": {"cpu_threads": 2},
             },
             work / "generation-result.json",
-            60,
+            min(1800, 60 + 12 * len(pages)) if t.get("pagination", {}).get("mode") == "source-pages" else 60,
             self.cancels[tid],
             module="nas_filetools.standalone.documents",
         )

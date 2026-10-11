@@ -146,9 +146,17 @@ class SourcePreviewTests(scenarios.HTTPTests):
         image = self.m.path(pid) / first["image"]
         image.write_bytes(b"corrupted synthetic cache")
         second = self.m.source_preview(pid, 23)
+        assert second.get("status") == "SUCCEEDED", (
+            second,
+            [f.read_text() for f in (self.m.path(pid) / "previews/source").glob("*/stderr.log")],
+        )
         assert not second["cache_hit"] and second["image_sha256"] == first["image_sha256"]
         with patch.dict(RENDERER, schema="source-page-synthetic-next-version"):
             third = self.m.source_preview(pid, 23)
+        assert third.get("status") == "SUCCEEDED", (
+            third,
+            [f.read_text() for f in (self.m.path(pid) / "previews/source").glob("*/stderr.log")],
+        )
         assert third["render_key"] != second["render_key"] and not third["cache_hit"]
         assert len(self.m.get(pid)["artifacts"][0]["pages"]) == 169
         assert any(x.get("image") == first["image"] for x in self.m.get(pid)["artifacts"][0]["legacy_pages"])
