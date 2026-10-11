@@ -4,7 +4,7 @@ let editing=false,editInfo=null,editText='',editOriginal='',editDirty=false,edit
 let dirtyDialogOpen=false,editorPending=Promise.resolve();
 let displayed={aid:artifact('right').artifact_id,index:$('#rightPosition').value};
 const state=t=>{$('#textState').textContent=t;$('#textState').hidden=!editing&&!t.startsWith('不可编辑')&&!t.startsWith('保存失败');};
-function editControls(){document.body.classList.toggle('editing',editing);$('#saveRevision').hidden=!editing;$('#cancelEdit').hidden=!editing;$('#textMode').hidden=editing||artifact('right').format!=='markdown'||!!editInfo&&editInfo.head_id!==editInfo.artifact_id;$('#textState').hidden=!editing;}
+function editControls(){document.body.classList.toggle('editing',editing);$('#saveRevision').hidden=!editing;$('#cancelEdit').hidden=!editing;$('#textMode').hidden=editing||(sourceReading.active&&!sourceReading.selected)||artifact('right').format!=='markdown'||!!editInfo&&editInfo.head_id!==editInfo.artifact_id;$('#textState').hidden=!editing;}
 const revisionURL='/api/projects/'+P.project_id;
 async function api(url,options){let r=await fetch(url,options),data=await r.json();if(!r.ok)throw Error(data.reason||data.error||r.status);return data;}
 function post(url,data){return api(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});}
@@ -22,15 +22,15 @@ function updateEditor(){
  $('#textMode').disabled=true;editInfo=null;
  return api(revisionURL+'/text/'+a.artifact_id+'?locator='+encodeURIComponent(JSON.stringify(position('right').locator))).then(info=>{
   if(epoch!==editEpoch)return;editInfo=info;let page=info.pages.find(p=>stable(p.locator)===stable(position('right').locator));
-  if(!page){state('当前位置缺少明确映射，不能逐页修补。');return;}
+  if(!page){$('#historyState').hidden=info.head_id===a.artifact_id;$('#restoreForEdit').hidden=true;editControls();state('请选择已登记的具体文字片段后编辑。');return;}
   editOriginal=page.text;editText=page.text;editDirty=false;requestId=null;
-  let historical=info.head_id!==a.artifact_id;$('#historyState').hidden=!historical;$('#restoreForEdit').hidden=!historical;$('#textMode').disabled=false;editControls();state(info.head_id!==a.artifact_id?'历史版本只读；可在版本与差异中恢复为新版本。':'已保存 · 仅修改当前来源位置');
+  let historical=info.head_id!==a.artifact_id;$('#historyState').hidden=!historical;$('#restoreForEdit').hidden=!historical||(sourceReading.active&&!sourceReading.selected);$('#textMode').disabled=false;editControls();state(info.head_id!==a.artifact_id?'历史版本只读；可在版本与差异中恢复为新版本。':'已保存 · 仅修改当前来源位置');
   if(editing)mountEditor();if(!$('#auxPanel').hidden&&document.querySelector('[data-panel=versions]').getAttribute('aria-selected')==='true')loadHistory();
  }).catch(e=>{if(epoch===editEpoch){editing=false;$('#saveRevision').hidden=true;state('不可编辑：'+e.message);}});
 }
 function mountEditor(){
  tokens.right++;editControls();let box=$('#rightContent');box.replaceChildren();let area=document.createElement('textarea');area.id='textEditor';area.spellcheck=false;area.setAttribute('aria-label','当前页 Markdown 文字');area.value=editText;area.readOnly=editBusy||editInfo.head_id!==editInfo.artifact_id;
- area.oninput=()=>{editText=area.value;editDirty=editText!==editOriginal;requestId=null;state(editDirty?'有未保存修改':'已保存');};box.append(area);if(innerWidth<=600)document.body.classList.add('result');area.focus({preventScroll:true});area.setSelectionRange(0,0);area.scrollTop=0;
+ area.oninput=()=>{editText=area.value;editDirty=editText!==editOriginal;requestId=null;state((editDirty?'有未保存修改':'已保存')+' · 文字位置 '+(Number($('#rightPosition').value)+1));};box.append(area);if(innerWidth<=600)document.body.classList.add('result');area.focus({preventScroll:true});area.setSelectionRange(0,0);area.scrollTop=0;
  $('#saveRevision').hidden=false;
  $('#saveRevision').disabled=area.readOnly;
 }
@@ -46,7 +46,7 @@ async function installProject(aid,loc,preserveEditor=false){
  if(preserveEditor)return;
  $('#rightArtifact').value=aid;positions('right');let a=artifact('right'),index=a.pages.findIndex(p=>stable(p.locator)===stable(loc));if(index>=0)$('#rightPosition').value=String(index);refresh('right');await editorPending;
 }
-function lockTextNavigation(value){for(let id of ['rightArtifact','rightPosition','rightPageInput','rightPagePrev','rightPageNext','textMode','textHistory','saveRevision','exportText','commentFilter','errorFilter','markdownMode'])$('#'+id).disabled=value;$('#cancelEdit').disabled=value;$('#restoreForEdit').disabled=value;}
+function lockTextNavigation(value){for(let id of ['rightArtifact','rightPosition','rightPageInput','rightPagePrev','rightPageNext','textMode','textHistory','saveRevision','exportText','commentFilter','errorFilter','markdownMode','sourcePageLookup','findSourcePage','locateSelectedSource'])$('#'+id).disabled=value;$('#cancelEdit').disabled=value;$('#restoreForEdit').disabled=value;}
 async function saveRevision(){
  if(editBusy||!editInfo)return false;editBusy=true;lockTextNavigation(true);state('正在保存修订…');if($('#textEditor'))$('#textEditor').readOnly=true;
  let loc=position('right').locator;
@@ -56,7 +56,7 @@ async function saveRevision(){
   return true;
  }catch(e){state('保存失败：'+e.message+'；草稿仍保留。');return false;}finally{editBusy=false;lockTextNavigation(false);$('#textMode').disabled=!editInfo;if($('#textEditor'))$('#textEditor').readOnly=editInfo.head_id!==editInfo.artifact_id;}
 }
-$('#textMode').onclick=async()=>{if(!editInfo||editInfo.head_id!==editInfo.artifact_id||!await chooseDirty())return;editing=true;mountEditor();state('已保存 · 仅修改当前文字位置');};
+$('#textMode').onclick=async()=>{if(!editInfo||editInfo.head_id!==editInfo.artifact_id||!await chooseDirty())return;editing=true;mountEditor();state(position('right').locator.kind==='document'?'整份文字编辑 · 无来源页映射':'仅编辑文字位置 '+(Number($('#rightPosition').value)+1));};
 $('#cancelEdit').onclick=async()=>{if(editBusy||!await chooseDirty())return;editing=false;editControls();render('right');};
 $('#saveRevision').onclick=()=>saveRevision();
 $('#editParent').onclick=async()=>{let p=parentMarkdown(artifact('right'));if(p&&await chooseDirty()){editing=false;await installProject(p.artifact_id,{kind:'document'});}};
@@ -81,7 +81,7 @@ $('#restoreForEdit').onclick=()=>restoreText(artifact('right').artifact_id,true)
 for(let id of ['rightArtifact','rightPosition','commentFilter','errorFilter','markdownMode']){
  let control=$('#'+id),handler=control.onchange;control.onchange=async event=>{let next=control.value,old=id==='rightArtifact'?displayed.aid:id==='rightPosition'?displayed.index:control.dataset.previous;
   if(editDirty){if(old!==undefined)control.value=old;if(!await chooseDirty()){compactLabels();return;}control.value=next;}
-  editing=false;handler?.call(control,event);control.dataset.previous=control.value;
+  editing=false;if(id==='rightPosition'){sourceReading.active=false;sourceReading.selected=null;positions('right');control.value=next;}if(id==='rightArtifact')sourceReading.selected=null;if(id==='rightArtifact'&&artifact('right').format!=='markdown'){sourceReading.active=false;sourceReading.selected=null;}handler?.call(control,event);control.dataset.previous=control.value;
  };control.dataset.previous=control.value;
 }
 const originalRefresh=refresh;refresh=function(side){originalRefresh(side);if(!side||side==='right')editorPending=updateEditor();};

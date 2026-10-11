@@ -224,7 +224,24 @@ with sync_playwright() as pw:
     stale_pdf = json.loads(json.dumps(pdf))
     stale_pdf["preview_render"] = {"status": "RUNNING"}
     stale_pdf["pages"] = []
+    stale_project = api("/api/projects/" + pid)
+    for item in stale_project["artifacts"]:
+        if item["artifact_id"] == pdf["artifact_id"]:
+            item["preview_render"] = {"status": "RUNNING"}
+            item["pages"] = []
+    pending_reads = []
+
+    def pending_preview(route):
+        pending_reads.append(True)
+        if len(pending_reads) <= 2:
+            route.fulfill(status=200, content_type="application/json", body=json.dumps(stale_project))
+        else:
+            route.continue_()
+
+    page.route("**/api/projects/" + pid, pending_preview)
     page.evaluate("(artifact) => previewExport(artifact)", stale_pdf)
+    page.unroute("**/api/projects/" + pid)
+    assert len(pending_reads) >= 3, pending_reads
     page.wait_for_selector("#exportPreview img")
     page.wait_for_function(
         "() => [...document.querySelectorAll('#exportPreview img')].every(i=>i.complete&&i.naturalWidth>0)"

@@ -161,3 +161,69 @@ class RevisionTests(HTTPTests):
         bad["path"] = "/etc/passwd"
         with self.assertRaises(urllib.error.HTTPError):
             self.request(f"/api/projects/{pid}/text-revisions", "POST", bad)
+
+    def test_multi_fragment_cross_page_revision_keeps_each_locator_and_mapping(self):
+        pid, aid = self.fixture()
+        root = self.m.path(pid)
+        p = self.m.get(pid)
+        artifact = next(a for a in p["artifacts"] if a["artifact_id"] == aid)
+        artifact["pages"][0]["source_page"] = 23
+        artifact["pages"][1]["source_page"] = 23
+        artifact["pages"][2].pop("source_page")
+        artifact["pages"][2]["source_pages"] = [23, 24]
+        self.m.save(root, p)
+        before = self.m.text_artifact(pid, aid)
+        request = self.payload(pid, aid, "只修改来源23的第二个片段")
+        result = self.m.save_text_revision(pid, request)
+        after = self.m.text_artifact(pid, result["artifact_id"])
+        self.assertEqual(after["pages"][0], before["pages"][0])
+        self.assertEqual(after["pages"][2], before["pages"][2])
+        self.assertEqual(after["pages"][2]["source_pages"], [23, 24])
+        self.assertEqual(after["pages"][1]["locator"], before["pages"][1]["locator"])
+        self.assertEqual(after["pages"][1]["source_page"], 23)
+        self.assertEqual(after["pages"][1]["text"], request["text"])
+        restore = self.payload(pid, result["artifact_id"])
+        restore.pop("text")
+        restore.pop("locator")
+        restore["restore_artifact_id"] = aid
+        restored = self.m.save_text_revision(pid, restore)
+        self.assertEqual(self.m.text_artifact(pid, restored["artifact_id"])["pages"], before["pages"])
+
+    def test_legacy_stable_fragments_without_source_mapping_stay_editable(self):
+        pid, aid = self.fixture()
+        p = self.m.get(pid)
+        artifact = next(a for a in p["artifacts"] if a["artifact_id"] == aid)
+        for view in artifact["pages"]:
+            view.pop("source_page")
+        self.m.save(self.m.path(pid), p)
+        info = self.m.text_artifact(pid, aid)
+        self.assertTrue(all(page["source_page"] is None for page in info["pages"]))
+        result = self.m.save_text_revision(pid, self.payload(pid, aid, "仍按稳定片段修订，不猜原件页"))
+        revised = self.m.text_artifact(pid, result["artifact_id"])
+        self.assertTrue(all(page["source_page"] is None for page in revised["pages"]))
+
+    def test_verified_legacy_whole_document_edits_without_inventing_source_pages(self):
+        pid, aid = self.fixture()
+        root = self.m.path(pid)
+        p = self.m.get(pid)
+        artifact = next(a for a in p["artifacts"] if a["artifact_id"] == aid)
+        body = (root / artifact["path"]).read_text()
+        page_data(root, "content/whole-document.js", {"text": body})
+        artifact["pages"] = [{"locator": {"kind": "document"}, "data": "content/whole-document.js"}]
+        emit_viewer(root, p)
+        before = self.m.text_artifact(pid, aid)
+        request = {
+            "request_id": str(uuid.uuid4()),
+            "parent_artifact_id": aid,
+            "parent_sha256": before["sha256"],
+            "head_id": before["head_id"],
+            "head_sha256": before["head_sha256"],
+            "locator": {"kind": "document"},
+            "text": "只编辑整份已核实文字，不伪造来源页",
+        }
+        result = self.m.save_text_revision(pid, request)
+        after = self.m.text_artifact(pid, result["artifact_id"])
+        self.assertEqual(
+            after["pages"], [{"locator": {"kind": "document"}, "source_page": None, "text": request["text"]}]
+        )
+        self.assertEqual(self.m.text_artifact(pid, aid)["pages"][0]["text"], body)

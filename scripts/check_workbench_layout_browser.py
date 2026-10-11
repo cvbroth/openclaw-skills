@@ -123,8 +123,10 @@ with sync_playwright() as pw:
     page.wait_for_function("() => document.querySelector('#rightPageInput').value==='2'")
     page.fill("#sourcePageLookup", "11")
     page.click("#findSourcePage")
-    assert "没有对应" in page.locator("#mapMessage").text_content()
-    assert page.input_value("#rightPageInput") == "2"
+    assert "没有登记" in page.locator("#rightContent").text_content()
+    assert page.locator(".source-fragment").count() == 0
+    page.fill("#rightPageInput", "2")
+    page.press("#rightPageInput", "Enter")
     page.select_option("#errorFilter", "yes")
     assert page.locator("#rightPosition option").count() == 1
     assert page.input_value("#rightPosition") == "-1"
@@ -132,7 +134,9 @@ with sync_playwright() as pw:
     page.select_option("#quality", "unknown")
     assert page.locator("#sourcePosition option").count() == 169
     page.select_option("#quality", "")
-    checks.append("registered source-page navigation, absent source keeps selection, error/quality filters")
+    checks.append(
+        "registered source-page navigation, absent source clears old text; independent position returns to normal reading, error/quality filters"
+    )
     page.click("[data-panel=comments]")
     page.select_option("#reviewer", "developer-agent")
     page.fill("#comment", "WORKBENCH_COMMENT_SENTINEL")

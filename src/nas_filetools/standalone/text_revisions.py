@@ -30,7 +30,12 @@ def mapped_text(root, artifact):
     for view in artifact.get("pages", []):
         loc = view.get("locator")
         key = json.dumps(loc, sort_keys=True)
-        if not loc or loc.get("kind") not in {"block", "physical_page", "page"} or key in seen:
+        whole_document = loc and loc.get("kind") == "document" and len(artifact["pages"]) == 1
+        if (
+            not loc
+            or (loc.get("kind") not in {"block", "physical_page", "page"} and not whole_document)
+            or key in seen
+        ):
             raise ValueError("缺少唯一稳定分段映射，不能逐页修补")
         seen.add(key)
         if not view.get("data") or not view.get("data_sha256"):
@@ -81,6 +86,11 @@ class TextRevisions:
                     {
                         "locator": r["view"]["locator"],
                         "source_page": r["view"].get("source_page"),
+                        **(
+                            {"source_pages": deepcopy(r["view"]["source_pages"])}
+                            if "source_pages" in r["view"]
+                            else {}
+                        ),
                         "text": r["text"],
                     }
                     for r in rows
@@ -162,6 +172,11 @@ class TextRevisions:
                         {
                             "locator": row["view"]["locator"],
                             "source_page": row["view"].get("source_page"),
+                            **(
+                                {"source_pages": deepcopy(row["view"]["source_pages"])}
+                                if "source_pages" in row["view"]
+                                else {}
+                            ),
                             "before": row["text"],
                             "after": new,
                         }
@@ -198,6 +213,11 @@ class TextRevisions:
                     structures.append(
                         {
                             "physical_page": view.get("source_page"),
+                            **(
+                                {"source_pages": deepcopy(view["source_pages"])}
+                                if "source_pages" in view
+                                else {}
+                            ),
                             "locator": view["locator"],
                             "text": row["text"],
                             "structure": model,

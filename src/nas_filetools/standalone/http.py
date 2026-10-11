@@ -138,7 +138,8 @@ class Handler(BaseHTTPRequestHandler):
             method == "GET"
             and parts[0] == "assets"
             and len(parts) == 2
-            and parts[1] in {"app.js", "management.js", "document-exports.js", "app.css", "templates.js", "engines.js"}
+            and parts[1]
+            in {"app.js", "management.js", "document-exports.js", "app.css", "templates.js", "engines.js"}
         ):
             return self.stream(Path(__file__).parent / "assets" / parts[1])
         if method == "GET" and parts == ["engines"]:
@@ -398,7 +399,8 @@ class Handler(BaseHTTPRequestHandler):
             if (
                 len(parts) == 4
                 and parts[2] == "review"
-                and parts[3] in {"index.html", "viewer.js", "viewer.css", "editor.js", "workbench.js"}
+                and parts[3]
+                in {"index.html", "viewer.js", "viewer.css", "editor.js", "workbench.js", "source-reader.js"}
             ):
                 path = Path(__file__).parent.parent / "project_assets" / parts[3]
             if not path.is_file():

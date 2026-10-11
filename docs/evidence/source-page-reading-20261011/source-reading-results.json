@@ -1,0 +1,161 @@
+{
+  "browser": "140.0.7339.16",
+  "checks": [
+    "30 original pages / 6 fragments: one, three ordered same-page fragments, cross-page whole text, failure, absent-page clears old text; independent left navigation",
+    "explicit source lookup includes all fragments under quality/error/comment filters; normal position remains filtered",
+    "selected fragment 3 saved under its stable locator only; five neighbors unchanged; cross-page mapping retained; failed-save/source/position/file cancellation retains draft; comment locator preserved",
+    "history preserves same page aggregation; read-only -> explicit restore/new version retains all source relationships; export selects restored version",
+    "missing mappings do not infer fragment index as physical page; stable unmapped fragments still independently editable",
+    "verified whole-document legacy text can independently edit/save, without synthesizing page or fragment mapping",
+    "failed fragment asset is explicit and keeps neighbors; offline package includes source reader and aggregates page23 without server writes"
+  ],
+  "metrics": [
+    {
+      "width": 1920,
+      "height": 1080,
+      "scroll": 1920,
+      "main": 1016
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "scroll": 1366,
+      "main": 683
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "scroll": 1024,
+      "main": 683
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "scroll": 768,
+      "main": 773
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "scroll": 390,
+      "main": 682
+    },
+    {
+      "width": 320,
+      "height": 640,
+      "scroll": 320,
+      "main": 478
+    }
+  ],
+  "page_errors": [],
+  "paid_model_calls": 0,
+  "OCR_calls": 0,
+  "original_fragments": [
+    {
+      "locator": {
+        "kind": "block",
+        "id": "stable-fragment-0"
+      },
+      "source_page": 22,
+      "text": "ONE_P22 · 一页一个片段"
+    },
+    {
+      "locator": {
+        "kind": "block",
+        "id": "stable-fragment-1"
+      },
+      "source_page": 23,
+      "text": "FIRST_P23 · 第一片段完整正文。"
+    },
+    {
+      "locator": {
+        "kind": "block",
+        "id": "stable-fragment-2"
+      },
+      "source_page": 23,
+      "text": "SECOND_P23 · 第二片段等待独立编辑。"
+    },
+    {
+      "locator": {
+        "kind": "block",
+        "id": "stable-fragment-3"
+      },
+      "source_page": null,
+      "source_pages": [
+        23,
+        24
+      ],
+      "text": "CROSS_23_24 · 第23页部分。\n第24页部分；跨页片段完整保留。"
+    },
+    {
+      "locator": {
+        "kind": "block",
+        "id": "stable-fragment-4"
+      },
+      "source_page": 25,
+      "text": ""
+    },
+    {
+      "locator": {
+        "kind": "block",
+        "id": "stable-fragment-5"
+      },
+      "source_page": null,
+      "text": "UNMAPPED_FRAGMENT · 来源未知，仍可独立编辑。"
+    }
+  ],
+  "revised_fragments": [
+    {
+      "locator": {
+        "kind": "block",
+        "id": "stable-fragment-0"
+      },
+      "source_page": 22,
+      "text": "ONE_P22 · 一页一个片段"
+    },
+    {
+      "locator": {
+        "kind": "block",
+        "id": "stable-fragment-1"
+      },
+      "source_page": 23,
+      "text": "FIRST_P23 · 第一片段完整正文。"
+    },
+    {
+      "locator": {
+        "kind": "block",
+        "id": "stable-fragment-2"
+      },
+      "source_page": 23,
+      "text": "EDIT_ONLY_SECOND_P23 · 仅修改第二片段。"
+    },
+    {
+      "locator": {
+        "kind": "block",
+        "id": "stable-fragment-3"
+      },
+      "source_page": null,
+      "source_pages": [
+        23,
+        24
+      ],
+      "text": "CROSS_23_24 · 第23页部分。\n第24页部分；跨页片段完整保留。"
+    },
+    {
+      "locator": {
+        "kind": "block",
+        "id": "stable-fragment-4"
+      },
+      "source_page": 25,
+      "text": ""
+    },
+    {
+      "locator": {
+        "kind": "block",
+        "id": "stable-fragment-5"
+      },
+      "source_page": null,
+      "text": "UNMAPPED_FRAGMENT · 来源未知，仍可独立编辑。"
+    }
+  ]
+}

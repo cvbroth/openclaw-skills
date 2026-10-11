@@ -33,7 +33,7 @@ class SourcePreviewTests(scenarios.HTTPTests):
         with patch.object(self.m, "run_child", side_effect=AssertionError("no engine/queue child")):
             for n in [1, 16, 23, 169]:
                 r = self.request(f"/api/projects/{pid}/source-preview/{n}", "POST", {})
-                assert r["status"] == "SUCCEEDED" and r["physical_page"] == n
+                assert r["status"] == "SUCCEEDED" and r["physical_page"] == n, r
                 assert not r["cache_hit"]
                 images.append(r["image_sha256"])
                 source_path = self.m.path(pid) / source["path"]

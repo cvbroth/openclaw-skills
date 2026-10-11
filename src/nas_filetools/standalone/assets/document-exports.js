@@ -49,10 +49,17 @@ let previewRequest=0;
 async function previewExport(a){
  const request=++previewRequest;
  const dialog=$('#exportPreview'),body=$('#exportPreviewBody');body.replaceChildren();$('#exportPreviewTitle').textContent=a.display_name||a.name;dialog.showModal();
- // List rows may hold the pre-render snapshot even after the background job finishes.
- try{const latest=await api('/api/projects/'+pid);a=latest.artifacts.find(item=>item.artifact_id===a.artifact_id)||a;}catch(e){if(request!==previewRequest||!dialog.open)return;body.append(el('p','读取最新预览状态失败：'+e.message,'muted'));}
- if(request!==previewRequest||!dialog.open)return;
  const download=el('a','下载 '+(a.format==='docx'?'Word':'PDF'),'button primary');download.href='/api/projects/'+pid+'/download/'+a.artifact_id;body.append(download);
+ const progress=el('p','正在读取预览状态…','muted');body.append(progress);
+ // Publication can finish just before its preview is queued. Observe the open dialog only.
+ const deadline=Date.now()+180000;let emptyReads=0;
+ try{while(request===previewRequest&&dialog.open){
+  const latest=await api('/api/projects/'+pid);a=latest.artifacts.find(item=>item.artifact_id===a.artifact_id)||a;
+  const status=a.preview_render?.status||'NONE';
+  if(!active(a.preview_render||{})&&!(status==='NONE'&&++emptyReads<3)||Date.now()>=deadline)break;
+  progress.textContent='预览正在生成，完成后自动显示；可先下载文件。';await new Promise(resolve=>setTimeout(resolve,500));
+ }}catch(e){if(request!==previewRequest||!dialog.open)return;progress.textContent='读取最新预览状态失败：'+e.message;return;}
+ if(request!==previewRequest||!dialog.open)return;progress.remove();
  if(a.preview_render?.status==='SUCCEEDED'&&(a.pages||[]).some(p=>p.image)){
   const scroll=el('div',undefined,'export-preview-pages');for(const p of a.pages){if(!p.image)continue;const image=el('img');image.src='/p/'+pid+'/'+p.image;image.alt='导出文档第'+(p.output_page||p.locator?.page||'')+'页';image.loading='lazy';scroll.append(image);}body.append(scroll);
  }else{body.append(el('p',active(a.preview_render||{})?'预览正在生成，请稍后重新打开。':'尚无预览，可下载文件或生成预览。','muted'));if(!active(a.preview_render||{}))body.append(button('生成 / 重试预览',()=>api(`/api/projects/${pid}/previews/${a.artifact_id}`,json('POST',{retry:true})).then(()=>{dialog.close();return detail();})));}
