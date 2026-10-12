@@ -61,13 +61,16 @@ def compact_options(value):
     return result
 
 
-def check_views(artifact, total):
+def check_views(artifact, total, selected=None):
     views = artifact.get("pages", [])
     if not views:
         raise ValueError("原文直出缺少来源页映射；请使用自定义模板连续排版，不能推断来源页。")
     previous = 0
     for v in views:
         n = v.get("source_page")
+        known = set(v.get("source_pages", [])) | ({n} if type(n) is int else set())
+        if selected is not None and known and not known.intersection(selected):
+            continue
         if type(n) is not int or n < 1 or type(total) is not int or n > total:
             raise ValueError("原文直出缺少可靠的来源物理页映射；片段位置不是原件页码。")
         if not v.get("data"):
@@ -105,6 +108,20 @@ def write_reader_docx(path, models, style, body_pt, line, paragraph_em):
             fmt.keep_with_next = False  # Reader headings do not bind across physical source pages.
             fmt.keep_together = False
             fmt.widow_control = False
+            if block.get("quote_depth"):
+                fmt.left_indent = Pt(size * (block["quote_depth"] * style["quote_indent_em"] + 0.5))
+            if block["style"] == "Code":
+                fmt.left_indent = fmt.right_indent = Pt(size * style["code_indent_em"])
+                shade = OxmlElement("w:shd")
+                shade.set(qn("w:fill"), "F4F6F9")
+                p._p.get_or_add_pPr().append(shade)
+            if block["style"] == "Separator" or block.get("quote_depth"):
+                borders = OxmlElement("w:pBdr")
+                border = OxmlElement("w:bottom" if block["style"] == "Separator" else "w:left")
+                for key, value in {"val": "single", "sz": "6", "color": "AAB6C7", "space": "4"}.items():
+                    border.set(qn("w:" + key), value)
+                borders.append(border)
+                p._p.get_or_add_pPr().append(borders)
             for part in block["runs"]:
                 for name, text in font_runs(part["text"], style["font_path"]):
                     run = p.add_run(text)
@@ -113,6 +130,8 @@ def write_reader_docx(path, models, style, body_pt, line, paragraph_em):
                     run.font.bold = bool(level or part.get("bold"))
                     run.font.italic = bool(part.get("italic"))
                     run.font.color.rgb = RGBColor.from_string("243145")
+    if not doc.paragraphs:
+        doc.add_paragraph()  # A real empty paragraph keeps a blank source page when merging.
     doc.save(path)
     embed_fonts(path)
 
@@ -174,6 +193,9 @@ def generate(request):
         "schema": "markdown-direct-pagination-v2",
         "policy": policy,
         "purpose": purpose,
+        "blank_missing": request.get("blank_missing", False),
+        "placeholder_candidates": request.get("placeholder_candidates", []),
+        "placeholders": request.get("placeholders", []),
         "groups": [],
         "verified": False,
         "ready": False,
@@ -196,11 +218,12 @@ def generate(request):
         if not groups or groups[-1]["source_page"] != n:
             groups.append({"source_page": n, "pages": []})
         groups[-1]["pages"].append(page)
-    for issue in report["issues"]:
+    for issue in report["issues"] + report["placeholders"]:
         n = issue["source_page"]
         if type(n) is int and not any(g["source_page"] == n for g in groups):
             groups.append({"source_page": n, "pages": []})
     groups.sort(key=lambda g: g["source_page"])
+    placeholder_pages = {i["source_page"]: i["reason"] for i in report["placeholders"]}
     blocked = {i["source_page"] for i in report["issues"]}
     checked, words, pdfs, text_by_page, fonts = 0, [], [], [], []
     renderer = ReaderPDF(out, style) if "pdf" in formats else None
@@ -230,8 +253,13 @@ def generate(request):
                 persist(n)
                 continue
             try:
+                placeholder = n in placeholder_pages
                 models = [parse_markdown(p["text"], p.get("source_locator")) for p in group["pages"]]
-                if any(not p["text"].strip() for p in group["pages"]):
+                if placeholder:
+                    if any(p["text"].strip() for p in group["pages"]):
+                        raise ValueError("空白占位不能抹掉已有正文")
+                    models = []
+                if not placeholder and any(not p["text"].strip() for p in group["pages"]):
                     raise ValueError("没有正文，不能作为成功提取的空白页导出")
                 labels = {
                     "POSSIBLE_TABLE_PRESERVED_AS_TEXT": "真实表格（含表头分隔行）",
@@ -242,7 +270,12 @@ def generate(request):
                     "HEADING_LEVEL_4_TO_6_RENDERED_AS_3": "四至六级标题",
                     "LITERAL_BLOCK_PRESERVED": "代码块或HTML块",
                 }
-                diagnostics = {labels.get(d["code"], d["code"]) for m in models for d in m["diagnostics"]}
+                diagnostics = {
+                    labels.get(d["code"], d["code"])
+                    for m in models
+                    for d in m["diagnostics"]
+                    if not d.get("supported")
+                }
                 if diagnostics:
                     raise ValueError(
                         "目前原文直出不支持的格式：" + "、".join(sorted(diagnostics)) + "；原文保留"
@@ -316,7 +349,8 @@ def generate(request):
                         )
                     )
                 entry.update(
-                    status="READY",
+                    status="PLACEHOLDER" if placeholder else "READY",
+                    placeholder_reason=placeholder_pages.get(n),
                     output_pages=[len(text_by_page) + 1],
                     content_equal=True,
                     final_parameters={"body_pt": size, "line_multiple": line, "paragraph_em": gap},
@@ -329,7 +363,18 @@ def generate(request):
             except (ValueError, RuntimeError, TimeoutError) as exc:
                 reason = str(exc) or "本页浏览器排版超过60秒或打印超过30秒，停止本页生成"
                 entry["reason"] = reason
-                report["issues"].append({"source_page": n, "reason": reason})
+                report["issues"].append(
+                    {
+                        "source_page": n,
+                        "category": "overflow"
+                        if "SOURCE_PAGE_OVERFLOW" in reason
+                        else "format"
+                        if "不支持的格式" in reason
+                        else "render",
+                        "placeholder_eligible": False,
+                        "reason": reason,
+                    }
+                )
             checked += 1
             persist(n)
         report["ready"] = bool(groups) and not report["issues"]

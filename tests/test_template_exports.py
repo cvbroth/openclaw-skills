@@ -29,6 +29,12 @@ def project(tmp_path):
                 doc.new_page()
             doc.save(path)
         pid = m.upload(path, path.name)["project_id"]
+        # The local upload analysis also writes metadata. Finish it before tests
+        # inject immutable synthetic extraction records outside the UI.
+        deadline = time.monotonic() + 100
+        while m.get(pid).get("analysis", {}).get("status") in {"QUEUED", "RUNNING"}:
+            assert time.monotonic() < deadline, "source analysis did not settle"
+            time.sleep(0.05)
         with m.lock:
             p = m.get(pid)
             root = m.path(pid)

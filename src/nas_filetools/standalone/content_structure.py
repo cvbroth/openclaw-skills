@@ -42,6 +42,7 @@ def parse_markdown(text, source=None):
     tokens = parser.parse(text)
     blocks, diagnostics, stack = [], [], []
     style = "Normal"
+    quote_depth = 0
     # Recognize real table grammar, including matching columns and escaped pipes.
     # Ordinary pipes (including Setext headings) are reader text, not table evidence.
     table_probe = MarkdownIt("commonmark", {"html": False}).enable("table")
@@ -65,7 +66,7 @@ def parse_markdown(text, source=None):
         elif t.type == "list_item_close":
             marker = ""
         elif t.type == "heading_open":
-            style = "Heading " + str(min(int(t.tag[1:]), 3))
+            style = "Heading " + str(int(t.tag[1:]))
         elif t.type == "heading_close":
             style = "Normal"
         elif t.type == "inline":
@@ -84,7 +85,14 @@ def parse_markdown(text, source=None):
                 elif child.type in ("softbreak", "hardbreak"):
                     runs.append({"text": "\n", "bold": bool(bold), "italic": bool(italic)})
                 elif child.type in ("text", "code_inline", "html_inline", "image"):
-                    runs.append({"text": child.content, "bold": bool(bold), "italic": bool(italic)})
+                    runs.append(
+                        {
+                            "text": child.content,
+                            "bold": bool(bold),
+                            "italic": bool(italic),
+                            "code": child.type == "code_inline",
+                        }
+                    )
                     if child.type == "image":
                         diagnostics.append(
                             {
@@ -115,21 +123,19 @@ def parse_markdown(text, source=None):
                 "runs": runs,
                 "text": str(RichText(runs)),
                 "list_depth": depth,
+                "quote_depth": quote_depth,
                 "source": source,
                 "source_lines": t.map,
                 "raw": raw,
             }
             blocks.append(block)
-            if style == "Heading 3" and any(
-                x.type == "heading_open" and x.map == t.map and x.tag in ("h4", "h5", "h6") for x in tokens
-            ):
-                diagnostics.append({"code": "HEADING_LEVEL_4_TO_6_RENDERED_AS_3", "source_lines": t.map})
         elif t.type in ("fence", "code_block", "html_block"):
             blocks.append(
                 {
                     "id": "literal-" + str(len(blocks)),
                     "type": "literal",
-                    "style": "Normal",
+                    "style": "Code",
+                    "quote_depth": quote_depth,
                     "text": t.content,
                     "runs": [{"text": t.content}],
                     "source": source,
@@ -137,24 +143,31 @@ def parse_markdown(text, source=None):
                     "raw": t.content,
                 }
             )
-            diagnostics.append({"code": "LITERAL_BLOCK_PRESERVED", "type": t.type, "source_lines": t.map})
-        elif t.type in ("blockquote_open", "hr"):
             diagnostics.append(
-                {"code": "UNSUPPORTED_BLOCK_PRESERVED_AS_TEXT", "type": t.type, "source_lines": t.map}
+                {"code": "LITERAL_BLOCK_PRESERVED", "supported": True, "type": t.type, "source_lines": t.map}
             )
-            if t.type == "hr":
-                blocks.append(
-                    {
-                        "id": "literal-" + str(len(blocks)),
-                        "type": "literal",
-                        "style": "Normal",
-                        "text": t.markup,
-                        "runs": [{"text": t.markup}],
-                        "source": source,
-                        "source_lines": t.map,
-                        "raw": t.markup,
-                    }
-                )
+            # Literal contents are escaped, never executed as HTML.
+
+        elif t.type == "blockquote_open":
+            quote_depth += 1
+        elif t.type == "blockquote_close":
+            quote_depth -= 1
+        elif t.type == "hr":
+            rule = "\n".join(lines[slice(*t.map)]) if t.map else t.markup
+            if quote_depth:
+                rule = re.sub(r"^(?:\s*> ?)+", "", rule)
+            blocks.append(
+                {
+                    "id": "literal-" + str(len(blocks)),
+                    "type": "separator",
+                    "style": "Separator",
+                    "text": rule,
+                    "runs": [{"text": rule}],
+                    "source": source,
+                    "source_lines": t.map,
+                    "raw": rule,
+                }
+            )
     return {
         "schema": "markdown-content-v1",
         "parser": "markdown-it-py==3.0.0; CommonMark; html disabled",
@@ -168,14 +181,17 @@ def items(model):
 
 
 def reading_html(model):
-    # Only generated allowlisted tags. No raw model HTML, external resources or URLs.
-    return "".join(
-        "<"
-        + ("h" + b["style"][-1] if b["type"] == "heading" else "p")
-        + ">"
-        + RichText(b["runs"]).safe_html
-        + "</"
-        + ("h" + b["style"][-1] if b["type"] == "heading" else "p")
-        + ">"
-        for b in model["blocks"]
-    )
+    # Allowlisted generated tags only. Literal code/HTML is escaped as document text.
+    output = []
+    for b in model["blocks"]:
+        tag = "h" + b["style"][-1] if b["type"] == "heading" else "p"
+        classes = []
+        if b.get("quote_depth"):
+            classes.append("md-quote")
+        if b["style"] in {"Code", "Separator"}:
+            classes.append("md-" + b["style"].lower())
+        attrs = ' class="' + " ".join(classes) + '"' if classes else ""
+        if b.get("quote_depth"):
+            attrs += ' style="--quote-depth:' + str(b["quote_depth"]) + '"'
+        output.append("<" + tag + attrs + ">" + RichText(b["runs"]).safe_html + "</" + tag + ">")
+    return "".join(output)

@@ -45,6 +45,27 @@ D. 不编造答案。
 
 
 class FormatJobs:
+    def direct_source_summary(self, pid, data):
+        from .document_exports import export_options
+        from .direct_source import collect
+
+        with self.lock:
+            project = self.get(pid)
+            artifact = next(a for a in project["artifacts"] if a["artifact_id"] == data["source_artifact_id"])
+            options = export_options(
+                {**data, "mode": "markdown-direct", "purpose": "check", "blank_missing": False},
+                project,
+                artifact,
+            )
+            source = collect(self.path(pid), project, artifact, options["source_pages"])
+            return {
+                k: source.get(k, []) for k in ("requested_source_pages", "placeholder_candidates", "issues")
+            } | {
+                "expected_output_pages": len(source["requested_source_pages"]),
+                "source_artifact_id": artifact["artifact_id"],
+                "source_sha256": artifact["sha256"],
+            }
+
     def export_documents(self, pid, data):
         from .document_exports import export_options
 
@@ -59,7 +80,9 @@ class FormatJobs:
             if options["mode"] == "markdown-direct":
                 from .direct_source import collect
 
-                source = collect(self.path(pid), project, artifact, options["source_pages"])
+                source = collect(
+                    self.path(pid), project, artifact, options["source_pages"], options["blank_missing"]
+                )
                 if options["purpose"] == "preview" and len(source["requested_source_pages"]) != 1:
                     raise ValueError("纸张预览请选择一个来源物理页")
                 if options["purpose"] == "export" and source["issues"]:
@@ -92,7 +115,8 @@ class FormatJobs:
             if artifact.get("recycled") or artifact["format"] != "markdown" or not artifact["path"]:
                 raise ValueError("source_artifact_id: registered Markdown required")
             if policy["mode"] == "source-pages" and not (
-                export and export.get("purpose") in {"check", "preview"}
+                export
+                and (export.get("mode") == "markdown-direct" or export.get("purpose") in {"check", "preview"})
             ):
                 from .text_revisions import mapped_text
 
@@ -146,9 +170,13 @@ class FormatJobs:
                 # Validate full assembly now, before accepting a range that could omit fragments.
                 from .text_revisions import mapped_text
 
-                if export.get("purpose") not in {"check", "preview"} and (
-                    export["source_pages"] is not None
-                    or any(v.get("data") for v in artifact.get("pages", []))
+                if (
+                    not direct
+                    and export.get("purpose") not in {"check", "preview"}
+                    and (
+                        export["source_pages"] is not None
+                        or any(v.get("data") for v in artifact.get("pages", []))
+                    )
                 ):
                     mapped_text(self.path(pid), artifact)
                 task["document_export"] = {
@@ -179,6 +207,18 @@ class FormatJobs:
                     and all(type(v.get("source_page")) is int for v in artifact["pages"])
                     else None,
                 }
+                if direct:
+                    from .direct_source import collect
+
+                    resolved = collect(
+                        self.path(pid),
+                        project,
+                        artifact,
+                        export["source_pages"],
+                        export.get("blank_missing", False),
+                    )
+                    task["document_export"]["included_source_pages"] = resolved["requested_source_pages"]
+                    task["document_export"]["placeholders"] = resolved.get("placeholders", [])
             if not allow_draft and not direct:
                 project["selected_template"] = dict(choice)
                 project["selected_pagination"] = policy
@@ -241,6 +281,8 @@ class FormatJobs:
         with self.lock:
             p = self.get(pid)
             t = self.task(p, tid)
+            if t["status"] == "CANCELLED" or self.cancels[tid].is_set():
+                return
             t["status"] = "RUNNING"
             self.save(root, p)
         a = next(a for a in p["artifacts"] if a["artifact_id"] == t["source_artifact_id"])
@@ -269,7 +311,13 @@ class FormatJobs:
         if direct:
             from .direct_source import collect
 
-            source_check = collect(root, p, a, t["document_export"]["source_pages"])
+            source_check = collect(
+                root,
+                p,
+                a,
+                t["document_export"]["source_pages"],
+                t["document_export"].get("blank_missing", False),
+            )
             pages = source_check["pages"]
         for view in [] if direct else a["pages"]:
             selected = t.get("document_export", {}).get("source_pages")
@@ -316,6 +364,11 @@ class FormatJobs:
                 "direct_purpose": t.get("document_export", {}).get("purpose", "export"),
                 "formats": t.get("document_export", {}).get("formats", ["docx", "pdf"]),
                 "source_issues": source_check["issues"] if source_check else [],
+                "placeholder_candidates": source_check.get("placeholder_candidates", [])
+                if source_check
+                else [],
+                "placeholders": source_check.get("placeholders", []) if source_check else [],
+                "blank_missing": t.get("document_export", {}).get("blank_missing", False),
                 "content_states": source_check["content_states"] if source_check else [],
                 "requested_source_pages": source_check["requested_source_pages"] if source_check else None,
                 "excluded_source_pages": t.get("document_export", {}).get("excluded_source_pages", []),
@@ -328,7 +381,11 @@ class FormatJobs:
                 "engine": {"cpu_threads": 2},
             },
             work / "generation-result.json",
-            min(86400, 120 + 120 * len(pages))
+            min(
+                86400,
+                120
+                + 120 * max(len(pages), len(source_check["requested_source_pages"]) if source_check else 0),
+            )
             if direct
             else min(1800, 60 + 12 * len(pages))
             if t.get("pagination", {}).get("mode") == "source-pages"
@@ -426,6 +483,8 @@ class FormatJobs:
                             "template_snapshot": t.get("template_snapshot"),
                             "pagination": t.get("pagination"),
                             "mode": t.get("document_export", {}).get("mode", "template"),
+                            "blank_missing": t.get("document_export", {}).get("blank_missing", False),
+                            "placeholders": t.get("document_export", {}).get("placeholders", []),
                             "compact": t.get("document_export", {}).get("compact"),
                             "reading_style": t.get("template_data", {}).get("reading_style"),
                             "renderer": t.get("direct_report", {}).get("renderer"),

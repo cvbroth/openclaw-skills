@@ -287,6 +287,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_json(m.save_text_revision(pid, self.json_body()))
             if len(parts) == 5 and parts[3] == "text-diff" and method == "GET":
                 return self.send_json(m.text_diff(pid, parts[4], parse_qs(url.query)["against"][0]))
+            if len(parts) == 4 and parts[3] == "direct-source-check" and method == "POST":
+                return self.send_json(m.direct_source_summary(pid, self.json_body()))
             if len(parts) == 4 and parts[3] == "document-exports" and method == "POST":
                 return self.send_json(m.export_documents(pid, self.json_body()), 202)
             if len(parts) == 5 and parts[3] == "direct-results" and method == "GET":

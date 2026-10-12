@@ -297,7 +297,7 @@ def emit_viewer(root, project):
             if path and path.is_file():
                 try:
                     data = json.loads(path.read_text().split("=", 1)[1].rstrip(";\n"))
-                    if not data.get("reading_html") and isinstance(data.get("text"), str):
+                    if isinstance(data.get("text"), str):
                         fallbacks[data["text"]] = reading_html(parse_markdown(data["text"]))
                 except (ValueError, IndexError):
                     pass  # Invalid legacy payloads remain available to diagnostics.

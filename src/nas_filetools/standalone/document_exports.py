@@ -15,6 +15,7 @@ def export_options(data, project, artifact):
         "mode",
         "compact",
         "purpose",
+        "blank_missing",
     }:
         raise ValueError("不支持的导出设置")
     formats = data.get("formats", ["docx", "pdf"])
@@ -31,13 +32,14 @@ def export_options(data, project, artifact):
     if mode not in {"template", "markdown-direct"}:
         raise ValueError("请选择原文直出或自定义模板")
     if mode == "markdown-direct":
-        from .markdown_direct import check_views, compact_options
+        from .markdown_direct import compact_options
 
         purpose = data.get("purpose", "export")
         if purpose not in {"export", "check", "preview"}:
             raise ValueError("无效的原文直出操作")
-        if purpose == "export":
-            check_views(artifact, project.get("source_info", {}).get("units"))
+        blank_missing = data.get("blank_missing", False)
+        if type(blank_missing) is not bool:
+            raise ValueError("空白占位须明确选择")
         compact = compact_options(data.get("compact"))
     selected = None
     value = data.get("pages", "全部")
@@ -54,13 +56,21 @@ def export_options(data, project, artifact):
             or any(type(v.get("source_page")) is not int or not 1 <= v["source_page"] <= total for v in views)
         ):
             raise ValueError("文字稿缺少来源页映射，不能按原件页选择")
-        available = {v["source_page"] for v in views}
+        available = {v.get("source_page") for v in views}
         missing = sorted(set(selected) - available)
         if missing and mode != "markdown-direct":
             raise ValueError("所选原件页没有文字记录：" + ",".join(map(str, missing[:20])))
+    if mode == "markdown-direct" and purpose == "export":
+        from .markdown_direct import check_views
+
+        check_views(artifact, project.get("source_info", {}).get("units"), selected)
     return {
         "formats": formats,
         "source_pages": selected,
         "mode": mode,
-        **({"compact": compact, "purpose": purpose} if mode == "markdown-direct" else {}),
+        **(
+            {"compact": compact, "purpose": purpose, "blank_missing": blank_missing}
+            if mode == "markdown-direct"
+            else {}
+        ),
     }

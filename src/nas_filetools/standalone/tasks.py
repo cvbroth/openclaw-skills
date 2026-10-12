@@ -396,7 +396,10 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
             if t["status"] not in ACTIVE:
                 raise ValueError("task not active")
             self.cancels[tid].set()
-            t["status"] = "CANCELLING"
+            queued = t["status"] == "QUEUED"
+            t["status"] = "CANCELLED" if queued else "CANCELLING"
+            if queued:
+                t["finished_at"] = now()
             self.save(self.path(pid), p)
 
     def retry(self, pid, tid):
@@ -481,6 +484,8 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
                     self.execute_analysis(pid, tid.split(":", 1)[1])
                 elif tid.startswith("preview:"):
                     self.execute_preview(pid, tid.split(":", 1)[1])
+                elif self.task(self.get(pid), tid).get("status") == "CANCELLED":
+                    continue
                 elif self.task(self.get(pid), tid).get("operation") == "format-artifact":
                     self.execute_format(pid, tid)
                 else:
