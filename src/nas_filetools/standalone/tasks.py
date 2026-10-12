@@ -548,6 +548,7 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
             "PYTHONDONTWRITEBYTECODE": "1",
             "OMP_NUM_THREADS": str(engine["cpu_threads"]),
             "OPENBLAS_NUM_THREADS": str(engine["cpu_threads"]),
+            "PLAYWRIGHT_BROWSERS_PATH": os.environ.get("PLAYWRIGHT_BROWSERS_PATH", "/opt/filetools-browsers"),
         }
         if secret is not None:
             env["FILETOOLS_ENGINE_CREDENTIAL"] = secret
@@ -568,8 +569,28 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
                 stderr=err,
             )
             self.child = child
+            last_progress, progress_at = None, 0
             try:
                 while child.process.poll() is None:
+                    if (
+                        request.get("export_mode") == "markdown-direct"
+                        and time.monotonic() - progress_at > 0.5
+                    ):
+                        progress_at = time.monotonic()
+                        progress_file = result.parent / "progress.json"
+                        if progress_file.is_file():
+                            progress = json.loads(progress_file.read_text())
+                            if progress != last_progress:
+                                last_progress = progress
+                                with self.lock:
+                                    folder = result.parents[4]
+                                    p = self.get(folder.name)
+                                    task = self.task(p, result.parents[1].name)
+                                    task["direct_progress"] = progress
+                                    report_file = result.parent / "pagination-report.json"
+                                    if report_file.is_file():
+                                        task["direct_report"] = json.loads(report_file.read_text())
+                                    self.save(folder, p)
                     if cancel.is_set() or self.stopping.is_set():
                         return {
                             "status": "CANCELLED",

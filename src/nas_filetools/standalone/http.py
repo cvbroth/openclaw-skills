@@ -289,6 +289,22 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_json(m.text_diff(pid, parts[4], parse_qs(url.query)["against"][0]))
             if len(parts) == 4 and parts[3] == "document-exports" and method == "POST":
                 return self.send_json(m.export_documents(pid, self.json_body()), 202)
+            if len(parts) == 5 and parts[3] == "direct-results" and method == "GET":
+                task = m.task(project, parts[4])
+                report = task.get("direct_report", {})
+                prefix = f"/p/{pid}/diagnostics/format/{task['task_id']}/work/"
+                return self.send_json(
+                    {
+                        "status": task["status"],
+                        "report": report,
+                        "progress": task.get("direct_progress"),
+                        "error": task.get("error"),
+                        "images": [prefix + p for p in report.get("preview_images", [])],
+                        "candidate_pdf": prefix + report["preview_pdf"]
+                        if report.get("preview_pdf")
+                        else None,
+                    }
+                )
             if len(parts) == 4 and parts[3] == "format" and method == "POST":
                 data = self.json_body()
                 return self.send_json(

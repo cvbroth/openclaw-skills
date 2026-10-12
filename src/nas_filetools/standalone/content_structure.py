@@ -42,7 +42,10 @@ def parse_markdown(text, source=None):
     tokens = parser.parse(text)
     blocks, diagnostics, stack = [], [], []
     style = "Normal"
-    if any(re.match(r"^\s*\|?.*\|.*$", line) for line in text.splitlines()):
+    # Recognize real table grammar, including matching columns and escaped pipes.
+    # Ordinary pipes (including Setext headings) are reader text, not table evidence.
+    table_probe = MarkdownIt("commonmark", {"html": False}).enable("table")
+    if any(t.type == "table_open" for t in table_probe.parse(text)):
         diagnostics.append({"code": "POSSIBLE_TABLE_PRESERVED_AS_TEXT"})
     bold = italic = 0
     marker = ""

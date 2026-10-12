@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import subprocess
 import fitz
 from docx import Document
 from docx.shared import Mm, Pt, RGBColor
@@ -120,170 +121,266 @@ def page_text(page):
     return re.sub(r"\s", "", page.get_text())
 
 
-def generate(request):
-    out = Path(request["output"])
-    style = request["template_data"]["reading_style"]
-    if snapshot() != style:
-        raise ValueError("阅读样式或字体与快照不一致，请建立新导出任务；历史文件保留。")
-    policy = compact_options(request.get("direct_compact"))
-    groups = []
-    for page in request["pages"]:
-        n = page.get("source_pdf_physical_page")
-        if type(n) is not int:
-            raise ValueError("原文直出缺少来源页映射")
-        if not page.get("text", "").strip():
-            raise ValueError(f"来源第{n}页没有正文，不能作为成功提取的空白页导出。")
-        model = parse_markdown(page["text"], page.get("source_locator"))
-        if model["diagnostics"]:
-            labels = {
-                "POSSIBLE_TABLE_PRESERVED_AS_TEXT": "疑似表格或含竖线的内容",
-                "UNSUPPORTED_BLOCK_PRESERVED_AS_TEXT": "引用块或分隔线",
-                "IMAGE_REFERENCE_NOT_RENDERED": "图片引用",
-                "LINK_DISPLAY_TEXT_ONLY": "超链接",
-                "INLINE_UNSUPPORTED": "特殊行内格式",
-                "HEADING_LEVEL_4_TO_6_RENDERED_AS_3": "四至六级标题",
-                "LITERAL_BLOCK_PRESERVED": "代码块或HTML块",
-            }
-            codes = ", ".join(
-                sorted({labels.get(d["code"], d["code"]) for d in model["diagnostics"]})
+def adaptation_attempts(style, policy):
+    values = [(style["body_pt"], style["line_multiple"], style["paragraph_em"])]
+    if policy["enabled"]:
+        values.append((style["body_pt"], policy["minimum_line_multiple"], policy["minimum_paragraph_em"]))
+        size = style["body_pt"] - 0.5
+        while size > policy["minimum_font_pt"]:
+            values.append((size, policy["minimum_line_multiple"], policy["minimum_paragraph_em"]))
+            size -= 0.5
+        if policy["minimum_font_pt"] < style["body_pt"]:
+            values.append(
+                (policy["minimum_font_pt"], policy["minimum_line_multiple"], policy["minimum_paragraph_em"])
             )
-            raise ValueError(
-                f"来源第{n}页包含目前原文直出不支持的格式：{codes}；原文保留，请调整格式或使用其他输出方式。"
-            )
-        if not groups or groups[-1]["source_page"] != n:
-            groups.append({"source_page": n, "models": []})
-        groups[-1]["models"].append(model)
-    if not groups:
-        raise ValueError("没有可直出的来源正文")
-    fonts = font_audit(
-        [
-            {
-                "source_pdf_physical_page": g["source_page"],
-                "items": [i for m in g["models"] for i in items(m)],
-            }
-            for g in groups
-        ],
-        style["font_path"],
-    )
-    (out / "font-resolution.json").write_text(json.dumps(fonts, ensure_ascii=False, indent=2))
-    report = {"schema": "markdown-direct-pagination-v1", "policy": policy, "groups": [], "verified": False}
-    chosen, expected = [], []
-    for index, group in enumerate(groups):
-        n = group["source_page"]
-        entry = {"source_page": n, "output_pages": [index + 1], "attempts": []}
-        report["groups"].append(entry)
-        attempts = [(style["body_pt"], style["line_multiple"], style["paragraph_em"])]
-        if policy["enabled"]:
-            attempts.append(
-                (style["body_pt"], policy["minimum_line_multiple"], policy["minimum_paragraph_em"])
-            )
-            size = style["body_pt"] - 0.5
-            while size > policy["minimum_font_pt"]:
-                attempts.append((size, policy["minimum_line_multiple"], policy["minimum_paragraph_em"]))
-                size -= 0.5
-            if policy["minimum_font_pt"] < style["body_pt"]:
-                attempts.append(
-                    (
-                        policy["minimum_font_pt"],
-                        policy["minimum_line_multiple"],
-                        policy["minimum_paragraph_em"],
-                    )
-                )
-        content = "".join(b["text"] for m in group["models"] for b in m["blocks"])
-        for attempt, (size, line, gap) in enumerate(attempts):
-            folder = out / "pagination-work" / f"group-{index + 1}-attempt-{attempt + 1}"
-            folder.mkdir(parents=True)
-            path = folder / "group.docx"
-            write_reader_docx(path, group["models"], style, size, line, gap)
-            actual_doc = Document(path)
-            if "".join(p.text for p in actual_doc.paragraphs) != content:
-                raise ValueError(f"来源第{n}页Word正文或顺序不一致，未发布。")
-            pdf = export_docx(path, folder, timeout=40)
-            with fitz.open(pdf) as rendered:
-                texts = [page_text(p) for p in rendered]
-            entry["attempts"].append(
-                {
-                    "body_pt": size,
-                    "line_multiple": line,
-                    "paragraph_em": gap,
-                    "actual_output_pages": len(texts),
-                }
-            )
-            (out / "pagination-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2))
-            if len(texts) == 1:
-                break
-        if len(texts) != 1:
-            entry["error"] = "SOURCE_PAGE_OVERFLOW"
-            (out / "pagination-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2))
-            raise ValueError(
-                f"SOURCE_PAGE_OVERFLOW: 来源第{n}页按当前阅读样式需要{len(texts)}页；"
-                + (
-                    "紧凑适配已到可见下限，仍无法单页容纳。"
-                    if policy["enabled"]
-                    else "未启用紧凑适配；可明确选择字号与间距下限后重试。"
-                )
-            )
-        if texts[0] != re.sub(r"\s", "", content):
+    return list(dict.fromkeys(values))
+
+
+def validate_pdf(path, expected, n, single=True):
+    with fitz.open(path) as doc:
+        if single and len(doc) != 1:
+            return False, len(doc)
+        if "".join(page_text(p) for p in doc) != re.sub(r"\s", "", expected):
             raise ValueError(f"来源第{n}页PDF正文或顺序不一致，未发布。")
-        entry["content_equal"] = True
-        chosen.append(path)
-        expected.extend(texts)
-    merged = Document(chosen[0])
-    for path in chosen[1:]:
-        body = [deepcopy(c) for c in Document(path).element.body if c.tag != qn("w:sectPr")]
-        props = body[0].find(qn("w:pPr"))
-        if props is None:
-            props = OxmlElement("w:pPr")
-            body[0].insert(0, props)
-        props.append(OxmlElement("w:pageBreakBefore"))
-        for child in body:
-            merged.element.body.insert(len(merged.element.body) - 1, child)
-    merged.save(out / "document.docx")
-    embed_fonts(out / "document.docx")
-    pdf = export_docx(out / "document.docx", out, timeout=40)
-    with fitz.open(pdf) as rendered:
-        if [page_text(p) for p in rendered] != expected:
-            raise ValueError("合并后来源分页或正文发生变化，未发布。")
-        for i, page in enumerate(rendered):
+        for page in doc:
             if any(
                 code == 0xFFFD or (glyph == 0 and not chr(code).isspace())
                 for span in page.get_texttrace()
                 for code, glyph, _, _ in span["chars"]
             ):
-                raise ValueError(f"来源第{groups[i]['source_page']}页PDF有缺字，未发布。")
+                raise ValueError(f"来源第{n}页PDF有缺字，未发布。")
             if any(
                 b[0] < -1 or b[1] < -1 or b[2] > page.rect.width + 1 or b[3] > page.rect.height + 1
                 for b in page.get_text("blocks")
             ):
-                raise ValueError(f"来源第{groups[i]['source_page']}页有内容越界，未发布。")
-    report["verified"] = True
-    (out / "pagination-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2))
-    (out / "content-structure.json").write_text(
-        json.dumps(
+                raise ValueError(f"来源第{n}页有文字越界，未发布。")
+        return len(doc) == 1, len(doc)
+
+
+def generate(request):
+    from .reading_pdf import ReaderPDF
+    from .tasks import atomic
+
+    out = Path(request["output"])
+    style = request["template_data"]["reading_style"]
+    if snapshot() != style:
+        raise ValueError("阅读样式或字体与快照不一致，请建立新任务；历史文件保留。")
+    policy = compact_options(request.get("direct_compact"))
+    purpose = request.get("direct_purpose", "export")
+    formats = request.get("formats", ["docx", "pdf"])
+    if purpose == "preview":
+        formats = ["pdf"]
+    report = {
+        "schema": "markdown-direct-pagination-v2",
+        "policy": policy,
+        "purpose": purpose,
+        "groups": [],
+        "verified": False,
+        "ready": False,
+        "issues": deepcopy(request.get("source_issues", [])),
+        "content_states": request.get("content_states", []),
+        "formats": formats,
+        "source_artifact_id": request["source_artifact_id"],
+        "source_sha256": request["source_sha256"],
+        "reading_style": style,
+        "renderer": {},
+        "requested_source_pages": request.get("requested_source_pages"),
+        "excluded_source_pages": request.get("excluded_source_pages", []),
+    }
+    groups = []
+    for page in request["pages"]:
+        n = page.get("source_pdf_physical_page")
+        if type(n) is not int:
+            report["issues"].append({"source_page": n, "reason": "缺少来源物理页映射"})
+            continue
+        if not groups or groups[-1]["source_page"] != n:
+            groups.append({"source_page": n, "pages": []})
+        groups[-1]["pages"].append(page)
+    for issue in report["issues"]:
+        n = issue["source_page"]
+        if type(n) is int and not any(g["source_page"] == n for g in groups):
+            groups.append({"source_page": n, "pages": []})
+    groups.sort(key=lambda g: g["source_page"])
+    blocked = {i["source_page"] for i in report["issues"]}
+    checked, words, pdfs, text_by_page, fonts = 0, [], [], [], []
+    renderer = ReaderPDF(out, style) if "pdf" in formats else None
+
+    def persist(current=None):
+        atomic(out / "pagination-report.json", report)
+        atomic(
+            out / "progress.json",
+            {
+                "phase": "逐页检查与生成",
+                "completed": checked,
+                "total": len(groups),
+                "source_page": current,
+                "blocked": len(report["issues"]),
+            },
+        )
+
+    try:
+        for group in groups:
+            n = group["source_page"]
+            entry = {"source_page": n, "attempts": [], "status": "BLOCKED"}
+            report["groups"].append(entry)
+            persist(n)
+            if n in blocked:
+                entry["reason"] = "正文或来源证据不完整，详见检查问题"
+                checked += 1
+                persist(n)
+                continue
+            try:
+                models = [parse_markdown(p["text"], p.get("source_locator")) for p in group["pages"]]
+                if any(not p["text"].strip() for p in group["pages"]):
+                    raise ValueError("没有正文，不能作为成功提取的空白页导出")
+                labels = {
+                    "POSSIBLE_TABLE_PRESERVED_AS_TEXT": "真实表格（含表头分隔行）",
+                    "UNSUPPORTED_BLOCK_PRESERVED_AS_TEXT": "引用块或分隔线",
+                    "IMAGE_REFERENCE_NOT_RENDERED": "图片引用",
+                    "LINK_DISPLAY_TEXT_ONLY": "超链接",
+                    "INLINE_UNSUPPORTED": "特殊行内格式",
+                    "HEADING_LEVEL_4_TO_6_RENDERED_AS_3": "四至六级标题",
+                    "LITERAL_BLOCK_PRESERVED": "代码块或HTML块",
+                }
+                diagnostics = {labels.get(d["code"], d["code"]) for m in models for d in m["diagnostics"]}
+                if diagnostics:
+                    raise ValueError(
+                        "目前原文直出不支持的格式：" + "、".join(sorted(diagnostics)) + "；原文保留"
+                    )
+                fonts.append(
+                    font_audit(
+                        [{"source_pdf_physical_page": n, "items": [i for m in models for i in items(m)]}],
+                        style["font_path"],
+                    )
+                )
+                content = "".join(b["text"] for m in models for b in m["blocks"])
+                fits = False
+                for attempt, (size, line, gap) in enumerate(adaptation_attempts(style, policy)):
+                    folder = out / "pagination-work" / f"group-{n}-attempt-{attempt + 1}"
+                    folder.mkdir(parents=True)
+                    metrics = {"body_pt": size, "line_multiple": line, "paragraph_em": gap}
+                    entry["attempts"].append(metrics)
+                    fits = True
+                    if renderer:
+                        pdf, measurement = renderer.render(
+                            models, folder, size, line, gap, purpose == "preview"
+                        )
+                        metrics["pdf"] = measurement
+                        report["renderer"]["pdf"] = measurement["renderer"]
+                        pdf_fits, count = validate_pdf(pdf, content, n, single=False)
+                        metrics["actual_output_pages"] = count
+                        fits = pdf_fits and not measurement["overflow"]
+                    if "docx" in formats and fits:
+                        word = folder / "group.docx"
+                        write_reader_docx(word, models, style, size, line, gap)
+                        if "".join(p.text for p in Document(word).paragraphs) != content:
+                            raise ValueError("Word正文或顺序不一致")
+                        word_pdf = export_docx(word, folder, timeout=60)
+                        word_fits, count = validate_pdf(word_pdf, content, n, single=False)
+                        metrics["word_output_pages"] = count
+                        metrics["actual_output_pages"] = max(metrics.get("actual_output_pages", 1), count)
+                        fits &= word_fits
+                        report["renderer"]["docx"] = {
+                            "name": "python-docx",
+                            "version": "1.1.2",
+                            "validation": subprocess.check_output(
+                                ["libreoffice", "--version"], text=True, timeout=10
+                            ).strip(),
+                            "role": "Word validation only; final PDF uses Chromium",
+                        }
+                    persist(n)
+                    if fits:
+                        break
+                if purpose == "preview" and renderer:
+                    report["preview_images"] = [
+                        str(f.relative_to(out))
+                        for f in sorted(
+                            folder.glob("preview-*.png"), key=lambda f: int(f.stem.split("-")[-1])
+                        )
+                    ]
+                    report["preview_pdf"] = str(pdf.relative_to(out))
+                    report["preview_parameters"] = metrics
+                if not fits:
+                    count = metrics.get("actual_output_pages", 2)
+                    raise ValueError(
+                        "SOURCE_PAGE_OVERFLOW: "
+                        + (
+                            f"需要{count}张输出页；"
+                            if count > 1
+                            else "候选虽为1页，但正文及段落边距高度超过可用纸张；"
+                        )
+                        + (
+                            "紧凑适配已到所设下限仍无法容纳"
+                            if policy["enabled"]
+                            else "未启用紧凑适配，可明确选择边界后重试"
+                        )
+                    )
+                entry.update(
+                    status="READY",
+                    output_pages=[len(text_by_page) + 1],
+                    content_equal=True,
+                    final_parameters={"body_pt": size, "line_multiple": line, "paragraph_em": gap},
+                )
+                text_by_page.append(re.sub(r"\s", "", content))
+                if "docx" in formats:
+                    words.append(word)
+                if renderer:
+                    pdfs.append(pdf)
+            except (ValueError, RuntimeError, TimeoutError) as exc:
+                reason = str(exc) or "本页浏览器排版超过60秒或打印超过30秒，停止本页生成"
+                entry["reason"] = reason
+                report["issues"].append({"source_page": n, "reason": reason})
+            checked += 1
+            persist(n)
+        report["ready"] = bool(groups) and not report["issues"]
+        report["verified"] = report["ready"]
+        persist()
+        atomic(out / "font-resolution.json", {"pages": fonts, "text_changed": False})
+        atomic(
+            out / "content-structure.json",
             {
                 "schema": "derived-content-v1",
                 "mode": "markdown-direct",
                 "source_artifact_id": request["source_artifact_id"],
                 "source_sha256": request["source_sha256"],
+                "reading_style": style,
                 "pages": groups,
-                "reading_style": style,
             },
-            ensure_ascii=False,
-            indent=2,
         )
-    )
-    (out / "layout-validation.json").write_text(
-        json.dumps(
-            {
-                "mode": "markdown-direct",
-                "content_equal": True,
-                "source_output_mapping": report["groups"],
-                "reading_style": style,
-                "font_resolution": fonts,
-                "visual_acceptance": "requires visual evidence",
-                "pdf_renderer": "LibreOffice from the same DOCX",
-            },
-            ensure_ascii=False,
-            indent=2,
-        )
-    )
+        atomic(out / "layout-validation.json", report)
+        if purpose != "export":
+            return
+        if not report["ready"]:
+            reasons = "；".join(f"来源第{i['source_page']}页：{i['reason']}" for i in report["issues"])
+            raise ValueError("原文直出未发布。" + reasons)
+        if words:
+            merged = Document(words[0])
+            for path in words[1:]:
+                body = [deepcopy(c) for c in Document(path).element.body if c.tag != qn("w:sectPr")]
+                props = body[0].find(qn("w:pPr"))
+                if props is None:
+                    props = OxmlElement("w:pPr")
+                    body[0].insert(0, props)
+                props.append(OxmlElement("w:pageBreakBefore"))
+                for child in body:
+                    merged.element.body.insert(len(merged.element.body) - 1, child)
+            merged.save(out / "document.docx")
+            embed_fonts(out / "document.docx")
+            validation = out / "word-validation"
+            validation.mkdir()
+            word_pdf = export_docx(out / "document.docx", validation, timeout=max(60, 15 + len(words) * 4))
+            with fitz.open(word_pdf) as doc:
+                if [page_text(p) for p in doc] != text_by_page:
+                    raise ValueError("合并后Word来源分页或正文发生变化，未发布")
+        if pdfs:
+            with fitz.open() as combined:
+                for pdf in pdfs:
+                    with fitz.open(pdf) as part:
+                        combined.insert_pdf(part)
+                combined.save(out / "document.pdf")
+            with fitz.open(out / "document.pdf") as doc:
+                if [page_text(p) for p in doc] != text_by_page:
+                    raise ValueError("合并后PDF来源分页或正文发生变化，未发布")
+    finally:
+        if renderer:
+            renderer.close()

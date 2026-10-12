@@ -101,6 +101,15 @@ def test_no_mapping_guess(project, mutation, match):
 def test_empty_unsupported_and_overflow_never_publish(project, text, match):
     m, pid, aid = project
     new = revise(m, pid, aid, text)
+    if not text:
+        before = m.get(pid)
+        with pytest.raises(ValueError, match="来源第6页.*没有正文"):
+            m.export_documents(
+                pid, {"mode": "markdown-direct", "source_artifact_id": new, "pages": "6", "formats": ["pdf"]}
+            )
+        assert m.get(pid)["artifacts"] == before["artifacts"]
+        assert m.get(pid)["tasks"] == before["tasks"]
+        return
     job = m.export_documents(
         pid, {"mode": "markdown-direct", "source_artifact_id": new, "pages": "6", "formats": ["pdf"]}
     )
@@ -155,8 +164,8 @@ def test_failed_extraction_is_not_successful_blank_page(project):
         a = next(a for a in p["artifacts"] if a["artifact_id"] == aid)
         a["pages"][0]["error"] = True
         m.save(m.path(pid), p)
-    job = m.export_documents(pid, {"source_artifact_id": aid, "pages": "6", "formats": ["pdf"]})
-    p, task = terminal(m, pid, job["task_id"])
-    assert task["status"] == "FAILED"
-    assert "来源第6页提取失败" in task["error"]["message"]
-    assert not any(a.get("task_id") == job["task_id"] for a in p["artifacts"])
+    before = m.get(pid)
+    with pytest.raises(ValueError, match="来源第6页.*缺少可核实"):
+        m.export_documents(pid, {"source_artifact_id": aid, "pages": "6", "formats": ["pdf"]})
+    assert m.get(pid)["artifacts"] == before["artifacts"]
+    assert m.get(pid)["tasks"] == before["tasks"]

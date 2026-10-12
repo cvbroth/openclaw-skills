@@ -1,0 +1,9 @@
+# Isolated FileTools daily service; extends the existing office/font environment.
+ARG BASE_IMAGE=filetools-http-dev:review-r3-20261009
+FROM ${BASE_IMAGE}
+USER root
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/filetools-browsers
+RUN /opt/nas-filetools/.venv/bin/python -m pip install --no-cache-dir playwright==1.55.0 \
+    && /opt/nas-filetools/.venv/bin/python -m playwright install --with-deps --only-shell chromium \
+    && chmod -R a+rX /opt/filetools-browsers
+USER 1000:1000

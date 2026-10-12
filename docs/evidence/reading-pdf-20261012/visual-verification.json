@@ -1,0 +1,24 @@
+{
+  "source6": {
+    "preview_final_pixels_equal": true,
+    "text_characters": 141,
+    "paper_points": [
+      0.0,
+      0.0,
+      594.9599609375,
+      841.9199829101562
+    ],
+    "final_pdf_pages": 5
+  },
+  "dense-source8": {
+    "preview_final_pixels_equal": true,
+    "text_characters": 1967,
+    "paper_points": [
+      0.0,
+      0.0,
+      594.9599609375,
+      841.9199829101562
+    ],
+    "final_pdf_pages": 1
+  }
+}

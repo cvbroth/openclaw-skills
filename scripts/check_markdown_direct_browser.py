@@ -80,7 +80,7 @@ with sync_playwright() as pw:
         r = context.request.get(base + "/api/projects/" + pid + "/download/" + a["artifact_id"])
         assert r.ok and hashlib.sha256(r.body()).hexdigest() == a["sha256"]
         page.locator('[data-artifact-id="' + a["artifact_id"] + '"]').get_by_role(
-            "button", name="预览", exact=True
+            "button", name="Word实际预览" if a["format"] == "docx" else "PDF预览", exact=True
         ).click()
         page.wait_for_function(
             "() => {const i=document.querySelector('#exportPreviewBody img');return i?.complete&&i.naturalWidth>0;}"

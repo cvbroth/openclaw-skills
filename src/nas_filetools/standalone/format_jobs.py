@@ -56,6 +56,18 @@ class FormatJobs:
                 data = {**data, "mode": "markdown-direct"}
             artifact = next(a for a in project["artifacts"] if a["artifact_id"] == data["source_artifact_id"])
             options = export_options(data, project, artifact)
+            if options["mode"] == "markdown-direct":
+                from .direct_source import collect
+
+                source = collect(self.path(pid), project, artifact, options["source_pages"])
+                if options["purpose"] == "preview" and len(source["requested_source_pages"]) != 1:
+                    raise ValueError("纸张预览请选择一个来源物理页")
+                if options["purpose"] == "export" and source["issues"]:
+                    raise ValueError(
+                        "导出前检查阻塞："
+                        + "；".join(f"来源第{i['source_page']}页：{i['reason']}" for i in source["issues"])
+                        + "。请先完整预检查；不会自动跳页，可明确修改来源范围后重试。"
+                    )
             return self.format_artifact(
                 pid,
                 artifact["artifact_id"],
@@ -79,7 +91,9 @@ class FormatJobs:
             artifact = next(a for a in project["artifacts"] if a["artifact_id"] == aid)
             if artifact.get("recycled") or artifact["format"] != "markdown" or not artifact["path"]:
                 raise ValueError("source_artifact_id: registered Markdown required")
-            if policy["mode"] == "source-pages":
+            if policy["mode"] == "source-pages" and not (
+                export and export.get("purpose") in {"check", "preview"}
+            ):
                 from .text_revisions import mapped_text
 
                 mapped_text(self.path(pid), artifact)
@@ -132,8 +146,9 @@ class FormatJobs:
                 # Validate full assembly now, before accepting a range that could omit fragments.
                 from .text_revisions import mapped_text
 
-                if export["source_pages"] is not None or any(
-                    v.get("data") for v in artifact.get("pages", [])
+                if export.get("purpose") not in {"check", "preview"} and (
+                    export["source_pages"] is not None
+                    or any(v.get("data") for v in artifact.get("pages", []))
                 ):
                     mapped_text(self.path(pid), artifact)
                 task["document_export"] = {
@@ -141,6 +156,15 @@ class FormatJobs:
                     "source_artifact_id": aid,
                     "source_sha256": artifact["sha256"],
                     "source_version": artifact["version"],
+                    "excluded_source_pages": sorted(
+                        {
+                            v["source_page"]
+                            for v in artifact.get("pages", [])
+                            if type(v.get("source_page")) is int
+                            and export["source_pages"] is not None
+                            and v["source_page"] not in export["source_pages"]
+                        }
+                    ),
                     "source_page_mapping_complete": bool(artifact.get("pages"))
                     and all(type(v.get("source_page")) is int for v in artifact["pages"]),
                     "included_source_pages": sorted(
@@ -225,8 +249,14 @@ class FormatJobs:
         if digest(root / a["path"]) != a["sha256"]:
             raise ValueError("SOURCE_ARTIFACT_HASH_CHANGED")
         registered_text = (root / a["path"]).read_text()
-        if t.get("document_export") and (
-            t["document_export"]["source_pages"] is not None or any(v.get("data") for v in a.get("pages", []))
+        direct = t.get("document_export", {}).get("mode") == "markdown-direct"
+        if (
+            not direct
+            and t.get("document_export")
+            and (
+                t["document_export"]["source_pages"] is not None
+                or any(v.get("data") for v in a.get("pages", []))
+            )
         ):
             from .text_revisions import mapped_text
 
@@ -235,13 +265,17 @@ class FormatJobs:
         source = next(x for x in p["artifacts"] if x["artifact_id"] == p["source_artifact_id"])
         provenance = root / "sources/pdf-provenance.json"
         proven = json.loads(provenance.read_text()) if provenance.is_file() else {}
-        for view in a["pages"]:
+        source_check = None
+        if direct:
+            from .direct_source import collect
+
+            source_check = collect(root, p, a, t["document_export"]["source_pages"])
+            pages = source_check["pages"]
+        for view in [] if direct else a["pages"]:
             selected = t.get("document_export", {}).get("source_pages")
             if selected is not None and view.get("source_page") not in selected:
                 continue
             if view.get("data"):
-                if t.get("document_export", {}).get("mode") == "markdown-direct" and view.get("error"):
-                    raise ValueError(f"来源第{view.get('source_page')}页提取失败，不能导出为成功空白页。")
                 if view.get("data_sha256") and digest(root / view["data"]) != view["data_sha256"]:
                     raise ValueError("SOURCE_VIEW_HASH_CHANGED")
                 raw = (root / view["data"]).read_text()
@@ -266,9 +300,9 @@ class FormatJobs:
                         else view.get("source_page"),
                     }
                 )
-        if not pages and t.get("document_export", {}).get("source_pages") is not None:
+        if not direct and not pages and t.get("document_export", {}).get("source_pages") is not None:
             raise ValueError("所选原件页没有可导出的文字内容")
-        if not pages:
+        if not direct and not pages:
             pages = [{"physical_page": 1, "text": (root / a["path"]).read_text()}]
         directory = root / "diagnostics/format" / tid
         work = directory / "work"
@@ -279,6 +313,12 @@ class FormatJobs:
                 "pagination": t.get("pagination"),
                 "export_mode": t.get("document_export", {}).get("mode", "template"),
                 "direct_compact": t.get("document_export", {}).get("compact"),
+                "direct_purpose": t.get("document_export", {}).get("purpose", "export"),
+                "formats": t.get("document_export", {}).get("formats", ["docx", "pdf"]),
+                "source_issues": source_check["issues"] if source_check else [],
+                "content_states": source_check["content_states"] if source_check else [],
+                "requested_source_pages": source_check["requested_source_pages"] if source_check else None,
+                "excluded_source_pages": t.get("document_export", {}).get("excluded_source_pages", []),
                 "title": p["name"],
                 "template": t["template"],
                 "template_data": t["template_data"],
@@ -288,7 +328,11 @@ class FormatJobs:
                 "engine": {"cpu_threads": 2},
             },
             work / "generation-result.json",
-            min(1800, 60 + 12 * len(pages)) if t.get("pagination", {}).get("mode") == "source-pages" else 60,
+            min(86400, 120 + 120 * len(pages))
+            if direct
+            else min(1800, 60 + 12 * len(pages))
+            if t.get("pagination", {}).get("mode") == "source-pages"
+            else 60,
             self.cancels[tid],
             module="nas_filetools.standalone.documents",
         )
@@ -298,20 +342,28 @@ class FormatJobs:
             t = self.task(p, tid)
             if self.cancels[tid].is_set() or self.stopping.is_set():
                 result = {"status": "CANCELLED"}
-            if result["status"] == "SUCCEEDED":
+            purpose = t.get("document_export", {}).get("purpose", "export")
+            report_path = work / "pagination-report.json"
+            if direct and report_path.is_file():
+                report = json.loads(report_path.read_text())
+                t["direct_report"] = report
+                t["pagination_report"] = str(report_path.relative_to(root))
+                if (work / "progress.json").is_file():
+                    t["direct_progress"] = json.loads((work / "progress.json").read_text())
+            if result["status"] == "SUCCEEDED" and purpose == "export":
+                required_formats = t["document_export"]["formats"] if direct else ["docx", "pdf"]
+                output_files = [f"document.{fmt}" for fmt in required_formats] + [
+                    "content-structure.json",
+                    "layout-validation.json",
+                ]
+                if direct:
+                    output_files.append("font-resolution.json")
+                if (work / "pagination-report.json").is_file():
+                    output_files.append("pagination-report.json")
                 published = publish(
                     work,
                     directory,
-                    [
-                        {"artifact_id": str(uuid.uuid4()), "kind": "output", "file": f}
-                        for f in [
-                            "document.docx",
-                            "document.pdf",
-                            "content-structure.json",
-                            "layout-validation.json",
-                        ]
-                        + (["pagination-report.json"] if (work / "pagination-report.json").is_file() else [])
-                    ],
+                    [{"artifact_id": str(uuid.uuid4()), "kind": "output", "file": f} for f in output_files],
                 )
                 # A new immutable version derives from this exact source/template pair.
                 version = 1 + max(
@@ -327,7 +379,9 @@ class FormatJobs:
                     ("document.pdf", "pdf"),
                     ("content-structure.json", "json"),
                     ("layout-validation.json", "json"),
-                ]:
+                ] + ([("font-resolution.json", "json")] if direct else []):
+                    if not (work / file).is_file():
+                        continue
                     item = register_artifact(
                         root,
                         p,
@@ -363,6 +417,9 @@ class FormatJobs:
                             "template_sha256": t["template_sha256"],
                             "source_pages": t.get("document_export", {}).get("included_source_pages"),
                             "requested_source_pages": t.get("document_export", {}).get("source_pages"),
+                            "excluded_source_pages": t.get("document_export", {}).get(
+                                "excluded_source_pages", []
+                            ),
                             "source_page_mapping_complete": t.get("document_export", {}).get(
                                 "source_page_mapping_complete", False
                             ),
@@ -371,6 +428,7 @@ class FormatJobs:
                             "mode": t.get("document_export", {}).get("mode", "template"),
                             "compact": t.get("document_export", {}).get("compact"),
                             "reading_style": t.get("template_data", {}).get("reading_style"),
+                            "renderer": t.get("direct_report", {}).get("renderer"),
                         }
                         if fmt not in t.get("document_export", {}).get("formats", ["docx", "pdf"]):
                             # Both formats are rendered for validation; expose only the requested files.
