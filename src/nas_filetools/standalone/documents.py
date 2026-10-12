@@ -18,6 +18,10 @@ from .source_pagination import options, generate_source_pages
 
 
 def generate(request):
+    if request.get("export_mode") == "markdown-direct":
+        from .markdown_direct import generate as generate_direct
+
+        return generate_direct(request)
     output = Path(request["output"])
     template = request.get("template_data") or load_template(
         request["template"]["id"], request["template"]["version"]
@@ -95,7 +99,11 @@ def generate(request):
     with fitz.open(output / "document.pdf") as pdf:
         if not 0 < len(pdf) <= template["parameters"]["max_pages"]:
             raise ValueError("TEMPLATE_PDF_PAGE_LIMIT")
-    native_layout = bool(pagination_report or template.get("word_styles") or template["parameters"].get("option_columns", 1) == 2)
+    native_layout = bool(
+        pagination_report
+        or template.get("word_styles")
+        or template["parameters"].get("option_columns", 1) == 2
+    )
     if native_layout:
         from docx import Document
         import re

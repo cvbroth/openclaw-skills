@@ -146,6 +146,10 @@ class Handler(BaseHTTPRequestHandler):
             return self.stream(Path(__file__).parent / "assets/engines.html")
         if method == "GET" and parts == ["templates"]:
             return self.stream(Path(__file__).parent / "assets/templates.html")
+        if method == "GET" and parts == ["api", "reading-style"]:
+            from ..reading_style import STYLE
+
+            return self.send_json(STYLE)
         if method == "GET" and parts == ["api", "limits"]:
             return self.send_json(
                 {

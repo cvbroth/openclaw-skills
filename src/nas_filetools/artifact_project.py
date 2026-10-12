@@ -284,6 +284,26 @@ def emit_viewer(root, project):
     assets = Path(__file__).parent / "project_assets"
     for name in ("index.html", "viewer.js", "viewer.css", "editor.js", "workbench.js", "source-reader.js"):
         shutil.copyfile(assets / name, root / "review" / name)
+    from .reading_style import emit_reading_assets
+    from .standalone.content_structure import parse_markdown, reading_html
+
+    emit_reading_assets(root / "review")
+    fallbacks = {}
+    for artifact in project["artifacts"]:
+        if artifact["format"] != "markdown":
+            continue
+        for page in artifact["pages"]:
+            path = relative(root, page["data"]) if page.get("data") else None
+            if path and path.is_file():
+                try:
+                    data = json.loads(path.read_text().split("=", 1)[1].rstrip(";\n"))
+                    if not data.get("reading_html") and isinstance(data.get("text"), str):
+                        fallbacks[data["text"]] = reading_html(parse_markdown(data["text"]))
+                except (ValueError, IndexError):
+                    pass  # Invalid legacy payloads remain available to diagnostics.
+    (root / "review/reading-fallbacks.js").write_text(
+        "window.READING_FALLBACKS=" + json.dumps(fallbacks, ensure_ascii=True).replace("<", "\\u003c") + ";"
+    )
     (root / "review" / "project.js").write_text(
         "window.PROJECT=" + json.dumps(project, ensure_ascii=True).replace("<", "\\u003c") + ";",
         encoding="utf-8",

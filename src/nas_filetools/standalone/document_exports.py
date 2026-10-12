@@ -6,7 +6,7 @@ from .page_ranges import parse_pages
 def export_options(data, project, artifact):
     if not isinstance(data, dict):
         raise ValueError("导出设置必须是对象")
-    if set(data) - {"source_artifact_id", "template", "formats", "pages", "pagination"}:
+    if set(data) - {"source_artifact_id", "template", "formats", "pages", "pagination", "mode", "compact"}:
         raise ValueError("不支持的导出设置")
     formats = data.get("formats", ["docx", "pdf"])
     if (
@@ -18,6 +18,14 @@ def export_options(data, project, artifact):
         raise ValueError("请选择 Word、PDF 或两者")
     if artifact.get("recycled") or artifact["format"] != "markdown" or not artifact.get("path"):
         raise ValueError("请选择可用的文字版本")
+    mode = data.get("mode", "template")
+    if mode not in {"template", "markdown-direct"}:
+        raise ValueError("请选择原文直出或自定义模板")
+    if mode == "markdown-direct":
+        from .markdown_direct import check_views, compact_options
+
+        check_views(artifact, project.get("source_info", {}).get("units"))
+        compact = compact_options(data.get("compact"))
     selected = None
     value = data.get("pages", "全部")
     if isinstance(value, str):
@@ -36,4 +44,9 @@ def export_options(data, project, artifact):
         missing = sorted(set(selected) - available)
         if missing:
             raise ValueError("所选原件页没有文字记录：" + ",".join(map(str, missing[:20])))
-    return {"formats": formats, "source_pages": selected}
+    return {
+        "formats": formats,
+        "source_pages": selected,
+        "mode": mode,
+        **({"compact": compact} if mode == "markdown-direct" else {}),
+    }

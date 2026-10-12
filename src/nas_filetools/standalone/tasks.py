@@ -23,7 +23,7 @@ from ..artifact_project import (
     snapshot_template,
 )
 from ..document_templates import TEMPLATE_ROOT
-from ..process_tree import ManagedChild
+from .scoped_child import StandaloneChild
 from ..publication import publish
 from .config import snapshot
 from .previews import PreviewJobs, signature
@@ -561,7 +561,7 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
             result.with_name("stdout.log").open("wb") as out,
             result.with_name("stderr.log").open("wb") as err,
         ):
-            child = ManagedChild(
+            child = StandaloneChild(
                 [sys.executable, "-m", module, str(req), str(result)],
                 env=env,
                 stdout=out,

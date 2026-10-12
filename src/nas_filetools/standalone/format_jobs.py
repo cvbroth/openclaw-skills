@@ -52,13 +52,17 @@ class FormatJobs:
             project = self.get(pid)
             if not isinstance(data, dict):
                 raise ValueError("导出设置必须是对象")
+            if "mode" not in data and not data.get("template"):
+                data = {**data, "mode": "markdown-direct"}
             artifact = next(a for a in project["artifacts"] if a["artifact_id"] == data["source_artifact_id"])
             options = export_options(data, project, artifact)
             return self.format_artifact(
                 pid,
                 artifact["artifact_id"],
-                data["template"],
-                pagination=data.get("pagination"),
+                data.get("template"),
+                pagination={"mode": "source-pages"}
+                if options["mode"] == "markdown-direct"
+                else data.get("pagination"),
                 export=options,
             )
 
@@ -85,7 +89,14 @@ class FormatJobs:
                     for v in artifact["pages"]
                 ):
                     raise ValueError("SOURCE_PAGE_MAPPING_REQUIRED: 保留原件分页需要每个片段的明确来源页")
-            template = self.library.load(choice["id"], choice["version"], allow_draft)
+            direct = export is not None and export.get("mode") == "markdown-direct"
+            if direct:
+                from .markdown_direct import direct_template
+
+                template = direct_template()
+                choice = {"id": "markdown-direct", "version": template["record"]["version"]}
+            else:
+                template = self.library.load(choice["id"], choice["version"], allow_draft)
             tid = str(uuid.uuid4())
             task = {
                 "task_id": tid,
@@ -106,7 +117,11 @@ class FormatJobs:
             }
             snapshot = self.path(pid) / "diagnostics/format" / tid / "template.json"
             snapshot.parent.mkdir(parents=True, exist_ok=True)
-            raw = self.library.path(template["record"]).read_bytes()
+            raw = (
+                json.dumps(template["reading_style"], ensure_ascii=False, sort_keys=True).encode()
+                if direct
+                else self.library.path(template["record"]).read_bytes()
+            )
             import hashlib
 
             if hashlib.sha256(raw).hexdigest() != task["template_sha256"]:
@@ -140,7 +155,7 @@ class FormatJobs:
                     and all(type(v.get("source_page")) is int for v in artifact["pages"])
                     else None,
                 }
-            if not allow_draft:
+            if not allow_draft and not direct:
                 project["selected_template"] = dict(choice)
                 project["selected_pagination"] = policy
             project.setdefault("tasks", []).append(task)
@@ -225,6 +240,8 @@ class FormatJobs:
             if selected is not None and view.get("source_page") not in selected:
                 continue
             if view.get("data"):
+                if t.get("document_export", {}).get("mode") == "markdown-direct" and view.get("error"):
+                    raise ValueError(f"来源第{view.get('source_page')}页提取失败，不能导出为成功空白页。")
                 if view.get("data_sha256") and digest(root / view["data"]) != view["data_sha256"]:
                     raise ValueError("SOURCE_VIEW_HASH_CHANGED")
                 raw = (root / view["data"]).read_text()
@@ -238,7 +255,9 @@ class FormatJobs:
                         or len(pages) + 1,
                         "text": payload.get("text", ""),
                         "source_locator": view["locator"],
-                        "source_pdf_physical_page": (
+                        "source_pdf_physical_page": view.get("source_page")
+                        if t.get("document_export", {}).get("mode") == "markdown-direct"
+                        else (
                             proven.get("source_pdf_physical_page")
                             if proven.get("image_sha256") == source.get("sha256")
                             else None
@@ -258,6 +277,8 @@ class FormatJobs:
             {
                 "pages": pages,
                 "pagination": t.get("pagination"),
+                "export_mode": t.get("document_export", {}).get("mode", "template"),
+                "direct_compact": t.get("document_export", {}).get("compact"),
                 "title": p["name"],
                 "template": t["template"],
                 "template_data": t["template_data"],
@@ -347,6 +368,9 @@ class FormatJobs:
                             ),
                             "template_snapshot": t.get("template_snapshot"),
                             "pagination": t.get("pagination"),
+                            "mode": t.get("document_export", {}).get("mode", "template"),
+                            "compact": t.get("document_export", {}).get("compact"),
+                            "reading_style": t.get("template_data", {}).get("reading_style"),
                         }
                         if fmt not in t.get("document_export", {}).get("formats", ["docx", "pdf"]):
                             # Both formats are rendered for validation; expose only the requested files.

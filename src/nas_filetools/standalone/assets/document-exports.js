@@ -11,7 +11,7 @@ function exportFailureMessage(task){
 }
 function openDocumentExport(aid){
  if(aid){if(![...$('#formatSource').options].some(o=>o.value===aid)){message('所选文字版本不可用，请重新选择。');return;}$('#formatSource').value=aid;}
- if(!$('#formatTemplate').value){message('暂无可用模板，请先在模板管理中发布模板。');return;}
+ if($('#exportMode').value==='template'&&!$('#formatTemplate').value){message('暂无可用模板，请先在模板管理中发布模板。');return;}
  $('#exportError').textContent='';$('#exportDialog').showModal();
 }
 function updateFormatSources(p){
@@ -51,7 +51,7 @@ function drawArtifacts(p){
  }
  const jobs=[...(p.tasks||[])].reverse().filter(t=>t.operation==='format-artifact'&&!t.archived);
  const history=el('details',undefined,'export-history');history.id='export-history';history.open=open.has(history.id);history.append(el('summary','导出记录（'+jobs.length+'）'));const jobBody=el('div');history.append(jobBody);if(jobs.length)areas.exports.prepend(history);
- for(const t of [...jobs.filter(active),...jobs.filter(t=>!active(t)).slice(0,10)]){const row=el('div',undefined,'export-job');row.append(el('span','模板导出 · '+chineseTime(t.created_at)),badge(t.status));if(t.error)row.append(el('p',exportFailureMessage(t),'muted'));if(active(t))row.append(button('取消',()=>api(`/api/projects/${pid}/tasks/${t.task_id}/cancel`,json('POST',{})).then(detail)));(active(t)?areas.exports:jobBody).append(row);}
+ for(const t of [...jobs.filter(active),...jobs.filter(t=>!active(t)).slice(0,10)]){const row=el('div',undefined,'export-job');row.append(el('span',(t.document_export?.mode==='markdown-direct'?'原文直出':'模板导出')+' · '+chineseTime(t.created_at)),badge(t.status));if(t.error)row.append(el('p',exportFailureMessage(t),'muted'));if(active(t))row.append(button('取消',()=>api(`/api/projects/${pid}/tasks/${t.task_id}/cancel`,json('POST',{})).then(detail)));(active(t)?areas.exports:jobBody).append(row);}
  if(jobs.length>10)jobBody.append(el('p','仅显示最近10条记录，完整记录保留在项目技术详情中。','muted'));
  for(const [id] of groups)if(!areas[id].children.length){if(id==='recycled')areas[id].parentElement.hidden=true;else areas[id].append(el('p',id==='exports'?'尚未导出 Word/PDF。':'暂无文字版本。','muted'));}
 }
@@ -74,13 +74,16 @@ async function previewExport(a){
   const scroll=el('div',undefined,'export-preview-pages');for(const p of a.pages){if(!p.image)continue;const image=el('img');image.src='/p/'+pid+'/'+p.image;image.alt='导出文档第'+(p.output_page||p.locator?.page||'')+'页';image.loading='lazy';scroll.append(image);}body.append(scroll);
  }else{body.append(el('p',active(a.preview_render||{})?'预览正在生成，请稍后重新打开。':'尚无预览，可下载文件或生成预览。','muted'));if(!active(a.preview_render||{}))body.append(button('生成 / 重试预览',()=>api(`/api/projects/${pid}/previews/${a.artifact_id}`,json('POST',{retry:true})).then(()=>{dialog.close();return detail();})));}
 }
+function exportModeChanged(){const direct=$('#exportMode').value==='markdown-direct';for(const e of document.querySelectorAll('[data-template-only]'))e.hidden=direct;$('#directSettings').hidden=!direct;$('#directDescription').hidden=!direct;}
 window.addEventListener('DOMContentLoaded',()=>{
+ $('#exportMode').onchange=exportModeChanged;exportModeChanged();
+ api('/api/reading-style').then(s=>{const font=s.body_pt;$('#directDescription').textContent='A4，'+s.margin_mm+'毫米边距；正文'+font+'磅、'+s.line_multiple+'倍行距。每个来源页只占一张输出页，放不下时明确失败。';$('#directMinimum').max=font;$('#directLine').max=s.line_multiple;}).catch(e=>{$('#exportError').textContent='读取阅读样式失败：'+e.message;});
  $('#openDocumentExport').onclick=()=>openDocumentExport();$('#closeDocumentExport').onclick=()=>$('#exportDialog').close();$('#closeExportPreview').onclick=()=>$('#exportPreview').close();
  $('#formatExisting').onclick=async()=>{
   const formats=[$('#exportWord').checked?'docx':null,$('#exportPDF').checked?'pdf':null].filter(Boolean);
   if(!formats.length){$('#exportError').textContent='至少选择一种格式。';return;}
   $('#formatExisting').disabled=true;$('#exportError').textContent='';
-  try{await api('/api/projects/'+pid+'/document-exports',json('POST',{source_artifact_id:$('#formatSource').value,template:JSON.parse($('#formatTemplate').value),formats,pages:$('#exportPages').value,pagination:{mode:$('#paginationMode').value,font_fit:$('#paginationFontFit').checked,minimum_font_pt:Number($('#paginationMinimum').value),allow_continuation:$('#paginationContinue').checked}}));$('#exportDialog').close();message('正在生成导出文件，可在“导出文件”中查看进度。');await detail();}catch(e){$('#exportError').textContent=e.message;}finally{$('#formatExisting').disabled=false;}
+  try{await api('/api/projects/'+pid+'/document-exports',json('POST',{source_artifact_id:$('#formatSource').value,mode:$('#exportMode').value,formats,pages:$('#exportPages').value,...($('#exportMode').value==='markdown-direct'?{compact:{enabled:$('#directCompact').checked,minimum_font_pt:Number($('#directMinimum').value),minimum_line_multiple:Number($('#directLine').value),minimum_paragraph_em:Number($('#directGap').value)}}:{template:JSON.parse($('#formatTemplate').value),pagination:{mode:$('#paginationMode').value,font_fit:$('#paginationFontFit').checked,minimum_font_pt:Number($('#paginationMinimum').value),allow_continuation:$('#paginationContinue').checked}})}));$('#exportDialog').close();message('正在生成导出文件，可在“导出文件”中查看进度。');await detail();}catch(e){$('#exportError').textContent=e.message;}finally{$('#formatExisting').disabled=false;}
  };
 
 });
