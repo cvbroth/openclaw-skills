@@ -282,7 +282,7 @@ def emit_viewer(root, project):
         encoding="utf-8",
     )
     assets = Path(__file__).parent / "project_assets"
-    for name in ("index.html", "viewer.js", "viewer.css", "editor.js", "workbench.js", "source-reader.js"):
+    for name in ("index.html", "viewer.js", "viewer.css", "editor.js", "workbench.js", "source-reader.js", "content-tools.js"):
         shutil.copyfile(assets / name, root / "review" / name)
     from .reading_style import emit_reading_assets
     from .standalone.content_structure import parse_markdown, reading_html

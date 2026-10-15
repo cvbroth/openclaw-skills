@@ -8,6 +8,7 @@ import hashlib
 import os
 import shutil
 import uuid
+from pathlib import Path
 
 from ..artifact_project import digest, page_data, register_artifact, relative
 from .content_structure import parse_markdown, reading_html
@@ -63,6 +64,24 @@ def mapped_text(root, artifact):
     if body not in {plain, marked}:
         raise ValueError("整稿与逐页映射不一致；保留原件，禁用编辑")
     return rows
+
+
+def export_rows(root, artifact):
+    """Unmapped legacy full documents are usable; broken registered mappings never fall back."""
+    if artifact.get("pages") and any(v.get("data") for v in artifact["pages"]):
+        return mapped_text(root, artifact)
+    if (
+        artifact.get("recycled")
+        or artifact.get("format") != "markdown"
+        or digest(relative(root, artifact["path"])) != artifact["sha256"]
+    ):
+        raise ValueError("历史文字资源校验失败")
+    return [
+        {
+            "view": {"locator": {"kind": "document"}, "source_page": None, "mapping_unavailable": True},
+            "text": relative(root, artifact["path"]).read_text(),
+        }
+    ]
 
 
 class TextRevisions:
@@ -268,6 +287,18 @@ class TextRevisions:
                 a.update(
                     role="result",
                     content_nature="manual-revision",
+                    resource_base=parent.get(
+                        "resource_base",
+                        str(
+                            Path(
+                                next(
+                                    x["path"]
+                                    for x in p["artifacts"]
+                                    if x["artifact_id"] == info["root_artifact_id"]
+                                )
+                            ).parent
+                        ),
+                    ),
                     text_revision={
                         "root_artifact_id": info["root_artifact_id"],
                         "parent_artifact_id": parent["artifact_id"],
@@ -276,6 +307,9 @@ class TextRevisions:
                         "created_at": record["created_at"],
                     },
                 )
+                from .content_marks import inherit_marks
+
+                inherit_marks(root, p, parent, a, changes)
                 for file in ("structure.json", "revision.json"):
                     diagnostic = register_artifact(
                         root, p, name=file, format="json", path=base + "/" + file, parents=[a["artifact_id"]]

@@ -129,69 +129,6 @@ def test_literal_markdown_keeps_markers_but_removes_blank_line_layout_cost(tmp_p
     assert len(d.tables) == 4
 
 
-def test_compact_template_continuous_export_preserves_text_and_symbols(tmp_path):
-    from nas_filetools.standalone.documents import generate
-    from nas_filetools.standalone.template_library import TemplateLibrary
-
-    template = TemplateLibrary(tmp_path / "templates").load("questions-zh-cn", "1.0.0")
-    template["parameters"].update(option_columns=2, line_spacing=1.05)
-    out = tmp_path / "export"
-    out.mkdir()
-    generate(
-        {
-            "output": str(out),
-            "template_data": template,
-            "title": "合成连续排版",
-            "pages": [{"physical_page": 1, "text": "题干⸺📖\nA. 甲\nB. 乙\nC. 丙\nD. 丁"}],
-        }
-    )
-    assert (out / "document.docx").is_file() and (out / "document.pdf").is_file()
-
-
-def test_source_merge_keeps_native_short_question_tables_on_distinct_pages(tmp_path):
-    from nas_filetools.standalone.source_pagination import generate_source_pages
-
-    template = load_template()
-    template["parameters"]["show_source_labels"] = False
-    pages = [
-        {
-            "source_pdf_physical_page": n,
-            "items": [
-                ("Question", f"{n}. 合成短题。"),
-                ("Option", "A. 甲"),
-                ("Option", "B. 乙"),
-                ("Option", "C. 丙"),
-                ("Option", "D. 丁"),
-            ],
-        }
-        for n in [6, 7]
-    ]
-    report = generate_source_pages(
-        tmp_path,
-        pages,
-        template,
-        FONT_PATH,
-        {"font_fit": False, "minimum_font_pt": 10, "allow_continuation": False},
-    )
-    assert report["verified"] and [g["output_pages"] for g in report["groups"]] == [[1], [2]]
-
-
-def test_compact_blank_source_page_retains_blank_output_page(tmp_path):
-    from nas_filetools.standalone.source_pagination import generate_source_pages
-
-    template = load_template()
-    template["parameters"]["option_columns"] = 2
-    report = generate_source_pages(
-        tmp_path,
-        [{"source_pdf_physical_page": 144, "items": []}],
-        template,
-        FONT_PATH,
-        {"font_fit": False, "minimum_font_pt": 10, "allow_continuation": False},
-    )
-    assert report["verified"] and report["groups"][0]["blank"]
-    assert report["groups"][0]["output_pages"] == [1]
-
-
 def test_bullet_and_fullwidth_option_labels_pair_without_deleting_markers(tmp_path):
     text = "题干\n- Ａ．甲\n- Ｂ．乙\n- Ｃ．丙\n- Ｄ．丁"
     t = load_template()["parameters"]

@@ -8,7 +8,7 @@ from .document_fonts import fallback_records
 
 STYLE = {
     "id": "filetools-reading",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "font_family": "Droid Sans Fallback",
     "body_pt": 10.5,
     "line_multiple": 1.85,
@@ -60,4 +60,5 @@ def emit_reading_assets(folder):
         ".reading .md-code{white-space:pre-wrap;background:#f4f6f9;padding:.5em}"
         ".reading .md-separator{border-bottom:1px solid #aab6c7}"
     )
+    css += ".reading table{border-collapse:collapse;width:100%;margin:1em 0;table-layout:auto}.reading th,.reading td{border:1px solid #64748b;padding:.35em;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere}.reading th{background:#f1f5f9;font-weight:bold}"
     (folder / "reading.css").write_text(css)

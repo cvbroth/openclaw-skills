@@ -287,8 +287,24 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_json(m.save_text_revision(pid, self.json_body()))
             if len(parts) == 5 and parts[3] == "text-diff" and method == "GET":
                 return self.send_json(m.text_diff(pid, parts[4], parse_qs(url.query)["against"][0]))
-            if len(parts) == 4 and parts[3] == "direct-source-check" and method == "POST":
-                return self.send_json(m.direct_source_summary(pid, self.json_body()))
+            if len(parts) == 5 and parts[3] == "content-marks":
+                if method == "GET":
+                    return self.send_json(m.content_marks(pid, parts[4]))
+                if method == "POST":
+                    data = self.json_body()
+                    return self.send_json(
+                        m.manual_mark(pid, parts[4], data)
+                        if data.get("action") == "manual"
+                        else m.identify_marks(pid, parts[4])
+                    )
+                if method == "PATCH":
+                    return self.send_json(m.decide_marks(pid, parts[4], self.json_body()))
+            if len(parts) == 4 and parts[3] == "table-revisions" and method == "POST":
+                return self.send_json(m.revise_table(pid, self.json_body()))
+            if len(parts) == 5 and parts[3] == "tables" and method == "GET":
+                return self.send_json(
+                    m.table_info(pid, parts[4], json.loads(parse_qs(url.query)["locator"][0]))
+                )
             if len(parts) == 4 and parts[3] == "document-exports" and method == "POST":
                 return self.send_json(m.export_documents(pid, self.json_body()), 202)
             if len(parts) == 5 and parts[3] == "direct-results" and method == "GET":

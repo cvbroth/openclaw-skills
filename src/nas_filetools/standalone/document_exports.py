@@ -1,76 +1,61 @@
-"""Explicit document export choices, independent of recognition and feedback."""
+"""One Pandoc export transaction; continuous pagination only."""
 
 from .page_ranges import parse_pages
 
 
 def export_options(data, project, artifact):
-    if not isinstance(data, dict):
-        raise ValueError("导出设置必须是对象")
-    if set(data) - {
+    if not isinstance(data, dict) or set(data) - {
         "source_artifact_id",
-        "template",
         "formats",
         "pages",
-        "pagination",
+        "remove_headers",
+        "remove_footers",
+        "new_header",
+        "new_page_numbers",
+        "template",
         "mode",
-        "compact",
-        "purpose",
-        "blank_missing",
     }:
-        raise ValueError("不支持的导出设置")
+        raise ValueError("导出设置已迁移：使用连续自然分页；不再支持来源强制分页、紧凑适配或空白占位")
+    if data.get("mode", "pandoc") not in {"pandoc", "template"}:
+        raise ValueError("旧导出引擎已移除，请刷新页面使用Pandoc导出")
+    if artifact.get("recycled") or artifact["format"] != "markdown" or not artifact.get("path"):
+        raise ValueError("请选择有效Markdown文字版本")
     formats = data.get("formats", ["docx", "pdf"])
     if (
         not isinstance(formats, list)
         or not formats
-        or any(not isinstance(fmt, str) or fmt not in {"docx", "pdf"} for fmt in formats)
+        or any(not isinstance(f, str) for f in formats)
         or len(formats) != len(set(formats))
+        or any(f not in {"docx", "pdf"} for f in formats)
     ):
-        raise ValueError("请选择 Word、PDF 或两者")
-    if artifact.get("recycled") or artifact["format"] != "markdown" or not artifact.get("path"):
-        raise ValueError("请选择可用的文字版本")
-    mode = data.get("mode", "template")
-    if mode not in {"template", "markdown-direct"}:
-        raise ValueError("请选择原文直出或自定义模板")
-    if mode == "markdown-direct":
-        from .markdown_direct import compact_options
-
-        purpose = data.get("purpose", "export")
-        if purpose not in {"export", "check", "preview"}:
-            raise ValueError("无效的原文直出操作")
-        blank_missing = data.get("blank_missing", False)
-        if type(blank_missing) is not bool:
-            raise ValueError("空白占位须明确选择")
-        compact = compact_options(data.get("compact"))
-    selected = None
+        raise ValueError("请选择Word、PDF或两者")
+    result = {
+        "mode": "pandoc",
+        "purpose": "export",
+        "formats": formats,
+        "source_pages": None,
+        "pagination": {"mode": "continuous"},
+    }
+    for key, default in [
+        ("remove_headers", False),
+        ("remove_footers", False),
+        ("new_header", False),
+        ("new_page_numbers", True),
+    ]:
+        value = data.get(key, default)
+        if type(value) is not bool:
+            raise ValueError("清理和页眉页脚设置必须明确选择")
+        result[key] = value
     value = data.get("pages", "全部")
     if isinstance(value, str):
         value = value.strip()
     if value != "全部":
         total = project.get("source_info", {}).get("units")
         if type(total) is not int:
-            raise ValueError("原件页数未知，请导出全部已有文字")
-        selected = parse_pages(value, total, 1000)
-        views = artifact.get("pages", [])
-        if mode != "markdown-direct" and (
-            not views
-            or any(type(v.get("source_page")) is not int or not 1 <= v["source_page"] <= total for v in views)
-        ):
-            raise ValueError("文字稿缺少来源页映射，不能按原件页选择")
-        available = {v.get("source_page") for v in views}
-        missing = sorted(set(selected) - available)
-        if missing and mode != "markdown-direct":
-            raise ValueError("所选原件页没有文字记录：" + ",".join(map(str, missing[:20])))
-    if mode == "markdown-direct" and purpose == "export":
-        from .markdown_direct import check_views
-
-        check_views(artifact, project.get("source_info", {}).get("units"), selected)
-    return {
-        "formats": formats,
-        "source_pages": selected,
-        "mode": mode,
-        **(
-            {"compact": compact, "purpose": purpose, "blank_missing": blank_missing}
-            if mode == "markdown-direct"
-            else {}
-        ),
-    }
+            raise ValueError("来源物理页数未知，只能导出全部已有内容")
+        result["source_pages"] = parse_pages(value, total, 1000)
+        if not artifact.get("pages") or any(type(v.get("source_page")) is not int for v in artifact["pages"]):
+            raise ValueError("文字稿缺少来源映射，不能按来源页选择")
+    if data.get("template"):
+        result["template"] = data["template"]
+    return result

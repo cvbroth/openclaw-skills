@@ -10,9 +10,10 @@ requires-python = ">=3.11,<3.13"
 dependencies = ["PyMuPDF==1.25.5", "python-docx==1.1.2", "Pillow==11.1.0", "openpyxl==3.1.5"]
 
 [project.optional-dependencies]
-standalone = ["markdown-it-py==3.0.0", "mdurl==0.1.2", "playwright==1.55.0"]
+standalone = ["markdown-it-py==3.0.0", "mdurl==0.1.2"]
 engines = ["rapidocr-onnxruntime==1.4.4", "onnxruntime==1.20.1", "numpy==1.26.4", "faster-whisper==1.1.1", "requests==2.32.5"]
 test = ["pytest==8.3.5", "ruff==0.11.2"]
+browser-test = ["playwright==1.55.0"]
 
 [project.scripts]
 nas-filetools = "nas_filetools.cli:main"
@@ -21,7 +22,7 @@ nas-filetools = "nas_filetools.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-nas_filetools = ["fonts/*.ttf", "fonts/*.json", "fonts/*.txt", "templates/*.json", "templates/published/*/*.json", "review_assets/*.html", "project_assets/*.html", "project_assets/*.js", "project_assets/*.css", "standalone/assets/*.html", "standalone/assets/*.js", "standalone/assets/*.css"]
+nas_filetools = ["fonts/*.ttf", "fonts/*.json", "fonts/*.txt", "templates/*.json", "templates/published/*/*.json", "review_assets/*.html", "project_assets/*.html", "project_assets/*.js", "project_assets/*.css", "standalone/assets/*.html", "standalone/assets/*.js", "standalone/assets/*.css", "standalone/*.docx"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

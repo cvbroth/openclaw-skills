@@ -1,7 +1,6 @@
 """Synthetic Word packages and real office pagination, no business text."""
 
 import copy
-import json
 import zipfile
 import pytest
 from docx import Document
@@ -11,8 +10,6 @@ from docx.oxml.ns import qn
 from nas_filetools.standalone.word_import import extract
 from nas_filetools.standalone.word_styles import validate_styles, apply_styles
 from nas_filetools.standalone.template_library import TemplateLibrary
-from nas_filetools.standalone.source_pagination import options, group_pages
-from nas_filetools.standalone.documents import generate
 
 
 def sample(path, multi=False):
@@ -93,10 +90,6 @@ def test_unsafe_packages_and_field_validation(tmp_path):
         validate_styles({"section": {}, "paragraphs": {"Normal": {"line_mode": "exact"}}})
     with pytest.raises(ValueError, match="页边距"):
         validate_styles({"section": {"width_cm": 10, "left_cm": 6, "right_cm": 6}, "paragraphs": {}})
-    with pytest.raises(ValueError):
-        options({"minimum_font_pt": 2})
-    with pytest.raises(ValueError, match="MAPPING"):
-        group_pages([{"items": [], "physical_page": 1}])
 
 
 def test_actual_word_styles_execution(tmp_path):
@@ -112,72 +105,6 @@ def test_actual_word_styles_execution(tmp_path):
     assert d.sections[0].page_width.cm == pytest.approx(29.7, abs=0.001)
     assert d.styles["Normal"].paragraph_format.line_spacing.pt == 19
     assert d.styles["Normal"].font.size.pt == 13
-
-
-def request(tmp_path, text=None, continuation=False):
-    t = TemplateLibrary(tmp_path / "library").load("questions-zh-cn", "1.0.0")
-    out = tmp_path / "out"
-    out.mkdir(exist_ok=True)
-    return {
-        "output": str(out),
-        "title": "禁止插入正文的项目大标题",
-        "template": {"id": "questions-zh-cn", "version": "1.0.0"},
-        "template_data": t,
-        "pagination": {"mode": "source-pages", "allow_continuation": continuation},
-        "pages": [
-            {
-                "physical_page": 1,
-                "source_pdf_physical_page": 23,
-                "text": text
-                if text is not None
-                else "## 合成标题\n\n完整正文。\n\nA. 保留选项。\n\nB. 独立审计。",
-            },
-            {"physical_page": 2, "source_pdf_physical_page": 24, "text": ""},
-        ],
-    }
-
-
-def test_real_source_pages_and_blank(tmp_path):
-    r = request(tmp_path)
-    r["pagination"]["font_fit"] = True
-    generate(r)
-    report = json.loads((tmp_path / "out/pagination-report.json").read_text())
-    assert report["verified"]
-    assert [g["output_pages"] for g in report["groups"]] == [[1], [2]]
-    d = Document(tmp_path / "out/document.docx")
-    assert r["title"] not in "\n".join(p.text for p in d.paragraphs)
-    assert json.loads((tmp_path / "out/layout-validation.json").read_text())["content_equal"]
-
-
-def test_real_overflow_conflict_and_explicit_continuation(tmp_path):
-    r = request(
-        tmp_path, "\n\n".join("合成超长材料" + str(i) + "。" + "长段落完整保留。" * 15 for i in range(70))
-    )
-    with pytest.raises(ValueError, match="SOURCE_PAGE_OVERFLOW"):
-        generate(r)
-    report = json.loads((tmp_path / "out/pagination-report.json").read_text())
-    assert report["groups"][0]["attempts"][-1]["actual_output_pages"] > 1
-    r["pagination"]["allow_continuation"] = True
-    generate(r)
-    report = json.loads((tmp_path / "out/pagination-report.json").read_text())
-    assert report["verified"] and len(report["groups"][0]["output_pages"]) > 1
-
-
-def test_real_question_tables_keep_text_and_mapping(tmp_path):
-    r = request(tmp_path, "1. 合成完整题干，明确四个选项。\n\nA. 甲。\nB. 乙。\nC. 丙。\nD. 丁。")
-    generate(r)
-    report = json.loads((tmp_path / "out/pagination-report.json").read_text())
-    assert report["verified"] and report["groups"][0]["output_pages"] == [1]
-    checks = json.loads((tmp_path / "out/layout-validation.json").read_text())
-    assert checks["content_equal"]
-
-
-def test_group_order_and_repeated_same_source():
-    a = {"source_pdf_physical_page": 23, "items": [("Normal", "甲")]}
-    groups = group_pages([a, {**a, "items": [("Normal", "乙")]}])
-    assert len(groups) == 1 and len(groups[0]["items"]) == 2
-    with pytest.raises(ValueError, match="ORDER_CONFLICT"):
-        group_pages([a, {**a, "source_pdf_physical_page": 22}])
 
 
 def test_macro_and_entity_rejected(tmp_path):

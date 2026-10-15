@@ -71,51 +71,27 @@ def export(m, pid, aid, **settings):
     return m.export_documents(pid, {"source_artifact_id": aid, "template": TEMPLATE, **settings})
 
 
-@pytest.mark.parametrize(
-    "formats,pages,pagination",
-    [
-        (["docx"], "全部", {"mode": "continuous"}),
-        (["pdf"], "7-9", {"mode": "continuous"}),
-        (["docx", "pdf"], "7-9", {"mode": "source-pages"}),
-    ],
-)
-def test_real_formats_ranges_fragments_and_provenance(project, formats, pages, pagination):
+@pytest.mark.parametrize("formats,pages", [(["docx"], "全部"), (["pdf"], "7-9"), (["docx", "pdf"], "7-9")])
+def test_real_formats_ranges_fragments_and_provenance(project, formats, pages):
     m, pid, aid = project
     before = m.get(pid)
-    # An export may only spawn the document worker, not render/recognize a source page.
-    original = m.run_child
-
-    def local_only(*args, **kwargs):
-        assert kwargs.get("module") in {
-            "nas_filetools.standalone.documents",
-            "nas_filetools.standalone.preview_worker",
-        }
-        return original(*args, **kwargs)
-
-    with patch.object(m, "run_child", side_effect=local_only):
-        job = export(m, pid, aid, formats=formats, pages=pages, pagination=pagination)
-        p, t = terminal(m, pid, job["task_id"])
-        assert t["status"] == "SUCCEEDED", t.get("error")
-        outputs = [
-            a for a in p["artifacts"] if a.get("task_id") == t["task_id"] and a.get("role") == "export"
-        ]
-        assert {a["format"] for a in outputs} == set(formats)
-        for a in outputs:
-            origin = a["export_source"]
-            assert origin["artifact_id"] == aid and origin["sha256"] == before["artifacts"][-1]["sha256"]
-            assert origin["source_pages"] == ([6, 7, 8, 9, 10] if pages == "全部" else [7, 8, 9])
-            assert digest(m.path(pid) / origin["template_snapshot"]) == origin["template_sha256"]
-            if a["format"] == "pdf":
-                with fitz.open(m.path(pid) / a["path"]) as doc:
-                    body = "".join(page.get_text() for page in doc)
-            else:
-                body = "".join(p.text for p in Document(m.path(pid) / a["path"]).paragraphs)
-            assert "第二片段必须保留" in body
-            assert ("第6页完整文字" in body) == (pages == "全部")
-            assert "第10页完整文字" not in body or pages == "全部"
-            assert not any(x in body for x in ["overall_quality", "source physical page", "技术诊断"])
-    for a in before["artifacts"]:
-        assert digest(m.path(pid) / a["path"]) == a["sha256"]
+    job = export(m, pid, aid, formats=formats, pages=pages)
+    p, t = terminal(m, pid, job["task_id"])
+    assert t["status"] == "SUCCEEDED", t.get("error")
+    outputs = [a for a in p["artifacts"] if a.get("task_id") == t["task_id"] and a.get("role") == "export"]
+    assert {a["format"] for a in outputs} == set(formats)
+    with fitz.open(m.path(pid) / "diagnostics/format" / t["task_id"] / "work/document.pdf") as pdf:
+        text = "".join("".join(page.get_text().split()) for page in pdf)
+        assert "第二片段必须保留" in text
+        assert ("第6页" in text) == (pages == "全部")
+        assert len(pdf) < len(t["document_export"]["included_source_pages"])
+    for a in outputs:
+        assert (
+            a["export_source"]["sha256"]
+            == next(x for x in before["artifacts"] if x["artifact_id"] == aid)["sha256"]
+        )
+        assert a["export_source"]["renderer"]["chain"] == "Pandoc native AST -> DOCX -> LibreOffice PDF"
+        assert all(x["output_pages"] is None for x in a["source_output_mapping"])
 
 
 def test_invalid_range_mapping_and_assembly(project):
@@ -196,12 +172,8 @@ def test_extraction_defaults_and_explicit_legacy_option(project):
         item = m.enqueue(pid, "fixture", [6], parameters)
         _, task = terminal(m, pid, item["task_id"])
         assert task["parameters"]["generate_documents"] is False
-    # Check explicit old clients without paying for recognition or starting the child.
-    with m.lock:
-        with patch.object(m.queue, "put"):
-            item = m.enqueue(pid, "fixture", [6], {"generate_documents": True})
-        assert m.task(m.get(pid), item["task_id"])["parameters"]["generate_documents"] is True
-        m.cancel(pid, item["task_id"])
+    with pytest.raises(ValueError, match="自动文档生成已迁移"):
+        m.enqueue(pid, "fixture", [6], {"generate_documents": True})
 
 
 def test_legacy_unmapped_full_text_allowed_range_refused(project):

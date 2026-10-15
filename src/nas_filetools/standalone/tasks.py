@@ -20,9 +20,7 @@ from ..artifact_project import (
     page_data,
     register_artifact,
     relative,
-    snapshot_template,
 )
-from ..document_templates import TEMPLATE_ROOT
 from .scoped_child import StandaloneChild
 from ..publication import publish
 from .config import snapshot
@@ -32,6 +30,7 @@ from .text_revisions import TextRevisions
 from .template_library import TemplateLibrary
 from .naming import decorate
 from .content_structure import parse_markdown, reading_html
+from .content_marks import ContentMarks
 from .source_quality import migrate
 from .analysis_jobs import AnalysisJobs
 from .engine_settings import EngineSettings
@@ -117,7 +116,9 @@ def inspect_file(path, config):
     return info
 
 
-class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, AnalysisJobs, ArtifactManagement):
+class Projects(
+    ContentMarks, TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, AnalysisJobs, ArtifactManagement
+):
     def __init__(self, root, config, *, start_worker=True):
         self.root = Path(root).resolve()
         self.config = config
@@ -359,6 +360,8 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
             pages = parse_pages(
                 pages, project["source_info"]["units"], self.config["conversion"]["max_selected_pages"]
             )
+            if parameters and parameters.get("generate_documents"):
+                raise ValueError("自动文档生成已迁移，请先提取文字，再使用导出入口提交Pandoc任务")
             tid = str(uuid.uuid4())
             task = {
                 "task_id": tid,
@@ -428,20 +431,17 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
             return {"project_id": pid, "task_id": tid, "retry_pages": pending}
 
     def reformat(self, pid, tid):
-        """Re-publish existing recognition with new documents, without engine calls."""
+        """Legacy endpoint explicitly submits a new Pandoc export of registered text."""
         with self.lock:
             p = self.get(pid)
-            t = self.task(p, tid)
-            if any(x["status"] in ACTIVE for x in p["tasks"]):
-                raise ValueError("active task")
-            if not any(row.get("latest") for row in t["pages"].values()):
-                raise ValueError("no saved recognition results")
-            t.update(status="QUEUED", format_only=True)
-            t.pop("error", None)
-            self.cancels[tid] = threading.Event()
-            self.save(self.path(pid), p)
-            self.queue.put((pid, tid))
-            return {"project_id": pid, "task_id": tid, "engine_calls": 0}
+            candidates = [
+                a
+                for a in p["artifacts"]
+                if a.get("task_id") == tid and a["format"] == "markdown" and not a.get("recycled")
+            ]
+            if not candidates:
+                raise ValueError("no saved recognition results; select registered Markdown")
+            return self.export_documents(pid, {"source_artifact_id": candidates[-1]["artifact_id"]})
 
     def rename(self, pid, name):
         if not isinstance(name, str) or not name.strip() or len(name) > 200:
@@ -553,7 +553,6 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
             "PYTHONDONTWRITEBYTECODE": "1",
             "OMP_NUM_THREADS": str(engine["cpu_threads"]),
             "OPENBLAS_NUM_THREADS": str(engine["cpu_threads"]),
-            "PLAYWRIGHT_BROWSERS_PATH": os.environ.get("PLAYWRIGHT_BROWSERS_PATH", "/opt/filetools-browsers"),
         }
         if secret is not None:
             env["FILETOOLS_ENGINE_CREDENTIAL"] = secret
@@ -577,10 +576,7 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
             last_progress, progress_at = None, 0
             try:
                 while child.process.poll() is None:
-                    if (
-                        request.get("export_mode") == "markdown-direct"
-                        and time.monotonic() - progress_at > 0.5
-                    ):
+                    if request.get("export_mode") == "pandoc" and time.monotonic() - progress_at > 0.5:
                         progress_at = time.monotonic()
                         progress_file = result.parent / "progress.json"
                         if progress_file.is_file():
@@ -591,7 +587,8 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
                                     folder = result.parents[4]
                                     p = self.get(folder.name)
                                     task = self.task(p, result.parents[1].name)
-                                    task["direct_progress"] = progress
+                                    task["export_progress"] = progress
+                                    task["phase"] = progress.get("phase", "generation")
                                     report_file = result.parent / "pagination-report.json"
                                     if report_file.is_file():
                                         task["direct_report"] = json.loads(report_file.read_text())
@@ -860,6 +857,9 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
                     "status": row["status"],
                     "text": text,
                     "blocks": blocks,
+                    "derived_structure": parse_markdown(
+                        text, {"source_physical_page": n, "coordinates": None}
+                    ),
                     "input": result.get("input"),
                     "error": result.get("error"),
                     "diagnostic": row.get("latest", {}).get("result"),
@@ -884,50 +884,6 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
         atomic(work / "quality.json", quality)
         files = ["content.md", "structure.json", "quality.json"]
         format_error = None
-        if t["parameters"]["generate_documents"] and any(page["text"] for page in pages):
-            try:
-                result = self.run_child(
-                    {
-                        "operation": "documents",
-                        "pages": pages,
-                        "title": p["name"],
-                        "template": t["template"],
-                        "template_data": self.library.load(t["template"]["id"], t["template"]["version"]),
-                        "output": str(work),
-                        "engine": {"cpu_threads": 2},
-                    },
-                    work / "generation-result.json",
-                    60,
-                    self.cancels[tid],
-                    module="nas_filetools.standalone.documents",
-                )
-                if result["status"] != "SUCCEEDED":
-                    raise ValueError("DOCUMENT_GENERATION_FAILED")
-                files += [
-                    "document.docx",
-                    "document.pdf",
-                    "content-structure.json",
-                    "layout-validation.json",
-                    "generation-result.json",
-                ]
-                choice = t["template"]
-                if not any(
-                    x["id"] == choice["id"] and x["version"] == choice["version"] for x in p["templates"]
-                ):
-                    snapshot_template(
-                        root,
-                        p,
-                        TEMPLATE_ROOT / "published" / choice["id"] / (choice["version"] + ".json"),
-                        template_id=choice["id"],
-                        version=choice["version"],
-                    )
-            except Exception as exc:
-                format_error = {
-                    "category": "local",
-                    "stage": "generation",
-                    "code": type(exc).__name__,
-                    "message": "Word/PDF not available; raw Markdown and source mapping retained.",
-                }
         artifacts = publish(
             work, run, [{"artifact_id": str(uuid.uuid4()), "kind": "output", "file": file} for file in files]
         )
@@ -1007,6 +963,8 @@ class Projects(TextRevisions, SourcePreviewJobs, PreviewJobs, FormatJobs, Analys
             emit_viewer(root, latest)
             self.save(root, latest)
         for artifact in latest["artifacts"]:
+            if artifact["artifact_id"] in created and artifact["format"] == "markdown":
+                self.identify_marks(pid, artifact["artifact_id"])
             if artifact["artifact_id"] in created and artifact["format"] in {"docx", "pdf"}:
                 self.preview(pid, artifact["artifact_id"])
 

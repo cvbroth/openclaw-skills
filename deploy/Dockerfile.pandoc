@@ -1,0 +1,14 @@
+# FileTools Pandoc export runtime. Build context includes the fixed official release tarball.
+# Download: https://github.com/jgm/pandoc/releases/download/3.6.4/pandoc-3.6.4-linux-amd64.tar.gz
+ARG BASE_IMAGE=filetools-http-dev:reading-pdf-20261012
+FROM ${BASE_IMAGE}
+USER root
+COPY pandoc-3.6.4.tar.gz /tmp/pandoc.tar.gz
+RUN echo '5def6e1ff535e397becce292ee97767a947306150b9fb1488003b67ac3417c5e  /tmp/pandoc.tar.gz' | sha256sum -c - \
+    && tar -xzf /tmp/pandoc.tar.gz -C /opt \
+    && ln -s /opt/pandoc-3.6.4/bin/pandoc /usr/local/bin/pandoc \
+    && pandoc --version | head -1 \
+    && /opt/nas-filetools/.venv/bin/python -m pip uninstall -y playwright \
+    && rm -rf /opt/filetools-browsers /tmp/pandoc.tar.gz
+ENV HOME=/tmp PYTHONDONTWRITEBYTECODE=1
+USER 1000:1000

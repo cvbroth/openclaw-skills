@@ -12,7 +12,17 @@ class RichText(str):
         obj.safe_html = "".join(
             ("<b>" if r.get("bold") else "")
             + ("<i>" if r.get("italic") else "")
-            + html.escape(r["text"]).replace("\n", "<br>")
+            + (
+                '<img src="'
+                + html.escape(r["image"], quote=True)
+                + '" alt="'
+                + html.escape(r["text"], quote=True)
+                + '">'
+                if r.get("image")
+                else (('<a href="' + html.escape(r["href"], quote=True) + '">') if r.get("href") else "")
+                + html.escape(r["text"]).replace("\n", "<br>")
+                + ("</a>" if r.get("href") else "")
+            )
             + ("</i>" if r.get("italic") else "")
             + ("</b>" if r.get("bold") else "")
             for r in runs
@@ -38,21 +48,58 @@ class RichText(str):
 def parse_markdown(text, source=None):
     from markdown_it import MarkdownIt
 
-    parser = MarkdownIt("commonmark", {"html": False, "breaks": True})
-    tokens = parser.parse(text)
+    from .markdown_rules import preserve_question_numbers
+
+    parser = MarkdownIt("commonmark", {"html": True, "breaks": True}).enable("table")
+    tokens = parser.parse(preserve_question_numbers(text))
     blocks, diagnostics, stack = [], [], []
     style = "Normal"
     quote_depth = 0
+    table_records = __import__(__package__ + ".table_structure", fromlist=["tables"]).tables(text)
+    table_by_line = {t["source_lines"][0]: t for t in table_records}
+    skip_until = -1
     # Recognize real table grammar, including matching columns and escaped pipes.
     # Ordinary pipes (including Setext headings) are reader text, not table evidence.
-    table_probe = MarkdownIt("commonmark", {"html": False}).enable("table")
-    if any(t.type == "table_open" for t in table_probe.parse(text)):
-        diagnostics.append({"code": "POSSIBLE_TABLE_PRESERVED_AS_TEXT"})
     bold = italic = 0
+    href = None
     marker = ""
     depth = 0
     lines = text.splitlines()
     for t in tokens:
+        if t.map and t.map[0] < skip_until:
+            continue
+        if t.map and t.map[0] in table_by_line:
+            record = table_by_line[t.map[0]]
+            skip_until = record["source_lines"][1]
+            if record.get("error"):
+                diagnostics.append({"code": "TABLE_NEEDS_REVIEW", "reason": record["error"]})
+                blocks.append(
+                    {
+                        "id": record["id"],
+                        "type": "literal",
+                        "style": "Code",
+                        "text": record["original"],
+                        "runs": [{"text": record["original"]}],
+                        "source_lines": record["source_lines"],
+                        "raw": record["original"],
+                        "source": source,
+                    }
+                )
+            else:
+                blocks.append(
+                    {
+                        "id": record["id"],
+                        "type": "table",
+                        "style": "Table",
+                        "text": "\n".join(c["text"] for c in record["model"]["cells"]),
+                        "runs": [{"text": "\n".join(c["text"] for c in record["model"]["cells"])}],
+                        "table": record["model"],
+                        "safe_html": record["html"],
+                        "source_lines": record["source_lines"],
+                        "source": source,
+                    }
+                )
+            continue
         if t.type in ("bullet_list_open", "ordered_list_open"):
             stack.append(t.type)
             depth += 1
@@ -82,7 +129,9 @@ def parse_markdown(text, source=None):
                     italic += 1
                 elif child.type == "em_close":
                     italic -= 1
-                elif child.type in ("softbreak", "hardbreak"):
+                elif child.type in ("softbreak", "hardbreak") or (
+                    child.type == "html_inline" and re.fullmatch(r"<br\s*/?>", child.content, re.I)
+                ):
                     runs.append({"text": "\n", "bold": bool(bold), "italic": bool(italic)})
                 elif child.type in ("text", "code_inline", "html_inline", "image"):
                     runs.append(
@@ -91,22 +140,29 @@ def parse_markdown(text, source=None):
                             "bold": bool(bold),
                             "italic": bool(italic),
                             "code": child.type == "code_inline",
+                            **({"href": href} if href else {}),
+                            **({"image": child.attrs.get("src")} if child.type == "image" else {}),
                         }
                     )
                     if child.type == "image":
                         diagnostics.append(
                             {
-                                "code": "IMAGE_REFERENCE_NOT_RENDERED",
+                                "code": "IMAGE_REFERENCE_LOCAL",
+                                "supported": True,
                                 "source_lines": t.map,
                                 "content": child.content,
                                 "reference": child.attrs.get("src"),
                             }
                         )
                 elif child.type in ("link_open", "link_close"):
+                    if child.type == "link_close":
+                        href = None
                     if child.type == "link_open":
+                        href = child.attrs.get("href")
                         diagnostics.append(
                             {
-                                "code": "LINK_DISPLAY_TEXT_ONLY",
+                                "code": "LINK_PRESERVED",
+                                "supported": True,
                                 "source_lines": t.map,
                                 "reference": child.attrs.get("href"),
                             }
@@ -184,6 +240,9 @@ def reading_html(model):
     # Allowlisted generated tags only. Literal code/HTML is escaped as document text.
     output = []
     for b in model["blocks"]:
+        if b["type"] == "table":
+            output.append(b["safe_html"])
+            continue
         tag = "h" + b["style"][-1] if b["type"] == "heading" else "p"
         classes = []
         if b.get("quote_depth"):

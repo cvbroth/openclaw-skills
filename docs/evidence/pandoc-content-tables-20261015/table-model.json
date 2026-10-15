@@ -1,0 +1,358 @@
+{
+  "rows": 6,
+  "columns": 10,
+  "cells": [
+    {
+      "row": 0,
+      "column": 0,
+      "text": "对象",
+      "rowspan": 2,
+      "colspan": 1,
+      "header": true
+    },
+    {
+      "row": 0,
+      "column": 1,
+      "text": "分组甲",
+      "rowspan": 1,
+      "colspan": 3,
+      "header": true
+    },
+    {
+      "row": 0,
+      "column": 4,
+      "text": "分组乙",
+      "rowspan": 1,
+      "colspan": 3,
+      "header": true
+    },
+    {
+      "row": 0,
+      "column": 7,
+      "text": "分组丙",
+      "rowspan": 1,
+      "colspan": 3,
+      "header": true
+    },
+    {
+      "row": 1,
+      "column": 1,
+      "text": "C1",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": true
+    },
+    {
+      "row": 1,
+      "column": 2,
+      "text": "C2",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": true
+    },
+    {
+      "row": 1,
+      "column": 3,
+      "text": "C3",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": true
+    },
+    {
+      "row": 1,
+      "column": 4,
+      "text": "C1",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": true
+    },
+    {
+      "row": 1,
+      "column": 5,
+      "text": "C2",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": true
+    },
+    {
+      "row": 1,
+      "column": 6,
+      "text": "C3",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": true
+    },
+    {
+      "row": 1,
+      "column": 7,
+      "text": "C1",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": true
+    },
+    {
+      "row": 1,
+      "column": 8,
+      "text": "C2",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": true
+    },
+    {
+      "row": 1,
+      "column": 9,
+      "text": "C3",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": true
+    },
+    {
+      "row": 2,
+      "column": 0,
+      "text": "S1",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 2,
+      "column": 1,
+      "text": "3",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 2,
+      "column": 2,
+      "text": "0",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 2,
+      "column": 3,
+      "text": "1",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 2,
+      "column": 4,
+      "text": "2",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 2,
+      "column": 5,
+      "text": "3",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 2,
+      "column": 6,
+      "text": "0",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 3,
+      "column": 0,
+      "text": "S2",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 3,
+      "column": 1,
+      "text": "0",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 3,
+      "column": 2,
+      "text": "1",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 3,
+      "column": 3,
+      "text": "2",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 3,
+      "column": 4,
+      "text": "3",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 3,
+      "column": 5,
+      "text": "0",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 3,
+      "column": 6,
+      "text": "1",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 4,
+      "column": 0,
+      "text": "S3",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 4,
+      "column": 1,
+      "text": "1",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 4,
+      "column": 2,
+      "text": "2",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 4,
+      "column": 3,
+      "text": "3",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 4,
+      "column": 4,
+      "text": "0",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 4,
+      "column": 5,
+      "text": "1",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 4,
+      "column": 6,
+      "text": "2",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 5,
+      "column": 0,
+      "text": "S4",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 5,
+      "column": 1,
+      "text": "2",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 5,
+      "column": 2,
+      "text": "3",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 5,
+      "column": 3,
+      "text": "0",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 5,
+      "column": 4,
+      "text": "1",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 5,
+      "column": 5,
+      "text": "2",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 5,
+      "column": 6,
+      "text": "3",
+      "rowspan": 1,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 2,
+      "column": 7,
+      "text": "0",
+      "rowspan": 4,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 2,
+      "column": 8,
+      "text": "2",
+      "rowspan": 4,
+      "colspan": 1,
+      "header": false
+    },
+    {
+      "row": 2,
+      "column": 9,
+      "text": "1",
+      "rowspan": 4,
+      "colspan": 1,
+      "header": false
+    }
+  ]
+}

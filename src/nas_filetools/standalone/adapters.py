@@ -9,7 +9,7 @@ import time
 import urllib.error
 import urllib.request
 
-PROMPT = """按图片阅读顺序逐字转写为Markdown，保留题号、题干、选项、数字和否定词。不解题、不润色、不根据知识纠错、不补全或重编号。难辨处标记【无法辨认】，不得静默跳过。"""
+PROMPT = """按图片阅读顺序逐字转写为Markdown，保留题号、题干、选项、数字和否定词。不解题、不润色、不根据知识纠错、不补全或重编号。难辨处标记【无法辨认】，不得静默跳过。页眉、页脚、原页码全部保留，不在提取阶段删除。普通表格输出规范Markdown表格。复杂表格输出安全HTML table（thead/tbody/tr/th/td及rowspan、colspan），逐格保留空单元格、多级表头、数字与合并关系；不使用额外竖线假装合并。合并关系看不清时不要猜测，在该表附近明确标记【合并关系待复核】，不要补齐缺失数字。"""
 QUALITY_PROMPT = """同时只根据图片可见情况评价原图，不以转写流畅证明清晰。输出严格两个标记段：<transcription_markdown>原样转写</transcription_markdown><quality_json>{"overall_quality":"good|usable_with_defects|poor|undetermined","suggested_action":"keep|check_original|request_clearer_source|undetermined","evidence":["最多3条可对照观察"],"uncertainty_note":"不确定处；这是未经校准的模型自评"}</quality_json>。good为关键正文都可直接辨读；usable_with_defects为局部模糊或缺损需核对；poor为关键文字必须猜测而无法可靠辨读；观察或输入不足为undetermined。无法辨认处在正文明确标记，不允许凭常识补字再反推原图清晰。"""
 
 

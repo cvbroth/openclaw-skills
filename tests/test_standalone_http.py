@@ -108,12 +108,25 @@ class HTTPTests(unittest.TestCase):
         p, t = self.terminal(item)
         old_ids = {a["artifact_id"] for a in p["artifacts"]}
         before = t["pages"]["1"]["attempts"]
-        self.request(f"/api/projects/{item['project_id']}/tasks/{item['task_id']}/format", "POST", {})
-        p, t = self.terminal(item)
-        self.assertEqual(t["status"], "SUCCEEDED")
-        self.assertEqual(before, t["pages"]["1"]["attempts"])
-        self.assertEqual(len(t["result_versions"]), 2)
+        exported = self.request(
+            f"/api/projects/{item['project_id']}/tasks/{item['task_id']}/format", "POST", {}
+        )
+        p, generated = self.terminal(exported)
+        self.assertEqual(generated["status"], "SUCCEEDED", generated.get("error"))
+        old = self.m.task(p, item["task_id"])
+        self.assertEqual(before, old["pages"]["1"]["attempts"])
+        self.assertEqual(len(old["result_versions"]), 1)
+        self.assertEqual(len(generated["result_versions"]), 1)
+        self.assertEqual(generated["document_export"]["mode"], "pandoc")
         self.assertTrue(old_ids <= {a["artifact_id"] for a in p["artifacts"]})
+        self.assertEqual(
+            {
+                a["format"]
+                for a in p["artifacts"]
+                if a.get("task_id") == generated["task_id"] and a.get("role") == "export"
+            },
+            {"docx", "pdf"},
+        )
 
     def test_upload_convert_download_and_versions(self):
         item = self.upload()
@@ -335,7 +348,9 @@ class HTTPTests(unittest.TestCase):
         import http.client
 
         limits = self.request("/api/limits")
-        self.assertEqual(limits, {"upload_bytes": 536870912, "max_pdf_pages": 1000, "max_selected_pages": 1000})
+        self.assertEqual(
+            limits, {"upload_bytes": 536870912, "max_pdf_pages": 1000, "max_selected_pages": 1000}
+        )
         raw = self.image.read_bytes()
         self.config["service"]["upload_bytes"] = len(raw)
         accepted = self.upload()
@@ -454,27 +469,20 @@ class HTTPTests(unittest.TestCase):
 class AdapterTests(unittest.TestCase):
     def test_formatter_verbatim_preservation_and_native_boundaries(self):
         from nas_filetools.standalone import documents
-        from unittest.mock import patch
+        from test_pandoc_workflow import direct_request
         import fitz
 
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
-            font = root / "font.ttf"
-            font.write_bytes(fitz.Font("cjk").buffer)
             text = "\n".join("未确认结构的长正文，保留换行与原文。" for _ in range(90))
-            with patch.object(documents, "FONT_PATH", font):
-                documents.generate(
-                    {
-                        "output": str(root),
-                        "template": {"id": "questions-zh-cn", "version": "1.0.0"},
-                        "title": "合成格式验收",
-                        "pages": [{"physical_page": 1, "text": text}],
-                    }
-                )
+            documents.generate(direct_request(root, text))
             check = json.loads((root / "layout-validation.json").read_text())
             self.assertTrue(check["content_equal"])
-            self.assertTrue(check["native_layout_boundaries"]["passed"])
-            self.assertFalse(check["quality_and_comments_in_body"])
+            self.assertTrue(check["pdf_character_inventory_equal"])
+            with fitz.open(root / "document.pdf") as pdf:
+                self.assertGreater(len(pdf), 1)
+                self.assertTrue(all(p.get_text().strip() for p in pdf))
+                self.assertEqual(sum(p.get_text().count("未确认结构的长正文") for p in pdf), 90)
 
     def test_config_errors(self):
         data = configuration()

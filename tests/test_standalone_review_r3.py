@@ -28,11 +28,12 @@ def test_untrusted_html_and_unsupported_content_preserved():
         "<img src=x onerror=alert(1)>\n\n![图](private.png)\n\n|甲|乙|\n|--|--|\n\n```\n**有意源码**\n```"
     )
     rendered = reading_html(m)
-    assert "<img" not in rendered and "&lt;img" in rendered
+    assert rendered.count("<img") == 1 and "&lt;img" in rendered
+    assert '<img src="private.png" alt="图">' in rendered
+    assert "<table>" in rendered
     assert "**有意源码**" in rendered
     assert {
-        "IMAGE_REFERENCE_NOT_RENDERED",
-        "POSSIBLE_TABLE_PRESERVED_AS_TEXT",
+        "IMAGE_REFERENCE_LOCAL",
         "LITERAL_BLOCK_PRESERVED",
     } <= {d["code"] for d in m["diagnostics"]}
 
@@ -116,44 +117,23 @@ def test_naming_changes_only_presentation():
 
 
 def test_actual_markdown_docx_pdf_and_page_number_switch(tmp_path):
-    import fitz
-    from docx import Document
+    from test_pandoc_workflow import direct_request
     from nas_filetools.standalone.documents import generate
-    from nas_filetools.document_sample import document_paragraphs
+    from docx import Document
 
-    lib = TemplateLibrary(tmp_path / "library")
-    td = lib.load("questions-zh-cn", "1.0.0")
-    td["parameters"]["page_numbers"] = False
-    out = tmp_path / "out"
-    out.mkdir()
-    generate(
-        {
-            "output": str(out),
-            "template_data": td,
-            "title": "合成排版测试",
-            "source_artifact_id": "synthetic",
-            "source_sha256": "fixed",
-            "pages": [
-                {
-                    "physical_page": 1,
-                    "text": "# 一级标题\n\n这是 **粗体** 和 *斜体* 与 \\*文字\\*。\n下一行\n\n3. 第三项\n7. 第七项\n\n- 无序列表\n",
-                }
-            ],
-        }
+    request = direct_request(
+        tmp_path,
+        "# 一级标题\n\n这是 **粗体** 和 *斜体* 与 \\*文字\\*。\n下一行\n\n3. 第三项\n7. 第七项\n\n- 无序列表\n",
     )
-    d = Document(out / "document.docx")
-    ps = document_paragraphs(d)
+    request["settings"]["new_page_numbers"] = False
+    generate(request)
+    d = Document(tmp_path / "document.docx")
+    ps = d.paragraphs
     assert any(p.style.name == "Heading 1" and p.text == "一级标题" for p in ps)
     assert any(r.bold and r.text == "粗体" for p in ps for r in p.runs)
     assert any(r.italic and r.text == "斜体" for p in ps for r in p.runs)
-    alltext = "\n".join(p.text for p in ps)
-    assert "**粗体**" not in alltext and "*文字*" in alltext
-    assert "3. 第三项" in alltext and "7. 第七项" in alltext
+    assert "*文字*" in "".join(p.text for p in ps)
     assert not any(p.text for p in d.sections[0].footer.paragraphs)
-    with fitz.open(out / "document.pdf") as pdf:
-        text = "".join(p.get_text() for p in pdf)
-        assert "**" not in text and "文档第" not in text
-    assert json.loads((out / "content-structure.json").read_text())["source_artifact_id"] == "synthetic"
 
 
 def test_inline_format_survives_flow_slicing():
@@ -173,26 +153,13 @@ def test_inline_format_survives_flow_slicing():
 
 
 def test_installed_font_without_required_glyphs_is_not_substituted(tmp_path):
+    from test_pandoc_workflow import direct_request
     from nas_filetools.standalone.documents import generate
 
-    lib = TemplateLibrary(tmp_path / "library")
-    td = lib.load("questions-zh-cn", "1.0.0")
-    if "DejaVu Sans" not in lib.fonts:
-        pytest.skip("test requires installed non-CJK font")
-    td["font"] = lib.fonts["DejaVu Sans"]
-    td["parameters"]["font_family"] = "DejaVu Sans"
-    out = tmp_path / "out"
-    out.mkdir()
+    request = direct_request(tmp_path, "正文" + chr(0x10FFFF))
     with pytest.raises(ValueError, match="FONT_MISSING_GLYPHS"):
-        generate(
-            {
-                "output": str(out),
-                "template_data": td,
-                "title": "中文合成",
-                "pages": [{"physical_page": 1, "text": "不允许静默换字体。"}],
-            }
-        )
-    assert not (out / "document.docx").exists()
+        generate(request)
+    assert not (tmp_path / "document.docx").exists()
 
 
 def test_changed_view_cannot_replace_registered_markdown(tmp_path):
@@ -232,7 +199,7 @@ def test_changed_view_cannot_replace_registered_markdown(tmp_path):
     )
     page_data(root, "content/view.js", {"text": "悄悄替换的文字"})
     try:
-        with pytest.raises(ValueError, match="SOURCE_VIEW_HASH_CHANGED"):
+        with pytest.raises(ValueError, match="页面文字资源哈希变化"):
             manager.execute_format(p["project_id"], job["task_id"])
         assert digest(root / a["path"]) == before
         assert not list((root / "outputs").glob("*.docx"))

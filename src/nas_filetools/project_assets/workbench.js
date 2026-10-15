@@ -9,6 +9,7 @@ function openAuxPanel(group='comments'){
  if(group==='comments')$('#commentPanel').open=true;
  if(group==='technical'){document.querySelector('.technical').open=true;updateTechnical();}
  if(group==='versions')loadHistory();
+ if(['marks','tables'].includes(group)&&typeof loadContentTools==='function')loadContentTools(group);
 }
 function closeAuxPanel(){let current=paneScroll(),restore=current.map((p,i)=>panelScroll?.clamped&&p.top===panelScroll.clamped[i].top&&p.left===panelScroll.clamped[i].left?panelScroll.before[i]:p);layoutChange(()=>{document.body.classList.remove('aux-open');$('#auxPanel').hidden=true;$('#toggleAux').setAttribute('aria-expanded','false');},restore);panelScroll=null;}
 $('#toggleAux').onclick=()=>$('#auxPanel').hidden?openAuxPanel():closeAuxPanel();

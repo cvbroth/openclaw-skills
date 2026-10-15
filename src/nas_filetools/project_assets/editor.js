@@ -80,13 +80,13 @@ $('#restoreForEdit').onclick=()=>restoreText(artifact('right').artifact_id,true)
 // Guard right-side object changes before replacing the editor; left navigation stays independent.
 for(let id of ['rightArtifact','rightPosition','commentFilter','errorFilter','markdownMode']){
  let control=$('#'+id),handler=control.onchange;control.onchange=async event=>{let next=control.value,old=id==='rightArtifact'?displayed.aid:id==='rightPosition'?displayed.index:control.dataset.previous;
-  if(editDirty){if(old!==undefined)control.value=old;if(!await chooseDirty()){compactLabels();return;}control.value=next;}
+  if(editDirty||(typeof tableDraft!=='undefined'&&tableDraft?.dirty)){if(old!==undefined)control.value=old;if(!await chooseDirty()){compactLabels();return;}control.value=next;}
   editing=false;if(id==='rightPosition'){sourceReading.active=false;sourceReading.selected=null;positions('right');control.value=next;}if(id==='rightArtifact')sourceReading.selected=null;if(id==='rightArtifact'&&artifact('right').format!=='markdown'){sourceReading.active=false;sourceReading.selected=null;}handler?.call(control,event);control.dataset.previous=control.value;
  };control.dataset.previous=control.value;
 }
 const originalRefresh=refresh;refresh=function(side){originalRefresh(side);if(!side||side==='right')editorPending=updateEditor();};
-window.addEventListener('beforeunload',e=>{if(editDirty){e.preventDefault();e.returnValue='';}});
-$('#back').addEventListener('click',async e=>{if(editBusy){e.preventDefault();state('正在保存，请稍候再离开。');return;}if(editDirty){let href=e.currentTarget.href;e.preventDefault();if(await chooseDirty())location.href=href;}});
+window.addEventListener('beforeunload',e=>{if(editDirty||(typeof tableDraft!=='undefined'&&tableDraft?.dirty)){e.preventDefault();e.returnValue='';}});
+$('#back').addEventListener('click',async e=>{if(editBusy){e.preventDefault();state('正在保存，请稍候再离开。');return;}if(editDirty||(typeof tableDraft!=='undefined'&&tableDraft?.dirty)){let href=e.currentTarget.href;e.preventDefault();if(await chooseDirty())location.href=href;}});
 updateEditor();
 
 for(let side of ['left','right'])$('#'+side+'PageInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();jump(side,e.target.value);}};

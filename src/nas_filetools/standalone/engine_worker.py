@@ -16,25 +16,44 @@ def main():
 
             with fitz.open(request["source"]) as doc:
                 page = doc[request["physical_page"] - 1]
-                text = page.get_text("text", sort=False)
-                native = page.get_text("blocks", sort=False)
+                from .pdf_tables import extract
+
+                extracted = extract(page, request["physical_page"])
+                text = extracted["text"]
+                native = extracted["native_blocks"]
                 result = {
-                    "status": "SUCCEEDED",
+                    "status": "PARTIAL" if extracted["issues"] else "SUCCEEDED",
                     "text": text,
                     "quality": None,
-                    "error": None,
+                    "error": {
+                        "category": "local",
+                        "stage": "table_structure",
+                        "code": "TABLE_STRUCTURE_REVIEW",
+                        "message": "；".join(i["reason"] for i in extracted["issues"]),
+                    }
+                    if extracted["issues"]
+                    else None,
                     "usage": None,
                     "raw_response": None,
                     "input": {
                         "source_sha256": digest(request["source"]),
                         "physical_page": request["physical_page"],
                         "page_size_pt": list(page.rect[2:]),
+                        "rotation": page.rotation,
+                        "cropbox": list(page.cropbox),
                     },
                     "native": {
                         "blocks": native,
-                        "order": "PDF native order; not guaranteed logical reading order",
+                        "order": extracted["order"],
+                        "tables": extracted["tables"],
+                        "table_issues": extracted["issues"],
                     },
                     "blocks": [
+                        {**block, "id": f"p{request['physical_page']}-b{i + 1:04d}"}
+                        for i, block in enumerate(extracted.get("semantic_blocks", []))
+                    ]
+                    if extracted.get("semantic_blocks")
+                    else [
                         {
                             "id": f"p{request['physical_page']}-b{i + 1:04d}",
                             "type": "text",
